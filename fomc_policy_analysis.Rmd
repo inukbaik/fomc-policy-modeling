@@ -1,0 +1,1983 @@
+---
+title: "Modeling the Federal Funds Target and Monetary Policy Using Macroeconomic Indicators"
+author: "Inuk Baik, Asal Delkhosh, Zihong Xiong"
+date: "2026-04-22"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = TRUE,
+  message = FALSE,
+  warning = FALSE
+)
+```
+
+# Setup
+
+```{r}
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(glmnet)
+library(tseries)
+library(zoo)
+library(cluster)
+library(strucchange)
+library(randomForest)
+library(xgboost)
+library(nnet)
+library(purrr)
+library(broom)
+library(corrplot)
+library(caret)
+library(factoextra)
+```
+
+# Load Data
+
+```{r}
+set.seed(597)
+df_raw <- read.csv("fed_funds_raw.csv")
+
+dim(df_raw)
+colnames(df_raw)
+head(df_raw)
+```
+
+# Initial Data Checks
+
+```{r}
+# missing values by column
+colSums(is.na(df_raw))
+
+# duplicated rows
+sum(duplicated(df_raw))
+
+# blank strings in character columns
+sapply(df_raw[, sapply(df_raw, is.character), drop = FALSE], function(x) sum(trimws(x) == ""))
+
+# check whether date conversion may fail
+if ("date" %in% names(df_raw)) {
+  sum(is.na(as.Date(df_raw$date)))
+  range(as.Date(df_raw$date), na.rm = TRUE)
+}
+
+# look for columns with only one unique value
+sapply(df_raw, function(x) length(unique(x[!is.na(x)])))
+
+# check for infinite values in numeric columns
+sapply(df_raw[, sapply(df_raw, is.numeric), drop = FALSE], function(x) sum(is.infinite(x)))
+
+# inspect suspicious numeric ranges
+summary(df_raw[, sapply(df_raw, is.numeric), drop = FALSE])
+```
+
+The raw dataset appears structurally sound, with no duplicate rows, no blank character fields, and a valid date range from 1982-09-01 to 2026-03-01. The main issue is missingness across several economic series, particularly JTSJOL, JTSQUR, T5YIE, DTWEXBGS, BAMLH0A0HYM2, and PCEC96. These missing values appear substantial enough to require targeted preprocessing decisions before feature engineering and model fitting.
+
+# Data Cleaning
+
+## Fix Variable Types
+
+```{r}
+df_clean <- df_raw %>%
+  mutate(date = as.Date(date))
+```
+
+The date variable was converted to `Date` format so the dataset could be filtered, joined, and ordered consistently in later preprocessing steps.
+
+## Remove Invalid or Incomplete Observations
+
+```{r}
+df_clean <- df_clean %>%
+  filter(!(date >= as.Date("2026-01-01") & date <= as.Date("2026-03-31")))
+```
+
+Observations from January 2026 through March 2026 were removed because multiple variables were incomplete in that period. Excluding these rows keeps the modeling dataset more consistent.
+
+## Handle Missing Values
+
+```{r}
+df_clean$UNRATE[df_clean$date == as.Date("2025-10-01")] <- mean(
+  c(
+    df_clean$UNRATE[df_clean$date == as.Date("2025-09-01")],
+    df_clean$UNRATE[df_clean$date == as.Date("2025-11-01")]
+  ),
+  na.rm = TRUE
+)
+
+df_clean[df_clean$date %in% as.Date(c("2025-09-01", "2025-10-01", "2025-11-01")),
+         c("date", "UNRATE")]
+```
+
+The missing unemployment rate for October 2025 was filled using the average of the adjacent months, September and November 2025. Since this was an isolated internal missing value, simple interpolation was sufficient.
+
+## Drop or Replace Variables
+
+```{r}
+df_clean <- df_clean %>%
+  select(-PCEC96)
+```
+
+`PCEC96` was removed because related consumption measures were already available in the dataset and this variable added substantial missingness without being central to the final feature set.
+
+```{r}
+wtisplc <- read.csv("WTISPLC.csv") %>%
+  mutate(date = as.Date(date))
+
+df_clean <- df_clean %>%
+  select(-DCOILWTICO) %>%
+  left_join(wtisplc, by = "date")
+```
+
+`DCOILWTICO` was replaced with `WTISPLC`, which captures the same WTI crude oil price concept while providing longer historical coverage.
+
+# Feature Engineering
+
+## Create Derived Variables
+
+```{r}
+df_clean <- df_clean %>%
+  arrange(date) %>%
+  mutate(
+    core_pce_yoy      = 100 * (PCEPILFE / lag(PCEPILFE, 12) - 1),
+    unrate_lag1       = lag(UNRATE, 1),
+    payems_yoy        = 100 * (PAYEMS / lag(PAYEMS, 12) - 1),
+    term_spread_10y_3m = DGS10 - DGS3MO,
+    inflation_gap     = core_pce_yoy - 2
+  )
+```
+
+Several derived variables were created to better capture macroeconomic conditions relevant to policy decisions, including core inflation growth, lagged unemployment, payroll growth, the term spread, and the inflation gap relative to the 2 percent target.
+
+## Create Target-Related Variables
+
+```{r}
+fomc_meetings <- read.csv("fed_meetings.csv") %>%
+  mutate(date = as.Date(date))
+
+fomc_monthly <- fomc_meetings %>%
+  mutate(month = as.Date(format(date, "%Y-%m-01"))) %>%
+  group_by(month) %>%
+  summarise(
+    fomc_meetings    = n(),
+    fomc_scheduled   = sum(is_scheduled, na.rm = TRUE),
+    fomc_unscheduled = sum(!is_scheduled, na.rm = TRUE),
+    .groups = "drop"
+  )
+
+df_clean <- df_clean %>%
+  mutate(month = as.Date(format(date, "%Y-%m-01"))) %>%
+  left_join(fomc_monthly, by = "month") %>%
+  mutate(
+    fomc_meetings    = dplyr::coalesce(fomc_meetings, 0),
+    fomc_scheduled   = dplyr::coalesce(fomc_scheduled, 0),
+    fomc_unscheduled = dplyr::coalesce(fomc_unscheduled, 0)
+  )
+```
+
+Monthly FOMC meeting counts were merged into the main dataset so the analysis could distinguish between months with scheduled meetings, unscheduled meetings, and no meetings.
+
+```{r}
+fomc_dates <- fomc_meetings %>%
+  arrange(date)
+
+df_clean <- df_clean %>%
+  rowwise() %>%
+  mutate(
+    days_since_last_fomc = as.numeric(date - max(fomc_dates$date[fomc_dates$date < date]))
+  ) %>%
+  ungroup() %>%
+  select(-month)
+```
+
+The variable `days_since_last_fomc` was added to measure how much time had passed since the most recent FOMC meeting, providing a simple timing feature related to policy activity.
+
+```{r}
+df_final <- df_clean %>%
+  filter(date >= as.Date("1986-01-01"))
+```
+
+After preprocessing and feature construction, the final working dataset was restricted to the post-1986 period to align with the availability of the selected variables and the scope of the modeling analysis.
+
+# Final Modeling Dataset
+
+The final modeling dataset is obtained after preprocessing, variable replacement, and feature engineering. The sample is restricted to the post-1986 period so that the analysis is based on a more consistent set of available variables. This dataset is used as the input for the remaining exploratory and modeling steps.
+
+```{r}
+dim(df_final)
+head(df_final)
+```
+
+# Exploratory Data Analysis
+
+## Distribution Checks
+
+```{r}
+ggplot(df_final, aes(x = ff_target)) +
+  geom_histogram(bins = 30) +
+  labs(
+    title = "Distribution of Federal Funds Target Rate",
+    x = "Federal Funds Target Rate",
+    y = "Frequency"
+  )
+```
+
+```{r}
+ggplot(df_final, aes(x = date, y = ff_target)) +
+  geom_line() +
+  labs(
+    title = "Federal Funds Target Rate Over Time",
+    x = "Date",
+    y = "Federal Funds Target Rate"
+  )
+```
+
+```{r}
+missing_summary <- colSums(is.na(df_final))
+
+missing_df <- data.frame(
+  Variable = names(missing_summary),
+  Missing_Count = as.numeric(missing_summary)
+) %>%
+  arrange(desc(Missing_Count))
+
+missing_df %>%
+  filter(Missing_Count > 0) %>%
+  ggplot(aes(x = reorder(Variable, Missing_Count), y = Missing_Count)) +
+  geom_col() +
+  coord_flip() +
+  labs(
+    title = "Missing Values by Variable",
+    x = "Variable",
+    y = "Number of Missing Values"
+  )
+```
+
+The distribution of the federal funds target rate and its movement over time were examined to understand the scale and temporal behavior of the response variable. Missing-value patterns were also reviewed to identify whether any variables still contained gaps after preprocessing.
+
+## Relationship Exploration
+
+```{r}
+candidate_vars <- c("UNRATE", "PCEPI", "DGS10", "T10Y3M")
+selected_vars <- candidate_vars[candidate_vars %in% names(df_final)]
+
+if (length(selected_vars) > 0) {
+  df_long <- df_final %>%
+    select(date, all_of(selected_vars)) %>%
+    pivot_longer(-date, names_to = "Variable", values_to = "Value")
+
+  ggplot(df_long, aes(x = date, y = Value)) +
+    geom_line() +
+    facet_wrap(~ Variable, scales = "free_y", ncol = 2) +
+    labs(
+      title = "Selected Predictors Over Time",
+      x = "Date",
+      y = "Value"
+    )
+}
+```
+
+```{r}
+numeric_df <- df_final %>% select(where(is.numeric))
+
+cor_mat <- cor(numeric_df, use = "complete.obs")
+
+cor_long <- as.data.frame(as.table(cor_mat))
+
+ggplot(cor_long, aes(x = Var1, y = Var2, fill = Freq)) +
+  geom_tile() +
+  scale_fill_gradient2(low = "blue", mid = "white", high = "red", midpoint = 0) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  labs(
+    title = "Correlation Heatmap of Numeric Variables",
+    x = "",
+    y = "",
+    fill = "Correlation"
+  )
+```
+
+Selected macroeconomic predictors were examined over time to compare their movement with changes in the policy target. Correlation analysis was also used to identify strong linear relationships among numeric variables, which is useful for understanding redundancy and potential multicollinearity in later modeling steps.
+
+## Key EDA Findings
+
+Overall, the exploratory analysis showed that the dataset is time-ordered and contains variables that vary meaningfully across different monetary policy environments. The federal funds target displays clear changes over time rather than a uniform distribution, and several predictors appear to move in related patterns. The correlation analysis also suggests that some variables are highly related, which supports paying attention to multicollinearity and model flexibility in the later modeling stage.
+
+# Research Question 1
+
+This section studies how the federal funds target is related to selected macroeconomic and financial variables, and whether those relationships remain stable over time.
+
+## Variable Selection
+
+```{r}
+data_rq2 <- df_final %>%
+  arrange(date)
+
+vars <- c(
+  "ff_target",
+  "core_pce_yoy", "inflation_gap",
+  "UNRATE", "payems_yoy",
+  "term_spread_10y_3m", "BAA10Y", "ANFCI",
+  "fomc_meetings", "days_since_last_fomc"
+)
+
+df_full_rq2 <- data_rq2[, vars]
+na_ratio <- colMeans(is.na(df_full_rq2))
+df_clean_rq2 <- df_full_rq2[, na_ratio < 0.2]
+```
+
+```{r}
+x <- model.matrix(ff_target ~ ., df_clean_rq2)[, -1]
+y <- df_clean_rq2$ff_target
+
+lasso <- cv.glmnet(x, y, alpha = 1)
+
+coef(lasso, s = "lambda.min")
+```
+
+Variable selection narrows the model to a smaller set of predictors that appear most relevant to the policy rate.
+
+## Final Regression Dataset
+
+```{r}
+df_reg_rq2 <- data_rq2[, c(
+  "date", "ff_target", "core_pce_yoy", "UNRATE",
+  "term_spread_10y_3m", "BAA10Y", "ANFCI"
+)]
+```
+
+The regression section uses a focused set of explanatory variables rather than the full macro dataset.
+
+## Exploratory Time-Series Checks
+
+```{r}
+plot(df_reg_rq2$date, df_reg_rq2$ff_target, type = "l", main = "Federal Funds Target Rate")
+
+plot(df_reg_rq2$date, df_reg_rq2$core_pce_yoy, type = "l", main = "Core PCE Inflation (YoY %)")
+
+plot(df_reg_rq2$date, df_reg_rq2$UNRATE, type = "l", main = "Unemployment Rate")
+
+plot(df_reg_rq2$date, df_reg_rq2$term_spread_10y_3m, type = "l", main = "Term Spread")
+
+cor(df_reg_rq2[, -1], use = "complete.obs")
+```
+
+These plots and the correlation matrix give a first look at the time-series behavior and cross-variable relationships before formal estimation.
+
+## ADF Tests
+
+```{r}
+adf.test(df_reg_rq2$ff_target)
+adf.test(df_reg_rq2$core_pce_yoy)
+adf.test(df_reg_rq2$UNRATE)
+adf.test(df_reg_rq2$term_spread_10y_3m)
+adf.test(df_reg_rq2$BAA10Y)
+adf.test(df_reg_rq2$ANFCI)
+```
+
+The ADF tests motivate the later robustness checks in differences and the stability analysis.
+
+## Baseline Model
+
+```{r}
+model_baseline <- lm(
+  ff_target ~ core_pce_yoy + UNRATE + term_spread_10y_3m + BAA10Y + ANFCI,
+  data = df_reg_rq2
+)
+
+summary(model_baseline)
+```
+
+The baseline model estimates the full-sample association between the policy rate and the selected explanatory variables.
+
+## Robustness Check 1: Dynamic Model
+
+```{r}
+df_reg_rq2$ff_target_lag1 <- dplyr::lag(df_reg_rq2$ff_target, 1)
+
+model_dyn <- lm(
+  ff_target ~ ff_target_lag1 + core_pce_yoy + UNRATE +
+    term_spread_10y_3m + BAA10Y + ANFCI,
+  data = df_reg_rq2
+)
+
+summary(model_dyn)
+```
+
+The dynamic specification captures persistence in the policy rate through a lagged dependent variable.
+
+## Robustness Check 2: Differenced Model
+
+```{r}
+df_diff <- data.frame(
+  date = df_reg_rq2$date[-1],
+  d_ff = diff(df_reg_rq2$ff_target),
+  d_core_pce = diff(df_reg_rq2$core_pce_yoy),
+  d_unrate = diff(df_reg_rq2$UNRATE),
+  term_spread_10y_3m = df_reg_rq2$term_spread_10y_3m[-1]
+)
+
+model_diff <- lm(
+  d_ff ~ d_core_pce + d_unrate + term_spread_10y_3m,
+  data = df_diff
+)
+
+summary(model_diff)
+```
+
+The first-difference model checks whether the main relationships remain visible when the focus shifts from levels to short-run changes.
+
+## Rolling Coefficient Plots
+
+```{r}
+get_coef <- function(idx) {
+  window_data <- df_reg_rq2[idx, ]
+  coef(lm(
+    ff_target ~ core_pce_yoy + UNRATE +
+      term_spread_10y_3m + BAA10Y + ANFCI,
+    data = window_data
+  ))
+}
+
+roll <- rollapply(
+  data = 1:nrow(df_reg_rq2),
+  width = 60,
+  FUN = get_coef,
+  by = 1,
+  align = "right"
+)
+
+roll <- as.data.frame(roll)
+roll_dates <- df_reg_rq2$date[60:nrow(df_reg_rq2)]
+```
+
+```{r}
+plot(roll_dates, roll$core_pce_yoy, type = "l",
+     main = "Rolling Coefficient: core_pce_yoy",
+     xlab = "Date", ylab = "Coefficient")
+
+plot(roll_dates, roll$UNRATE, type = "l",
+     main = "Rolling Coefficient: UNRATE",
+     xlab = "Date", ylab = "Coefficient")
+
+plot(roll_dates, roll$term_spread_10y_3m, type = "l",
+     main = "Rolling Coefficient: Term Spread",
+     xlab = "Date", ylab = "Coefficient")
+```
+
+Rolling coefficients provide a visual way to assess whether the reaction function changes across different periods.
+
+## Breakpoint Analysis
+
+```{r}
+bp <- breakpoints(
+  ff_target ~ core_pce_yoy + UNRATE +
+    term_spread_10y_3m + BAA10Y + ANFCI,
+  data = df_reg_rq2
+)
+
+summary(bp)
+plot(bp)
+```
+
+```{r}
+confint(bp, breaks = 3)
+
+df_reg_rq2$date[c(198, 274, 387)]
+```
+
+```{r}
+plot(df_reg_rq2$date, df_reg_rq2$ff_target, type = "l")
+abline(v = df_reg_rq2$date[c(198, 274, 387)], col = "red")
+```
+
+This section formally identifies structural break candidates in the relationship between the federal funds target and the explanatory variables.
+
+## Chow Tests
+
+```{r}
+chow_dates <- as.Date(c(
+  "2001-09-01",
+  "2002-06-01",
+  "2008-01-01",
+  "2008-10-01",
+  "2008-11-01",
+  "2018-03-01",
+  "2020-03-01"
+))
+
+for (d in chow_dates) {
+  idx <- which(df_reg_rq2$date == as.Date(d, origin = "1970-01-01"))
+  if (length(idx) > 0) {
+    test <- sctest(
+      ff_target ~ core_pce_yoy + UNRATE +
+        term_spread_10y_3m + BAA10Y + ANFCI,
+      type = "Chow",
+      point = idx,
+      data = df_reg_rq2
+    )
+    cat("Date:", format(as.Date(d, origin = "1970-01-01")),
+        "| F =", round(test$statistic, 2),
+        "| p-value =", format(test$p.value, scientific = TRUE), "\n")
+  }
+}
+```
+
+The Chow tests evaluate whether the regression relationship shifts at both estimated and theory-motivated break dates.
+
+## Sub-Period Regressions
+
+```{r}
+df_reg_rq2$period <- cut(
+  df_reg_rq2$date,
+  breaks = as.Date(c("1986-01-01", "2002-06-01", "2008-10-01", "2018-03-01", "2030-01-01")),
+  labels = c("1986-2002", "2002-2008", "2008-2018", "2018+"),
+  right = FALSE
+)
+
+model_p1 <- lm(ff_target ~ core_pce_yoy + UNRATE + term_spread_10y_3m + BAA10Y + ANFCI,
+               data = subset(df_reg_rq2, period == "1986-2002"))
+model_p2 <- lm(ff_target ~ core_pce_yoy + UNRATE + term_spread_10y_3m + BAA10Y + ANFCI,
+               data = subset(df_reg_rq2, period == "2002-2008"))
+model_p3 <- lm(ff_target ~ core_pce_yoy + UNRATE + term_spread_10y_3m + BAA10Y + ANFCI,
+               data = subset(df_reg_rq2, period == "2008-2018"))
+model_p4 <- lm(ff_target ~ core_pce_yoy + UNRATE + term_spread_10y_3m + BAA10Y + ANFCI,
+               data = subset(df_reg_rq2, period == "2018+"))
+```
+
+```{r}
+models <- list(
+  "1986-2002" = model_p1,
+  "2002-2008" = model_p2,
+  "2008-2018" = model_p3,
+  "2018+" = model_p4
+)
+
+lapply(models, summary)
+```
+
+```{r}
+coef_table <- rbind(
+  "1986-2002" = coef(model_p1),
+  "2002-2008" = coef(model_p2),
+  "2008-2018" = coef(model_p3),
+  "2018+" = coef(model_p4)
+)
+
+coef_table
+```
+
+```{r}
+coef_table <- do.call(rbind, lapply(names(models), function(p) {
+  df <- tidy(models[[p]])
+  df$period <- p
+  return(df)
+}))
+
+coef_table
+```
+
+```{r}
+ggplot(coef_table[coef_table$term != "(Intercept)", ],
+       aes(x = period, y = estimate, color = term, group = term)) +
+  geom_line() +
+  geom_point()
+```
+
+Sub-period regressions make it easier to interpret how the policy rule differs across historical regimes.
+
+# Research Question 2
+
+## Data Preparation
+
+```{r}
+data_rq1 <- df_final %>%
+  arrange(date)
+
+data_rq1$policy_change <- as.numeric(data_rq1$policy_change)
+```
+
+The dataset is sorted in chronological order so the clustering results can later be interpreted as evolving regimes rather than disconnected groups.
+
+## Event-Sensitive Feature Construction
+
+```{r}
+data_rq1$ff_change_1m     <- c(NA, diff(data_rq1$ff_target))
+data_rq1$unrate_change_1m <- c(NA, diff(data_rq1$UNRATE))
+data_rq1$oil_change_1m    <- c(NA, diff(data_rq1$WTISPLC))
+data_rq1$house_change_1m  <- c(NA, diff(data_rq1$HOUST))
+data_rq1$credit_change_1m <- c(NA, diff(data_rq1$BAA10Y))
+data_rq1$fci_change_1m    <- c(NA, diff(data_rq1$ANFCI))
+data_rq1$infl_change_1m   <- c(NA, diff(data_rq1$core_pce_yoy))
+```
+
+Monthly changes were added so the clustering can reflect both the level of macroeconomic conditions and how quickly those conditions are shifting.
+
+## Missingness Screening
+
+```{r}
+num_data <- data_rq1[, setdiff(names(data_rq1), "date")]
+num_data <- num_data[, sapply(num_data, is.numeric)]
+
+na_share <- colMeans(is.na(num_data))
+na_share
+```
+
+```{r}
+num_data <- num_data[, na_share <= 0.20]
+```
+
+Variables with more than 20% missingness were excluded from the initial numeric screening step to keep the clustering input reasonably complete.
+
+## Variable Selection for Clustering
+
+```{r}
+cluster_vars_model <- c(
+  "ff_target",
+  "PCEPILFE",
+  "MICH",
+  "UNRATE",
+  "HOUST",
+  "T10Y3M",
+  "BAA10Y",
+  "ANFCI",
+  "WTISPLC",
+  "core_pce_yoy",
+  "payems_yoy",
+  "ff_change_1m",
+  "unrate_change_1m",
+  "oil_change_1m",
+  "credit_change_1m",
+  "fci_change_1m",
+  "infl_change_1m"
+)
+
+cluster_vars_extra <- c(
+  "policy_change",
+  "fomc_meetings",
+  "fomc_scheduled",
+  "fomc_unscheduled",
+  "days_since_last_fomc"
+)
+
+cluster_vars_model <- intersect(cluster_vars_model, names(data_rq1))
+cluster_vars_extra <- intersect(cluster_vars_extra, names(data_rq1))
+
+cluster_df <- data_rq1[, c("date", cluster_vars_model, cluster_vars_extra)]
+cluster_df <- na.omit(cluster_df)
+
+cluster_x <- cluster_df[, cluster_vars_model]
+cluster_x_extra <- cluster_df[, cluster_vars_extra]
+dates <- cluster_df$date
+
+nrow(cluster_x)
+```
+
+The model variables are used for clustering itself, while the extra variables are kept for later interpretation of the resulting regimes.
+
+## Correlation Check on Final Clustering Inputs
+
+```{r}
+cor_mat2 <- cor(cluster_x)
+corrplot(cor_mat2, method = "color", tl.cex = 0.6)
+```
+
+```{r}
+remove_auto <- findCorrelation(cor_mat2, cutoff = 0.9, names = TRUE)
+cat("Variables removed due to high correlation:\n")
+print(remove_auto)
+
+cluster_x2 <- cluster_x[, !names(cluster_x) %in% remove_auto]
+```
+
+## Scaling and PCA
+
+```{r}
+cluster_scaled <- scale(cluster_x2)
+
+pca <- prcomp(cluster_scaled)
+summary(pca)
+```
+
+```{r}
+plot(pca, type = "l", main = "Scree Plot")
+```
+
+```{r}
+cum_var <- cumsum(pca$sdev^2 / sum(pca$sdev^2))
+cum_var
+```
+
+```{r}
+n_pc <- which(cum_var >= 0.80)[1]
+cat("Number of PCs explaining at least 80% variance:", n_pc, "\n")
+
+pc_scores <- pca$x[, 1:n_pc, drop = FALSE]
+head(pc_scores)
+```
+
+PCA is used to reduce dimensionality while retaining most of the variation in the clustering inputs.
+
+## Clustering
+
+```{r}
+fviz_nbclust(pc_scores, kmeans, method = "wss")
+fviz_nbclust(pc_scores, kmeans, method = "silhouette")
+```
+
+```{r}
+k <- 3
+set.seed(123)
+km <- kmeans(pc_scores, centers = k, nstart = 100)
+
+result <- data.frame(
+  date = dates,
+  cluster = factor(km$cluster),
+  cluster_x_extra
+)
+
+head(result)
+```
+
+The clustering uses k-means on the retained principal components, with the number of clusters chosen based on the WSS and silhouette diagnostics.
+
+## Cluster Visualization
+
+```{r}
+plot_df <- data.frame(
+  date = dates,
+  PC1 = pca$x[, 1],
+  PC2 = pca$x[, 2],
+  cluster = factor(km$cluster)
+)
+
+ggplot(plot_df, aes(x = PC1, y = PC2, color = cluster)) +
+  geom_point(size = 2, alpha = 0.7) +
+  geom_path(aes(group = 1), color = "gray70", alpha = 0.3, linewidth = 0.4) +
+  theme_minimal() +
+  labs(
+    title = "Clusters in PCA Space",
+    subtitle = "Points connected in time order",
+    x = "PC1",
+    y = "PC2"
+  )
+```
+
+```{r}
+pc_time_df <- data.frame(
+  date = dates,
+  PC1 = pca$x[, 1],
+  cluster = factor(km$cluster)
+)
+
+ggplot(pc_time_df, aes(x = date, y = PC1, color = cluster)) +
+  geom_line(linewidth = 0.8) +
+  theme_minimal() +
+  labs(
+    title = "PC1 Over Time",
+    x = "Date",
+    y = "PC1"
+  )
+```
+
+These plots show both the separation of regimes in reduced-dimensional space and the way regime structure evolves over time.
+
+## Regimes Over Time
+
+```{r}
+ggplot(result, aes(x = date, y = 1, fill = cluster)) +
+  geom_tile(height = 0.8) +
+  theme_minimal() +
+  theme(
+    axis.title.y = element_blank(),
+    axis.text.y = element_blank(),
+    axis.ticks.y = element_blank()
+  ) +
+  labs(
+    title = "Economic Regimes Over Time",
+    x = "Date",
+    fill = "Cluster"
+  )
+```
+
+This plot gives a compact time-line view of how regime membership changes across the sample.
+
+## Regimes and Historical Events
+
+```{r}
+event_df <- data.frame(
+  date = as.Date(c(
+    "1990-08-01",  # Gulf War
+    "2001-09-01",  # 9/11
+    "2008-09-01",  # GFC / Lehman
+    "2020-03-01",  # COVID shock
+    "2022-02-01"   # Russia-Ukraine war
+  )),
+  label = c(
+    "Gulf War",
+    "9/11",
+    "GFC",
+    "COVID",
+    "Russia-Ukraine"
+  )
+)
+
+ggplot(result, aes(x = date, y = 1, fill = cluster)) +
+  geom_tile(height = 0.8) +
+  geom_vline(
+    data = event_df,
+    aes(xintercept = as.numeric(date)),
+    linetype = "dashed"
+  ) +
+  geom_text(
+    data = event_df,
+    aes(x = date, y = 1.35, label = label),
+    angle = 90,
+    vjust = -0.3,
+    size = 3,
+    inherit.aes = FALSE
+  ) +
+  theme_minimal() +
+  theme(
+    axis.title.y = element_blank(),
+    axis.text.y = element_blank(),
+    axis.ticks.y = element_blank()
+  ) +
+  labs(
+    title = "Economic Regimes with Major Historical Events",
+    x = "Date",
+    fill = "Cluster"
+  )
+```
+
+Major historical events are overlaid on the regime timeline to assess whether regime changes line up with well-known macroeconomic disruptions.
+
+## Regime Duration
+
+```{r}
+result_spell <- result %>%
+  mutate(
+    change_flag = cluster != lag(cluster, default = first(cluster)),
+    spell_id = cumsum(change_flag)
+  )
+
+spell_summary <- result_spell %>%
+  group_by(spell_id, cluster) %>%
+  summarise(
+    start = min(date),
+    end = max(date),
+    months = n(),
+    .groups = "drop"
+  ) %>%
+  arrange(start)
+
+print(spell_summary)
+```
+
+Spell analysis helps show whether the clusters behave like persistent macroeconomic regimes rather than very short-lived fluctuations.
+
+## Cluster Profiles
+
+```{r}
+cluster_profile <- data.frame(cluster_x2, cluster = factor(km$cluster)) %>%
+  group_by(cluster) %>%
+  summarise(across(everything(), mean), .groups = "drop")
+
+print(cluster_profile)
+```
+
+```{r}
+cluster_profile_scaled <- data.frame(cluster_scaled, cluster = factor(km$cluster)) %>%
+  group_by(cluster) %>%
+  summarise(across(everything(), mean), .groups = "drop")
+
+cluster_profile_long <- cluster_profile_scaled %>%
+  pivot_longer(-cluster, names_to = "variable", values_to = "mean_z")
+
+ggplot(cluster_profile_long, aes(x = variable, y = cluster, fill = mean_z)) +
+  geom_tile() +
+  scale_fill_gradient2() +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 60, hjust = 1)) +
+  labs(
+    title = "Cluster Profiles",
+    subtitle = "Average standardized value in each cluster",
+    x = "",
+    y = "Cluster",
+    fill = "Mean z-score"
+  )
+```
+
+These tables and heatmaps help interpret the economic meaning of each cluster in terms of inflation, labor markets, financial conditions, and policy timing.
+
+## Extra Variable Summary
+
+```{r}
+if (ncol(cluster_x_extra) > 0) {
+  extra_summary <- data.frame(cluster_x_extra, cluster = factor(km$cluster)) %>%
+    group_by(cluster) %>%
+    summarise(across(everything(), mean), .groups = "drop")
+  print(extra_summary)
+}
+```
+
+This summary adds policy-related interpretation variables that were not used directly to build the clusters.
+
+## Event Window Summary
+
+```{r}
+event_windows <- data.frame(
+  event = c("Gulf War", "Dot-com / 9-11", "GFC", "COVID", "Russia-Ukraine"),
+  start = as.Date(c("1990-08-01", "2001-03-01", "2007-12-01", "2020-03-01", "2022-02-01")),
+  end = as.Date(c("1991-03-01", "2002-12-01", "2009-06-01", "2020-12-01", "2023-12-01"))
+)
+
+event_cluster_summary <- lapply(1:nrow(event_windows), function(i) {
+  temp <- result[result$date >= event_windows$start[i] &
+                   result$date <= event_windows$end[i], ]
+  tb <- table(temp$cluster)
+  data.frame(
+    event = event_windows$event[i],
+    dominant_cluster = names(which.max(tb)),
+    dominant_share = as.numeric(max(tb) / sum(tb))
+  )
+})
+
+event_cluster_summary <- do.call(rbind, event_cluster_summary)
+print(event_cluster_summary)
+```
+
+The event-window summary checks whether each major shock period is dominated by a particular regime.
+
+# Research Question 3
+
+This section turns the meeting-level data into a multiclass classification problem and compares tuned machine-learning models against a naive benchmark.
+
+## Data Preparation
+
+```{r}
+df_rq3 <- df_final %>%
+  arrange(date)
+
+df_rq3$policy_change <- as.integer(df_rq3$policy_change)
+```
+
+The data are restructured at the FOMC meeting level so the prediction task matches actual decision points.
+
+
+## Meeting-Level Target
+
+```{r}
+df_meeting <- df_rq3 %>%
+  arrange(date) %>%
+  filter(fomc_meetings > 0) %>%
+  mutate(
+    prev_meeting_target = lag(ff_target),
+    target_change_from_prev_meeting = ff_target - prev_meeting_target,
+    policy_action_class = case_when(
+      target_change_from_prev_meeting > 0 ~ "hike",
+      target_change_from_prev_meeting < 0 ~ "cut",
+      target_change_from_prev_meeting == 0 ~ "hold",
+      TRUE ~ NA_character_
+    )
+  ) %>%
+  filter(!is.na(policy_action_class)) %>%
+  mutate(
+    policy_action_class = factor(
+      policy_action_class,
+      levels = c("cut", "hold", "hike")
+    )
+  )
+
+df_meeting %>%
+  count(policy_action_class) %>%
+  mutate(percent = round(100 * n / sum(n), 2))
+```
+
+This defines the prediction target directly from changes in the federal funds target at meeting dates.
+
+## Lagged Predictors
+
+```{r}
+exclude_from_lag <- c(
+  "date",
+  "ff_target",
+  "unrate_lag1",
+  "term_spread_10y_3m"
+)
+
+df_lagged <- df_rq3 %>%
+  arrange(date) %>%
+  mutate(
+    across(
+      -all_of(exclude_from_lag),
+      ~ lag(.x),
+      .names = "{.col}_lag1"
+    )
+  )
+```
+
+```{r}
+df_meeting_model <- df_lagged %>%
+  filter(fomc_meetings > 0) %>%
+  mutate(
+    prev_meeting_target = lag(ff_target),
+    target_change_from_prev_meeting = ff_target - prev_meeting_target,
+    policy_action_class = case_when(
+      target_change_from_prev_meeting > 0 ~ "hike",
+      target_change_from_prev_meeting < 0 ~ "cut",
+      target_change_from_prev_meeting == 0 ~ "hold",
+      TRUE ~ NA_character_
+    )
+  ) %>%
+  filter(!is.na(policy_action_class)) %>%
+  mutate(
+    policy_action_class = factor(
+      policy_action_class,
+      levels = c("cut", "hold", "hike")
+    )
+  )
+
+df_meeting_model %>%
+  count(policy_action_class) %>%
+  mutate(percent = round(100 * n / sum(n), 2))
+```
+
+Only lagged information is used so that the predictors reflect information available before the meeting.
+
+## Complete Predictor Set
+
+```{r}
+lagged_predictors <- names(df_meeting_model)[grepl("_lag1$", names(df_meeting_model))]
+
+lagged_predictors_complete <- lagged_predictors[
+  sapply(df_meeting_model[, lagged_predictors], function(x) sum(is.na(x)) == 0)
+]
+
+df_final_rq3 <- df_meeting_model %>%
+  select(date, policy_action_class, all_of(lagged_predictors_complete)) %>%
+  select(
+    -core_pce_yoy_lag1,
+    -PCEPI_lag1,
+    -DGS3MO_lag1,
+    -PAYEMS_lag1,
+    -DGS10_lag1
+  )
+
+str(df_final_rq3)
+table(df_final_rq3$policy_action_class)
+```
+
+This step keeps only complete lagged predictors and removes a few highly redundant variables.
+
+## Train/Test Split
+
+```{r}
+df_final_rq3$policy_action_class <- factor(
+  df_final_rq3$policy_action_class,
+  levels = c("cut", "hold", "hike")
+)
+
+n <- nrow(df_final_rq3)
+train_size <- floor(0.8 * n)
+
+train_data <- df_final_rq3[1:train_size, ]
+test_data  <- df_final_rq3[(train_size + 1):n, ]
+
+train_data$policy_action_class <- factor(
+  train_data$policy_action_class,
+  levels = c("cut", "hold", "hike")
+)
+
+test_data$policy_action_class <- factor(
+  test_data$policy_action_class,
+  levels = c("cut", "hold", "hike")
+)
+
+prop.table(table(train_data$policy_action_class))
+prop.table(table(test_data$policy_action_class))
+```
+
+A chronological split is used so the evaluation respects time order.
+
+## Metric Helpers
+
+```{r}
+get_metrics <- function(pred, truth) {
+  cm <- confusionMatrix(pred, truth)
+
+  by_class <- as.data.frame(cm$byClass)
+
+  precision <- by_class[, "Pos Pred Value"]
+  recall <- by_class[, "Sensitivity"]
+  bal_acc <- by_class[, "Balanced Accuracy"]
+
+  f1 <- ifelse(
+    (precision + recall) == 0,
+    NA,
+    2 * precision * recall / (precision + recall)
+  )
+
+  list(
+    cm = cm,
+    summary = data.frame(
+      Macro_F1 = mean(f1, na.rm = TRUE),
+      Mean_Balanced_Accuracy = mean(bal_acc, na.rm = TRUE),
+      Kappa = unname(cm$overall["Kappa"]),
+      Accuracy = unname(cm$overall["Accuracy"])
+    )
+  )
+}
+
+extract_model_metrics <- function(cm, model_name) {
+  by_class <- as.data.frame(cm$byClass)
+
+  precision <- by_class[, "Pos Pred Value"]
+  recall <- by_class[, "Sensitivity"]
+  bal_acc <- by_class[, "Balanced Accuracy"]
+
+  f1 <- ifelse(
+    (precision + recall) == 0,
+    NA,
+    2 * precision * recall / (precision + recall)
+  )
+
+  data.frame(
+    Model = model_name,
+    Macro_F1 = mean(f1, na.rm = TRUE),
+    Mean_Balanced_Accuracy = mean(bal_acc, na.rm = TRUE),
+    Kappa = unname(cm$overall["Kappa"]),
+    Accuracy = unname(cm$overall["Accuracy"])
+  )
+}
+
+rank_metric_table <- function(results_df) {
+  results_df %>%
+    arrange(
+      desc(Macro_F1),
+      desc(Mean_Balanced_Accuracy),
+      desc(Kappa),
+      desc(Accuracy)
+    )
+}
+```
+
+These helpers ensure the same metric framework is used across all candidate models.
+
+## Inner Validation Helpers
+
+```{r}
+make_inner_split <- function(train_part, valid_frac = 0.2) {
+  n <- nrow(train_part)
+  valid_size <- max(10, floor(valid_frac * n))
+
+  inner_train <- train_part[1:(n - valid_size), ]
+  inner_valid <- train_part[(n - valid_size + 1):n, ]
+
+  list(
+    inner_train = inner_train,
+    inner_valid = inner_valid
+  )
+}
+
+to_xgb_label <- function(y_factor) {
+  as.integer(y_factor) - 1
+}
+```
+
+The inner split is also chronological so tuning remains time-aware.
+
+## Baseline Model
+
+```{r}
+baseline_pred <- factor(
+  rep("hold", nrow(test_data)),
+  levels = levels(test_data$policy_action_class)
+)
+
+baseline_eval <- get_metrics(
+  baseline_pred,
+  test_data$policy_action_class
+)
+
+baseline_cm <- baseline_eval$cm
+baseline_cm
+```
+
+The baseline always predicts hold and acts as a naive benchmark.
+
+## Tuned Models
+
+```{r}
+tune_multinom <- function(train_part) {
+  split_obj <- make_inner_split(train_part)
+  inner_train <- split_obj$inner_train
+  inner_valid <- split_obj$inner_valid
+
+  decay_grid <- c(0, 1e-4, 1e-3, 1e-2, 1e-1)
+  results <- list()
+
+  for (d in decay_grid) {
+    fit <- multinom(
+      policy_action_class ~ . - date,
+      data = inner_train,
+      decay = d,
+      trace = FALSE,
+      MaxNWts = 5000
+    )
+
+    pred <- predict(fit, newdata = inner_valid)
+    metric_row <- get_metrics(pred, inner_valid$policy_action_class)$summary
+
+    results[[length(results) + 1]] <- cbind(
+      data.frame(decay = d),
+      metric_row
+    )
+  }
+
+  results_df <- bind_rows(results) %>%
+    rank_metric_table()
+
+  best_decay <- results_df$decay[1]
+
+  final_fit <- multinom(
+    policy_action_class ~ . - date,
+    data = train_part,
+    decay = best_decay,
+    trace = FALSE,
+    MaxNWts = 5000
+  )
+
+  list(
+    best_params = results_df[1, ],
+    tuning_results = results_df,
+    final_fit = final_fit
+  )
+}
+```
+
+```{r}
+tune_enet <- function(train_part) {
+  split_obj <- make_inner_split(train_part)
+  inner_train <- split_obj$inner_train
+  inner_valid <- split_obj$inner_valid
+
+  x_inner_train <- model.matrix(policy_action_class ~ . - date, data = inner_train)[, -1]
+  y_inner_train <- inner_train$policy_action_class
+
+  x_inner_valid <- model.matrix(policy_action_class ~ . - date, data = inner_valid)[, -1]
+  y_inner_valid <- inner_valid$policy_action_class
+
+  alpha_grid <- c(0, 0.25, 0.5, 0.75, 1)
+  results <- list()
+
+  for (a in alpha_grid) {
+    cv_fit <- cv.glmnet(
+      x = x_inner_train,
+      y = y_inner_train,
+      family = "multinomial",
+      alpha = a,
+      type.measure = "class",
+      nfolds = 5,
+      standardize = TRUE,
+      nlambda = 50,
+      lambda.min.ratio = 1e-3,
+      maxit = 200000
+    )
+
+    pred <- predict(
+      cv_fit,
+      newx = x_inner_valid,
+      s = "lambda.1se",
+      type = "class"
+    )
+
+    pred <- factor(as.vector(pred), levels = levels(y_inner_valid))
+    metric_row <- get_metrics(pred, y_inner_valid)$summary
+
+    results[[length(results) + 1]] <- cbind(
+      data.frame(alpha = a, lambda = cv_fit$lambda.1se),
+      metric_row
+    )
+  }
+
+  results_df <- bind_rows(results) %>%
+    rank_metric_table()
+
+  best_alpha <- results_df$alpha[1]
+
+  x_train <- model.matrix(policy_action_class ~ . - date, data = train_part)[, -1]
+  y_train <- train_part$policy_action_class
+
+  final_fit <- cv.glmnet(
+    x = x_train,
+    y = y_train,
+    family = "multinomial",
+    alpha = best_alpha,
+    type.measure = "class",
+    nfolds = 5,
+    standardize = TRUE,
+    nlambda = 50,
+    maxit = 200000
+  )
+
+  list(
+    best_params = results_df[1, ],
+    tuning_results = results_df,
+    final_fit = final_fit
+  )
+}
+```
+
+```{r}
+tune_rf <- function(train_part) {
+  split_obj <- make_inner_split(train_part)
+  inner_train <- split_obj$inner_train
+  inner_valid <- split_obj$inner_valid
+
+  p <- ncol(inner_train %>% select(-date, -policy_action_class))
+
+  mtry_grid <- unique(pmax(1, c(floor(sqrt(p)), floor(p / 3), floor(p / 2))))
+  nodesize_grid <- c(1, 3, 5)
+  ntree_grid <- c(300, 500, 1000)
+
+  results <- list()
+
+  for (m in mtry_grid) {
+    for (ns in nodesize_grid) {
+      for (nt in ntree_grid) {
+        fit <- randomForest(
+          policy_action_class ~ . - date,
+          data = inner_train,
+          ntree = nt,
+          mtry = m,
+          nodesize = ns,
+          importance = TRUE
+        )
+
+        pred <- predict(fit, newdata = inner_valid)
+        metric_row <- get_metrics(pred, inner_valid$policy_action_class)$summary
+
+        results[[length(results) + 1]] <- cbind(
+          data.frame(mtry = m, nodesize = ns, ntree = nt),
+          metric_row
+        )
+      }
+    }
+  }
+
+  results_df <- bind_rows(results) %>%
+    rank_metric_table()
+
+  best_mtry <- results_df$mtry[1]
+  best_nodesize <- results_df$nodesize[1]
+  best_ntree <- results_df$ntree[1]
+
+  final_fit <- randomForest(
+    policy_action_class ~ . - date,
+    data = train_part,
+    ntree = best_ntree,
+    mtry = best_mtry,
+    nodesize = best_nodesize,
+    importance = TRUE
+  )
+
+  list(
+    best_params = results_df[1, ],
+    tuning_results = results_df,
+    final_fit = final_fit
+  )
+}
+```
+
+```{r}
+tune_xgb <- function(train_part) {
+  split_obj <- make_inner_split(train_part)
+  inner_train <- split_obj$inner_train
+  inner_valid <- split_obj$inner_valid
+
+  x_inner_train <- model.matrix(policy_action_class ~ . - date, data = inner_train)[, -1]
+  y_inner_train <- to_xgb_label(inner_train$policy_action_class)
+
+  x_inner_valid <- model.matrix(policy_action_class ~ . - date, data = inner_valid)[, -1]
+  y_inner_valid_factor <- inner_valid$policy_action_class
+
+  dtrain <- xgb.DMatrix(data = x_inner_train, label = y_inner_train)
+  dvalid <- xgb.DMatrix(data = x_inner_valid)
+
+  eta_grid <- c(0.01, 0.05, 0.1)
+  max_depth_grid <- c(1, 2, 3)
+  nrounds_grid <- c(100, 300, 500)
+  min_child_weight_grid <- c(1, 3)
+
+  results <- list()
+
+  for (eta_val in eta_grid) {
+    for (depth_val in max_depth_grid) {
+      for (nrounds_val in nrounds_grid) {
+        for (mcw_val in min_child_weight_grid) {
+
+          fit <- xgb.train(
+            params = list(
+              objective = "multi:softmax",
+              num_class = 3,
+              eval_metric = "merror",
+              eta = eta_val,
+              max_depth = depth_val,
+              min_child_weight = mcw_val,
+              subsample = 1,
+              colsample_bytree = 1
+            ),
+            data = dtrain,
+            nrounds = nrounds_val,
+            verbose = 0
+          )
+
+          pred_numeric <- predict(fit, newdata = dvalid)
+          pred_factor <- factor(
+            c("cut", "hold", "hike")[pred_numeric + 1],
+            levels = c("cut", "hold", "hike")
+          )
+
+          metric_row <- get_metrics(pred_factor, y_inner_valid_factor)$summary
+
+          results[[length(results) + 1]] <- cbind(
+            data.frame(
+              eta = eta_val,
+              max_depth = depth_val,
+              nrounds = nrounds_val,
+              min_child_weight = mcw_val
+            ),
+            metric_row
+          )
+        }
+      }
+    }
+  }
+
+  results_df <- bind_rows(results) %>%
+    rank_metric_table()
+
+  best <- results_df[1, ]
+
+  x_train <- model.matrix(policy_action_class ~ . - date, data = train_part)[, -1]
+  y_train <- to_xgb_label(train_part$policy_action_class)
+
+  dtrain_full <- xgb.DMatrix(data = x_train, label = y_train)
+
+  final_fit <- xgb.train(
+    params = list(
+      objective = "multi:softmax",
+      num_class = 3,
+      eval_metric = "merror",
+      eta = best$eta,
+      max_depth = best$max_depth,
+      min_child_weight = best$min_child_weight,
+      subsample = 1,
+      colsample_bytree = 1
+    ),
+    data = dtrain_full,
+    nrounds = best$nrounds,
+    verbose = 0
+  )
+
+  list(
+    best_params = best,
+    tuning_results = results_df,
+    final_fit = final_fit
+  )
+}
+```
+
+These tuning functions keep the model-fitting section organized while preserving the full comparison pipeline.
+
+## Held-Out Test Evaluation
+
+```{r}
+multinom_obj <- tune_multinom(train_data)
+multinom_fit <- multinom_obj$final_fit
+multinom_pred <- predict(multinom_fit, newdata = test_data)
+multinom_eval <- get_metrics(multinom_pred, test_data$policy_action_class)
+multinom_cm <- multinom_eval$cm
+
+enet_obj <- tune_enet(train_data)
+enet_fit <- enet_obj$final_fit
+x_test <- model.matrix(policy_action_class ~ . - date, data = test_data)[, -1]
+enet_pred <- predict(enet_fit, newx = x_test, s = "lambda.1se", type = "class")
+enet_pred <- factor(as.vector(enet_pred), levels = levels(test_data$policy_action_class))
+enet_eval <- get_metrics(enet_pred, test_data$policy_action_class)
+enet_cm <- enet_eval$cm
+
+rf_obj <- tune_rf(train_data)
+rf_fit <- rf_obj$final_fit
+rf_pred <- predict(rf_fit, newdata = test_data)
+rf_eval <- get_metrics(rf_pred, test_data$policy_action_class)
+rf_cm <- rf_eval$cm
+
+xgb_obj <- tune_xgb(train_data)
+xgb_fit <- xgb_obj$final_fit
+x_test_xgb <- model.matrix(policy_action_class ~ . - date, data = test_data)[, -1]
+dtest_xgb <- xgb.DMatrix(data = x_test_xgb)
+xgb_pred_numeric <- predict(xgb_fit, newdata = dtest_xgb)
+xgb_pred <- factor(
+  c("cut", "hold", "hike")[xgb_pred_numeric + 1],
+  levels = c("cut", "hold", "hike")
+)
+xgb_eval <- get_metrics(xgb_pred, test_data$policy_action_class)
+xgb_cm <- xgb_eval$cm
+```
+
+This block tunes each model on the training portion and evaluates it once on the held-out test set.
+
+## Model Comparison
+
+```{r}
+results_table <- bind_rows(
+  cbind(Model = "Baseline_Hold", baseline_eval$summary),
+  cbind(Model = "Multinomial_Logit_Tuned", multinom_eval$summary),
+  cbind(Model = "Elastic_Net_Tuned", enet_eval$summary),
+  cbind(Model = "Random_Forest_Tuned", rf_eval$summary),
+  cbind(Model = "XGBoost_Tuned", xgb_eval$summary)
+) %>%
+  rank_metric_table()
+
+results_table
+```
+
+```{r}
+multinom_obj$best_params
+enet_obj$best_params
+rf_obj$best_params
+xgb_obj$best_params
+```
+
+## Variable Importance
+
+```{r}
+rf_importance <- importance(rf_fit)
+
+rf_importance_df <- data.frame(
+  Variable = rownames(rf_importance),
+  MeanDecreaseAccuracy = rf_importance[, "MeanDecreaseAccuracy"],
+  MeanDecreaseGini = rf_importance[, "MeanDecreaseGini"]
+) %>%
+  arrange(desc(MeanDecreaseAccuracy))
+
+head(rf_importance_df, 10)
+```
+
+```{r}
+xgb_feature_names <- colnames(model.matrix(policy_action_class ~ . - date, data = train_data)[, -1])
+
+xgb_importance <- xgb.importance(
+  feature_names = xgb_feature_names,
+  model = xgb_fit
+)
+
+head(xgb_importance, 10)
+```
+
+Variable importance helps interpret which lagged macro variables are most useful for predicting meeting outcomes.
+
+## Robustnesss Checks
+
+This section tests whether the model comparison remains stable when performance is evaluated across multiple future periods rather than one single hold-out split.
+
+### Rolling / Expanding Evaluation
+
+```{r}
+get_fold_main_metrics <- function(cm, model_name, fold, train_end_date, test_start_date, test_end_date) {
+  data.frame(
+    Fold = fold,
+    Model = model_name,
+    Train_End = train_end_date,
+    Test_Start = test_start_date,
+    Test_End = test_end_date,
+    Accuracy = unname(cm$overall["Accuracy"]),
+    Kappa = unname(cm$overall["Kappa"])
+  )
+}
+
+get_fold_extra_metrics <- function(cm, model_name, fold, train_end_date, test_start_date, test_end_date) {
+  by_class <- as.data.frame(cm$byClass)
+
+  precision <- by_class[, "Pos Pred Value"]
+  recall <- by_class[, "Sensitivity"]
+  bal_acc <- by_class[, "Balanced Accuracy"]
+
+  f1 <- ifelse(
+    (precision + recall) == 0,
+    NA,
+    2 * precision * recall / (precision + recall)
+  )
+
+  data.frame(
+    Fold = fold,
+    Model = model_name,
+    Train_End = train_end_date,
+    Test_Start = test_start_date,
+    Test_End = test_end_date,
+    Macro_F1 = mean(f1, na.rm = TRUE),
+    Mean_Balanced_Accuracy = mean(bal_acc, na.rm = TRUE),
+    Mean_Precision = mean(precision, na.rm = TRUE),
+    Mean_Recall = mean(recall, na.rm = TRUE)
+  )
+}
+
+get_fold_classwise_metrics <- function(cm, model_name, fold) {
+  by_class <- as.data.frame(cm$byClass)
+  by_class$Class <- rownames(by_class)
+  rownames(by_class) <- NULL
+
+  by_class %>%
+    transmute(
+      Fold = fold,
+      Model = model_name,
+      Class = gsub("^Class: ", "", Class),
+      Precision = `Pos Pred Value`,
+      Recall = Sensitivity,
+      Specificity = Specificity,
+      Balanced_Accuracy = `Balanced Accuracy`,
+      F1 = ifelse(
+        (`Pos Pred Value` + Sensitivity) == 0,
+        NA,
+        2 * (`Pos Pred Value`) * Sensitivity / (`Pos Pred Value` + Sensitivity)
+      )
+    )
+}
+```
+
+These helper functions store fold-level metrics in a consistent format so the rolling results can later be summarized and plotted.
+
+### Rolling / Expanding Window Evaluation
+
+```{r}
+start_train <- 200
+step_size <- 12
+
+rolling_main_results <- list()
+rolling_extra_results <- list()
+rolling_class_results <- list()
+tuning_log <- list()
+
+fold_num <- 1
+
+for (end_train in seq(start_train, nrow(df_final_rq3) - step_size, by = step_size)) {
+
+  train_part <- df_final_rq3[1:end_train, ]
+  test_part  <- df_final_rq3[(end_train + 1):(end_train + step_size), ]
+
+  train_part$policy_action_class <- factor(
+    train_part$policy_action_class,
+    levels = c("cut", "hold", "hike")
+  )
+
+  test_part$policy_action_class <- factor(
+    test_part$policy_action_class,
+    levels = c("cut", "hold", "hike")
+  )
+
+  train_end_date  <- max(train_part$date)
+  test_start_date <- min(test_part$date)
+  test_end_date   <- max(test_part$date)
+
+  baseline_pred <- factor(
+    rep("hold", nrow(test_part)),
+    levels = levels(test_part$policy_action_class)
+  )
+
+  baseline_cm <- confusionMatrix(
+    baseline_pred,
+    test_part$policy_action_class
+  )
+
+  rolling_main_results[[length(rolling_main_results) + 1]] <-
+    get_fold_main_metrics(
+      baseline_cm, "Baseline_Hold", fold_num,
+      train_end_date, test_start_date, test_end_date
+    )
+
+  rolling_extra_results[[length(rolling_extra_results) + 1]] <-
+    get_fold_extra_metrics(
+      baseline_cm, "Baseline_Hold", fold_num,
+      train_end_date, test_start_date, test_end_date
+    )
+
+  rolling_class_results[[length(rolling_class_results) + 1]] <-
+    get_fold_classwise_metrics(
+      baseline_cm, "Baseline_Hold", fold_num
+    )
+
+  multinom_obj <- tune_multinom(train_part)
+  multinom_fit <- multinom_obj$final_fit
+
+  multinom_pred <- predict(multinom_fit, newdata = test_part)
+  multinom_cm <- confusionMatrix(multinom_pred, test_part$policy_action_class)
+
+  rolling_main_results[[length(rolling_main_results) + 1]] <-
+    get_fold_main_metrics(
+      multinom_cm, "Multinomial_Logit_Tuned", fold_num,
+      train_end_date, test_start_date, test_end_date
+    )
+
+  rolling_extra_results[[length(rolling_extra_results) + 1]] <-
+    get_fold_extra_metrics(
+      multinom_cm, "Multinomial_Logit_Tuned", fold_num,
+      train_end_date, test_start_date, test_end_date
+    )
+
+  rolling_class_results[[length(rolling_class_results) + 1]] <-
+    get_fold_classwise_metrics(
+      multinom_cm, "Multinomial_Logit_Tuned", fold_num
+    )
+
+  tuning_log[[length(tuning_log) + 1]] <- cbind(
+    Fold = fold_num,
+    Model = "Multinomial_Logit_Tuned",
+    multinom_obj$best_params
+  )
+
+  enet_obj <- tune_enet(train_part)
+  enet_fit <- enet_obj$final_fit
+
+  x_test <- model.matrix(policy_action_class ~ . - date, data = test_part)[, -1]
+
+  enet_pred <- predict(
+    enet_fit,
+    newx = x_test,
+    s = "lambda.1se",
+    type = "class"
+  )
+
+  enet_pred <- factor(
+    as.vector(enet_pred),
+    levels = levels(test_part$policy_action_class)
+  )
+
+  enet_cm <- confusionMatrix(enet_pred, test_part$policy_action_class)
+
+  rolling_main_results[[length(rolling_main_results) + 1]] <-
+    get_fold_main_metrics(
+      enet_cm, "Elastic_Net_Tuned", fold_num,
+      train_end_date, test_start_date, test_end_date
+    )
+
+  rolling_extra_results[[length(rolling_extra_results) + 1]] <-
+    get_fold_extra_metrics(
+      enet_cm, "Elastic_Net_Tuned", fold_num,
+      train_end_date, test_start_date, test_end_date
+    )
+
+  rolling_class_results[[length(rolling_class_results) + 1]] <-
+    get_fold_classwise_metrics(
+      enet_cm, "Elastic_Net_Tuned", fold_num
+    )
+
+  tuning_log[[length(tuning_log) + 1]] <- cbind(
+    Fold = fold_num,
+    Model = "Elastic_Net_Tuned",
+    enet_obj$best_params
+  )
+
+  rf_obj <- tune_rf(train_part)
+  rf_fit <- rf_obj$final_fit
+
+  rf_pred <- predict(rf_fit, newdata = test_part)
+  rf_cm <- confusionMatrix(rf_pred, test_part$policy_action_class)
+
+  rolling_main_results[[length(rolling_main_results) + 1]] <-
+    get_fold_main_metrics(
+      rf_cm, "Random_Forest_Tuned", fold_num,
+      train_end_date, test_start_date, test_end_date
+    )
+
+  rolling_extra_results[[length(rolling_extra_results) + 1]] <-
+    get_fold_extra_metrics(
+      rf_cm, "Random_Forest_Tuned", fold_num,
+      train_end_date, test_start_date, test_end_date
+    )
+
+  rolling_class_results[[length(rolling_class_results) + 1]] <-
+    get_fold_classwise_metrics(
+      rf_cm, "Random_Forest_Tuned", fold_num
+    )
+
+  tuning_log[[length(tuning_log) + 1]] <- cbind(
+    Fold = fold_num,
+    Model = "Random_Forest_Tuned",
+    rf_obj$best_params
+  )
+
+  xgb_obj <- tune_xgb(train_part)
+  xgb_fit <- xgb_obj$final_fit
+
+  x_test_xgb <- model.matrix(policy_action_class ~ . - date, data = test_part)[, -1]
+  dtest_xgb <- xgb.DMatrix(data = x_test_xgb)
+
+  xgb_pred_numeric <- predict(xgb_fit, newdata = dtest_xgb)
+
+  xgb_pred <- factor(
+    c("cut", "hold", "hike")[xgb_pred_numeric + 1],
+    levels = c("cut", "hold", "hike")
+  )
+
+  xgb_cm <- confusionMatrix(xgb_pred, test_part$policy_action_class)
+
+  rolling_main_results[[length(rolling_main_results) + 1]] <-
+    get_fold_main_metrics(
+      xgb_cm, "XGBoost_Tuned", fold_num,
+      train_end_date, test_start_date, test_end_date
+    )
+
+  rolling_extra_results[[length(rolling_extra_results) + 1]] <-
+    get_fold_extra_metrics(
+      xgb_cm, "XGBoost_Tuned", fold_num,
+      train_end_date, test_start_date, test_end_date
+    )
+
+  rolling_class_results[[length(rolling_class_results) + 1]] <-
+    get_fold_classwise_metrics(
+      xgb_cm, "XGBoost_Tuned", fold_num
+    )
+
+  tuning_log[[length(tuning_log) + 1]] <- cbind(
+    Fold = fold_num,
+    Model = "XGBoost_Tuned",
+    xgb_obj$best_params
+  )
+
+  fold_num <- fold_num + 1
+}
+```
+
+This evaluation uses an expanding training window and a fixed future test block, which gives a more reliable time-ordered assessment than relying on one single split.
+
+### Combine Rolling Results
+
+```{r}
+rolling_main_table  <- bind_rows(rolling_main_results)
+rolling_extra_table <- bind_rows(rolling_extra_results)
+rolling_class_table <- bind_rows(rolling_class_results)
+tuning_table        <- bind_rows(tuning_log)
+```
+
+```{r}
+rolling_main_summary <- rolling_main_table %>%
+  group_by(Model) %>%
+  summarise(
+    Mean_Accuracy = mean(Accuracy, na.rm = TRUE),
+    SD_Accuracy = sd(Accuracy, na.rm = TRUE),
+    Mean_Kappa = mean(Kappa, na.rm = TRUE),
+    SD_Kappa = sd(Kappa, na.rm = TRUE),
+    .groups = "drop"
+  )
+
+rolling_extra_summary <- rolling_extra_table %>%
+  group_by(Model) %>%
+  summarise(
+    Mean_Macro_F1 = mean(Macro_F1, na.rm = TRUE),
+    Mean_Balanced_Accuracy = mean(Mean_Balanced_Accuracy, na.rm = TRUE),
+    Mean_Precision = mean(Mean_Precision, na.rm = TRUE),
+    Mean_Recall = mean(Mean_Recall, na.rm = TRUE),
+    .groups = "drop"
+  )
+
+rolling_final_summary <- rolling_main_summary %>%
+  left_join(rolling_extra_summary, by = "Model") %>%
+  arrange(
+    desc(Mean_Macro_F1),
+    desc(Mean_Balanced_Accuracy),
+    desc(Mean_Kappa),
+    desc(Mean_Accuracy)
+  )
+
+rolling_final_summary
+```
+
+The rolling summary compares the models on their average performance across many future test windows rather than a single test period.
+
+```{r}
+rolling_class_summary <- rolling_class_table %>%
+  group_by(Model, Class) %>%
+  summarise(
+    Mean_Precision = mean(Precision, na.rm = TRUE),
+    Mean_Recall = mean(Recall, na.rm = TRUE),
+    Mean_Specificity = mean(Specificity, na.rm = TRUE),
+    Mean_F1 = mean(F1, na.rm = TRUE),
+    Mean_Balanced_Accuracy = mean(Balanced_Accuracy, na.rm = TRUE),
+    .groups = "drop"
+  ) %>%
+  arrange(Model, Class)
+
+rolling_class_summary
+```
+
+This class-wise summary shows whether a model performs differently for cuts, holds, and hikes.
+
+### Tuning Stability Log
+
+```{r}
+tuning_table
+```
+
+### Rolling Macro F1 Plot
+
+```{r}
+ggplot(
+  rolling_final_summary,
+  aes(x = reorder(Model, Mean_Macro_F1), y = Mean_Macro_F1)
+) +
+  geom_col() +
+  coord_flip() +
+  labs(
+    title = "Rolling / Expanding Window Mean Macro F1 by Model",
+    x = "Model",
+    y = "Mean Macro F1"
+  )
+```
+
+This plot summarizes average multiclass performance across the full rolling evaluation.
+
+### Fold-by-Fold Macro F1 Plot
+
+```{r}
+rolling_extra_table_plot <- rolling_extra_table %>%
+  filter(is.finite(Macro_F1))
+
+ggplot(
+  rolling_extra_table_plot,
+  aes(x = Fold, y = Macro_F1, color = Model)
+) +
+  geom_line() +
+  geom_point() +
+  labs(
+    title = "Fold-by-Fold Macro F1 Across Expanding Windows",
+    x = "Fold",
+    y = "Macro F1"
+  )
+```
+
+Some fold-level Macro F1 values for the naive baseline can become undefined when a class is never predicted, so non-finite values are removed before plotting.
+
+### Fold-by-Fold Accuracy Plot
+
+```{r}
+ggplot(
+  rolling_main_table,
+  aes(x = Fold, y = Accuracy, color = Model)
+) +
+  geom_line() +
+  geom_point() +
+  labs(
+    title = "Fold-by-Fold Accuracy Across Expanding Windows",
+    x = "Fold",
+    y = "Accuracy"
+  )
+```
+
+The fold-by-fold accuracy plot shows how stable each model is across different forecast periods.
+
+### Robustness Check Summary
+
+The rolling and expanding evaluation provides a broader view of model behavior across time. If a model performs well only on the single hold-out split but not across repeated future windows, that would suggest the single-split result may not be stable. By contrast, models that remain strong across rolling folds provide more credible evidence of predictive usefulness.
+
