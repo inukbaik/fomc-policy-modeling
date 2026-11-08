@@ -37,7 +37,16 @@ All `*.csv` files are git-ignored. Data is fetched, not committed.
 
 ## Running
 
-- R 4.6. Render a notebook with `Rscript -e 'rmarkdown::render("fomc_policy_analysis.Rmd")'`.
+- R 4.6. Packages are pinned with renv. After cloning, run
+  `Rscript -e 'renv::restore()'` once. After adding a package, run
+  `renv::snapshot()` and commit `renv.lock`.
+- renv quirk: `recipes` (a caret dependency, from CRAN) has a `biocViews`
+  field, so renv mistakes it for Bioconductor and `renv::snapshot()` aborts.
+  Snapshot with `force = TRUE`, then put it back as CRAN:
+  `renv::record(list(recipes = list(Package = "recipes", Version = "<ver>", Source = "Repository", Repository = "CRAN")))`,
+  and delete any top-level `"Bioconductor"` block from `renv.lock`.
+  `renv::status()` still lists `recipes` as out of sync; that's harmless.
+- Render a notebook with `Rscript -e 'rmarkdown::render("fomc_policy_analysis.Rmd")'`.
 - Acquisition needs a FRED API key: `cp .env.example .env`, then set `FRED_KEY`.
 - The RQ3 expanding-window loop refits four tuned models per fold and takes a while.
   Run long renders in the background.
