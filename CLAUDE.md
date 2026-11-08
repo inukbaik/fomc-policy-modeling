@@ -88,6 +88,30 @@ the old root-level CSVs belong to tag `v1.0-course-submission`.
   (commit `2b1f27f`). Improvements go on top of it, not in place of its history.
 - Credit teammates for their sections in any published output.
 
+## Analysis decisions
+
+Settled choices that code changes must respect. The notebook text explains
+each one to readers; keep the two in sync.
+
+- **RQ3 unit = one scheduled FOMC meeting** (decided 2026-11-08). Conference
+  calls and unscheduled meetings are excluded because (1) they react to sudden
+  shocks that lagged monthly data can't see, so every model misses them for
+  the same reason and they only add noise to the comparison; (2) whether an
+  emergency call happens is itself a stress signal, which changes what is
+  being predicted; (3) scheduled meetings happen on known dates, matching the
+  question of comparing models on each regular decision. Emergency moves stay
+  in the target series and may become a predictor later.
+- **RQ3 label = target `LABEL_WINDOW_DAYS` (2) days after the decision minus
+  target the day before the meeting starts**, from `data/fed_target_daily.csv`.
+  Changes often take effect the next day, hence the window. Intermeeting moves
+  by the Chair (26 of 150 changes since 1986, all 1986–1992) belong to no
+  meeting and are not attributed to one. Never label from the monthly-average
+  target: it mislabelled about 20% of meetings.
+- **Breaks (RQ1) = 3 and k (RQ2) = 3 are settings**, not data-driven, until C4
+  and C5 fix the methods (BIC hits its cap; silhouette is flat).
+- **Missing values inside a series**: carry the last value forward, one month
+  at most (no look-ahead).
+
 ## Git conventions
 
 Use [Conventional Commits](https://www.conventionalcommits.org/):
