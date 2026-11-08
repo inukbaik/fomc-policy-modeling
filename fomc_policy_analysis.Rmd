@@ -46,6 +46,7 @@ BP_MAX_BREAKS   <- 5                      # most structural breaks the test cons
 BP_N_BREAKS     <- 3                      # breaks used (RQ1); BIC picks the max here, see C4
 K_RANGE         <- 2:8                    # cluster counts shown in diagnostics (RQ2)
 K_CLUSTERS      <- 3                      # clusters used (RQ2); silhouette is flat, see C5
+LABEL_WINDOW_DAYS <- 2                    # days after a decision to read the new target (RQ3)
 RQ3_START_TRAIN <- 200                    # meetings in the first training window
 RQ3_STEP        <- 12                     # meetings per test block
 
@@ -993,34 +994,56 @@ The data are restructured at the FOMC meeting level so the prediction task match
 
 ## Meeting-Level Target
 
+Each row is one **scheduled** FOMC meeting, labelled by what was decided at that meeting.
+
+**Label rule.** The label compares the target the day before the meeting starts with the target `r LABEL_WINDOW_DAYS` days after the decision. Rate changes often take effect the day after the announcement, so the window has to extend past the decision date. Since 1986, 124 of 150 target changes fall inside such a window. The other 26 were intermeeting moves made by the Chair between meetings (all in 1986–1992). They are not decisions of any meeting, so they are not attributed to one.
+
+**Why scheduled meetings only.** Conference calls and unscheduled meetings are excluded:
+
+- They respond to sudden shocks (9/11, January and October 2008, COVID). The predictors are last month's macro data, which cannot see those shocks coming, so every model misses them for the same reason. They add noise to the comparison, not information about the models.
+- Whether an emergency call happens at all is itself a signal of stress. Mixing those rows with regular meetings changes what is being predicted.
+- Scheduled meetings happen on known dates (about eight a year), so every row is a decision the Fed was going to make regardless. That matches the question: how do model families compare at predicting the decision at each meeting.
+
+Emergency moves are not discarded from the data. They remain in the target series and could be used as a predictor later ("was there an intermeeting move since the last meeting?").
+
+The previous version of this section labelled meetings from the change in the *monthly average* target between meeting months. A move late in one month raised the next month's average, so later holds were labelled as hikes or cuts. Two meetings in the same month were also merged into one row.
+
 ```{r}
-df_meeting <- df_rq3 %>%
-  arrange(date) %>%
-  filter(fomc_meetings > 0) %>%
+target_daily <- read.csv("data/fed_target_daily.csv") %>%
+  mutate(date = as.Date(date)) %>%
+  arrange(date)
+
+# Target in effect on a given day (last observation on or before it).
+target_asof <- function(d) {
+  target_daily$ff_target[findInterval(as.numeric(d), as.numeric(target_daily$date))]
+}
+
+meetings_rq3 <- read.csv("data/fomc_meetings.csv") %>%
+  filter(type == "scheduled") %>%
   mutate(
-    prev_meeting_target = lag(ff_target),
-    target_change_from_prev_meeting = ff_target - prev_meeting_target,
-    policy_action_class = case_when(
-      target_change_from_prev_meeting > 0 ~ "hike",
-      target_change_from_prev_meeting < 0 ~ "cut",
-      target_change_from_prev_meeting == 0 ~ "hold",
-      TRUE ~ NA_character_
-    )
+    start_date    = as.Date(start_date),
+    decision_date = as.Date(decision_date),
+    month         = as.Date(format(start_date, "%Y-%m-01"))
   ) %>%
-  filter(!is.na(policy_action_class)) %>%
+  filter(month >= SAMPLE_START, month <= SAMPLE_END) %>%
   mutate(
+    target_before = target_asof(start_date - 1),
+    target_after  = target_asof(decision_date + LABEL_WINDOW_DAYS),
+    target_change = target_after - target_before,
     policy_action_class = factor(
-      policy_action_class,
+      case_when(
+        target_change > 0 ~ "hike",
+        target_change < 0 ~ "cut",
+        TRUE              ~ "hold"
+      ),
       levels = c("cut", "hold", "hike")
     )
   )
 
-df_meeting %>%
+meetings_rq3 %>%
   count(policy_action_class) %>%
   mutate(percent = round(100 * n / sum(n), 2))
 ```
-
-This defines the prediction target directly from changes in the federal funds target at meeting dates.
 
 ## Lagged Predictors
 
@@ -1032,7 +1055,7 @@ exclude_from_lag <- c(
   "term_spread_10y_3m"
 )
 
-df_lagged <- df_rq3 %>%
+df_rq3_lagged <- df_rq3 %>%
   arrange(date) %>%
   mutate(
     across(
@@ -1041,28 +1064,18 @@ df_lagged <- df_rq3 %>%
       .names = "{.col}_lag1"
     )
   )
-```
 
-```{r}
-df_meeting_model <- df_lagged %>%
-  filter(fomc_meetings > 0) %>%
-  mutate(
-    prev_meeting_target = lag(ff_target),
-    target_change_from_prev_meeting = ff_target - prev_meeting_target,
-    policy_action_class = case_when(
-      target_change_from_prev_meeting > 0 ~ "hike",
-      target_change_from_prev_meeting < 0 ~ "cut",
-      target_change_from_prev_meeting == 0 ~ "hold",
-      TRUE ~ NA_character_
-    )
+# Each meeting gets the previous month's values (the `_lag1` columns of the
+# month the meeting starts in). `date` becomes the decision date.
+df_meeting_model <- meetings_rq3 %>%
+  select(month, decision_date, policy_action_class) %>%
+  left_join(
+    df_rq3_lagged %>% select(date, ends_with("_lag1")),
+    by = c("month" = "date")
   ) %>%
-  filter(!is.na(policy_action_class)) %>%
-  mutate(
-    policy_action_class = factor(
-      policy_action_class,
-      levels = c("cut", "hold", "hike")
-    )
-  )
+  rename(date = decision_date) %>%
+  select(-month) %>%
+  arrange(date)
 
 df_meeting_model %>%
   count(policy_action_class) %>%
