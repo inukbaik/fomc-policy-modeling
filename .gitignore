@@ -60,3 +60,6 @@ figures/
 
 # Data files (local only for now)
 *.csv
+
+# Local planning notes
+TODO.md
