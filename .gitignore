@@ -58,8 +58,9 @@ figures/
 # macOS
 .DS_Store
 
-# Data files (local only for now)
+# Data files (fetched by R/acquire_data.R, never committed)
 *.csv
+data/
 
 # Local planning notes
 TODO.md
