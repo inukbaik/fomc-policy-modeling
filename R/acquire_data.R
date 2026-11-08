@@ -33,7 +33,7 @@ MONTHLY_SERIES <- c(
   "MICH",                            # Michigan 1-year inflation expectations
   "UNRATE", "PAYEMS",                # unemployment rate, payrolls
   "JTSJOL", "JTSQUR",                # JOLTS openings, quits rate
-  "INDPRO", "PCEC96", "HOUST", "RRSFS",
+  "INDPRO", "HOUST", "RRSFS",
   "WTISPLC"                          # WTI spot price (monthly, longer history)
 )
 
@@ -45,12 +45,11 @@ AVERAGED_SERIES <- c(
   # BAMLH0A0HYM2 (ICE BofA high-yield spread) dropped: FRED now serves only
   # ~3 years of it under ICE licensing, so it can't support the 1986+ sample.
   "ANFCI",                           # Chicago Fed adjusted financial conditions
-  "DTWEXBGS",                        # broad dollar index
-  "DCOILWTICO"                       # WTI daily (shorter history than WTISPLC)
+  "DTWEXBGS"                         # broad dollar index
 )
 
-# Note: the analysis notebook still drops PCEC96 and DCOILWTICO. They stay
-# here for now so the notebook runs unchanged; trim them in the refactor.
+# Not fetched: PCEC96 (real consumption, starts 2007) and DCOILWTICO (daily WTI,
+# starts 1986). WTISPLC covers oil with a longer history.
 
 # ---- FRED --------------------------------------------------------------------
 
