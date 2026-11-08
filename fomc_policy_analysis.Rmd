@@ -34,6 +34,30 @@ library(caret)
 library(factoextra)
 ```
 
+# Settings
+
+Analysis choices in one place. Everything else (sample end, break dates,
+number of clusters) is computed from the data.
+
+```{r settings}
+SAMPLE_START    <- as.Date("1986-01-01")  # start of the modeling sample
+MAX_GAP_FILL    <- 1                      # fill internal gaps up to this many months
+BP_MAX_BREAKS   <- 5                      # most structural breaks the test considers (RQ1)
+BP_N_BREAKS     <- 3                      # breaks used (RQ1); BIC picks the max here, see C4
+K_RANGE         <- 2:8                    # cluster counts shown in diagnostics (RQ2)
+K_CLUSTERS      <- 3                      # clusters used (RQ2); silhouette is flat, see C5
+RQ3_START_TRAIN <- 200                    # meetings in the first training window
+RQ3_STEP        <- 12                     # meetings per test block
+
+# Events tested with Chow tests alongside the estimated break dates (RQ1)
+CHOW_EVENT_DATES <- as.Date(c(
+  "2001-09-01",  # 9/11
+  "2008-01-01",  # start of 2008 easing
+  "2008-11-01",  # zero lower bound reached
+  "2020-03-01"   # COVID
+))
+```
+
 # Load Data
 
 ```{r}
@@ -74,7 +98,13 @@ sapply(df_raw[, sapply(df_raw, is.numeric), drop = FALSE], function(x) sum(is.in
 summary(df_raw[, sapply(df_raw, is.numeric), drop = FALSE])
 ```
 
-The raw dataset appears structurally sound, with no duplicate rows, no blank character fields, and a valid date range from 1982-09-01 to 2026-03-01. The main issue is missingness across several economic series, particularly JTSJOL, JTSQUR, T5YIE, DTWEXBGS, BAMLH0A0HYM2, and PCEC96. These missing values appear substantial enough to require targeted preprocessing decisions before feature engineering and model fitting.
+```{r}
+raw_dates  <- as.Date(df_raw$date)
+na_share   <- sort(colMeans(is.na(df_raw[, -1])), decreasing = TRUE)
+most_missing <- names(na_share[na_share > 0.2])
+```
+
+The raw dataset has `r sum(duplicated(df_raw))` duplicate rows and covers `r format(min(raw_dates))` to `r format(max(raw_dates))`. The main issue is missingness: series that start later (`r paste(most_missing, collapse = ", ")`) are missing for more than 20% of months, and the most recent months are incomplete because of publication delays. These are handled in the cleaning steps below.
 
 # Data Cleaning
 
@@ -90,47 +120,49 @@ The date variable was converted to `Date` format so the dataset could be filtere
 ## Remove Invalid or Incomplete Observations
 
 ```{r}
+# Sample end: the last month in which every series has been published.
+# Series are released with different delays, so later months are incomplete.
+series_cols <- setdiff(names(df_clean), "date")
+
+last_obs <- sapply(series_cols, function(col) {
+  max(df_clean$date[!is.na(df_clean[[col]])])
+})
+SAMPLE_END <- as.Date(min(last_obs))
+
+sort(as.Date(last_obs))  # last available month per series
+
 df_clean <- df_clean %>%
-  # Same sample end as the original submission (Dec 2025). TODO(B3): compute
-  # the cutoff from data availability instead of hardcoding it.
-  filter(date < as.Date("2026-01-01"))
+  filter(date <= SAMPLE_END)
 ```
 
-Observations from January 2026 through March 2026 were removed because multiple variables were incomplete in that period. Excluding these rows keeps the modeling dataset more consistent.
+The sample ends in `r format(SAMPLE_END, "%B %Y")`, the last month in which every series has been published. Later months are dropped because some series are released with a delay of one to two months.
 
 ## Handle Missing Values
 
 ```{r}
-df_clean$UNRATE[df_clean$date == as.Date("2025-10-01")] <- mean(
-  c(
-    df_clean$UNRATE[df_clean$date == as.Date("2025-09-01")],
-    df_clean$UNRATE[df_clean$date == as.Date("2025-11-01")]
-  ),
-  na.rm = TRUE
-)
+# Fill short gaps inside a series (e.g. October 2025, when the government
+# shutdown stopped some releases) by carrying the last value forward.
+# Carrying forward never uses later data, so it adds no look-ahead.
+# Leading NAs (before a series starts) are left alone.
+before <- df_clean
 
-df_clean[df_clean$date %in% as.Date(c("2025-09-01", "2025-10-01", "2025-11-01")),
-         c("date", "UNRATE")]
-```
-
-The missing unemployment rate for October 2025 was filled using the average of the adjacent months, September and November 2025. Since this was an isolated internal missing value, simple interpolation was sufficient.
-
-## Drop or Replace Variables
-
-```{r}
 df_clean <- df_clean %>%
-  select(-PCEC96)
+  arrange(date) %>%
+  mutate(across(
+    all_of(series_cols),
+    ~ zoo::na.locf(.x, na.rm = FALSE, maxgap = MAX_GAP_FILL)
+  ))
+
+filled <- map_dfr(series_cols, function(col) {
+  idx <- which(is.na(before[[col]]) & !is.na(df_clean[[col]]))
+  tibble(series = col, date = before$date[idx], filled_with = df_clean[[col]][idx])
+})
+filled
 ```
 
-`PCEC96` was removed because related consumption measures were already available in the dataset and this variable added substantial missingness without being central to the final feature set.
+`r nrow(filled)` value(s) were missing inside a series and filled with the previous month's value: `r paste(filled$series, format(filled$date, "%b %Y"), collapse = ", ")`.
 
-```{r}
-# WTISPLC now comes in the main panel from R/acquire_data.R
-df_clean <- df_clean %>%
-  select(-DCOILWTICO)
-```
-
-`DCOILWTICO` was replaced with `WTISPLC`, which captures the same WTI crude oil price concept while providing longer historical coverage.
+Oil prices come from `WTISPLC`, the monthly WTI spot price, which has a longer history than the daily series.
 
 # Feature Engineering
 
@@ -199,7 +231,7 @@ The variable `days_since_last_fomc` was added to measure how much time had passe
 
 ```{r}
 df_final <- df_clean %>%
-  filter(date >= as.Date("1986-01-01"))
+  filter(date >= SAMPLE_START)
 ```
 
 After preprocessing and feature construction, the final working dataset was restricted to the post-1986 period to align with the availability of the selected variables and the scope of the modeling analysis.
@@ -474,53 +506,48 @@ Rolling coefficients provide a visual way to assess whether the reaction functio
 ## Breakpoint Analysis
 
 ```{r}
-bp <- breakpoints(
-  ff_target ~ core_pce_yoy + UNRATE +
-    term_spread_10y_3m + BAA10Y + ANFCI,
-  data = df_reg_rq2
-)
+rq1_formula <- ff_target ~ core_pce_yoy + UNRATE +
+  term_spread_10y_3m + BAA10Y + ANFCI
+
+bp <- breakpoints(rq1_formula, data = df_reg_rq2, breaks = BP_MAX_BREAKS)
 
 summary(bp)
 plot(bp)
 ```
 
 ```{r}
-confint(bp, breaks = 3)
+# Number of breaks is a setting (BP_N_BREAKS); the dates come from the fitted
+# model. BIC's own choice is printed for comparison.
+bic_breaks <- length(breakpoints(bp)$breakpoints)
+bic_breaks
 
-df_reg_rq2$date[c(198, 274, 387)]
+bp_rows  <- breakpoints(bp, breaks = BP_N_BREAKS)$breakpoints
+n_breaks <- length(bp_rows)
+bp_dates <- df_reg_rq2$date[bp_rows]
+
+n_breaks
+bp_dates
+confint(bp, breaks = n_breaks)
 ```
 
 ```{r}
 plot(df_reg_rq2$date, df_reg_rq2$ff_target, type = "l")
-abline(v = df_reg_rq2$date[c(198, 274, 387)], col = "red")
+abline(v = bp_dates, col = "red")
 ```
 
-This section formally identifies structural break candidates in the relationship between the federal funds target and the explanatory variables.
+The analysis uses `r n_breaks` breaks, estimated at `r paste(format(bp_dates, "%b %Y"), collapse = ", ")`. BIC alone would pick `r bic_breaks`, the most the test allows; with trending variables and serially correlated errors BIC tends to over-select breaks, so the number of breaks is kept as an explicit choice.
 
 ## Chow Tests
 
 ```{r}
-chow_dates <- as.Date(c(
-  "2001-09-01",
-  "2002-06-01",
-  "2008-01-01",
-  "2008-10-01",
-  "2008-11-01",
-  "2018-03-01",
-  "2020-03-01"
-))
+chow_dates <- sort(unique(c(CHOW_EVENT_DATES, bp_dates)))
 
-for (d in chow_dates) {
-  idx <- which(df_reg_rq2$date == as.Date(d, origin = "1970-01-01"))
+for (d in as.list(chow_dates)) {
+  idx <- which(df_reg_rq2$date == d)
   if (length(idx) > 0) {
-    test <- sctest(
-      ff_target ~ core_pce_yoy + UNRATE +
-        term_spread_10y_3m + BAA10Y + ANFCI,
-      type = "Chow",
-      point = idx,
-      data = df_reg_rq2
-    )
-    cat("Date:", format(as.Date(d, origin = "1970-01-01")),
+    test <- sctest(rq1_formula, type = "Chow", point = idx, data = df_reg_rq2)
+    cat("Date:", format(d),
+        if (d %in% bp_dates) "(estimated break)" else "(event)",
         "| F =", round(test$statistic, 2),
         "| p-value =", format(test$p.value, scientific = TRUE), "\n")
   }
@@ -532,42 +559,28 @@ The Chow tests evaluate whether the regression relationship shifts at both estim
 ## Sub-Period Regressions
 
 ```{r}
+# Sub-periods run between the estimated break dates.
+period_starts <- c(min(df_reg_rq2$date), bp_dates)
+period_ends   <- c(bp_dates, max(df_reg_rq2$date) + 1)
+period_labels <- paste0(format(period_starts, "%Y"), "-", format(period_ends - 1, "%Y"))
+
 df_reg_rq2$period <- cut(
   df_reg_rq2$date,
-  breaks = as.Date(c("1986-01-01", "2002-06-01", "2008-10-01", "2018-03-01", "2030-01-01")),
-  labels = c("1986-2002", "2002-2008", "2008-2018", "2018+"),
+  breaks = c(period_starts, max(df_reg_rq2$date) + 1),
+  labels = period_labels,
   right = FALSE
 )
 
-model_p1 <- lm(ff_target ~ core_pce_yoy + UNRATE + term_spread_10y_3m + BAA10Y + ANFCI,
-               data = subset(df_reg_rq2, period == "1986-2002"))
-model_p2 <- lm(ff_target ~ core_pce_yoy + UNRATE + term_spread_10y_3m + BAA10Y + ANFCI,
-               data = subset(df_reg_rq2, period == "2002-2008"))
-model_p3 <- lm(ff_target ~ core_pce_yoy + UNRATE + term_spread_10y_3m + BAA10Y + ANFCI,
-               data = subset(df_reg_rq2, period == "2008-2018"))
-model_p4 <- lm(ff_target ~ core_pce_yoy + UNRATE + term_spread_10y_3m + BAA10Y + ANFCI,
-               data = subset(df_reg_rq2, period == "2018+"))
-```
-
-```{r}
-models <- list(
-  "1986-2002" = model_p1,
-  "2002-2008" = model_p2,
-  "2008-2018" = model_p3,
-  "2018+" = model_p4
-)
+models <- lapply(period_labels, function(p) {
+  lm(rq1_formula, data = subset(df_reg_rq2, period == p))
+})
+names(models) <- period_labels
 
 lapply(models, summary)
 ```
 
 ```{r}
-coef_table <- rbind(
-  "1986-2002" = coef(model_p1),
-  "2002-2008" = coef(model_p2),
-  "2008-2018" = coef(model_p3),
-  "2018+" = coef(model_p4)
-)
-
+coef_table <- do.call(rbind, lapply(models, coef))
 coef_table
 ```
 
@@ -730,7 +743,16 @@ fviz_nbclust(pc_scores, kmeans, method = "silhouette")
 ```
 
 ```{r}
-k <- 3
+# Silhouette diagnostics over K_RANGE; k itself is a setting (K_CLUSTERS).
+set.seed(123)
+dist_pc <- dist(pc_scores)
+avg_sil <- sapply(K_RANGE, function(kk) {
+  fit <- kmeans(pc_scores, centers = kk, nstart = 50)
+  mean(silhouette(fit$cluster, dist_pc)[, "sil_width"])
+})
+data.frame(k = K_RANGE, avg_silhouette = round(avg_sil, 3))
+
+k <- K_CLUSTERS
 set.seed(123)
 km <- kmeans(pc_scores, centers = k, nstart = 100)
 
@@ -743,7 +765,7 @@ result <- data.frame(
 head(result)
 ```
 
-The clustering uses k-means on the retained principal components, with the number of clusters chosen based on the WSS and silhouette diagnostics.
+The clustering uses k-means on the retained principal components. The analysis uses k = `r k` clusters. Average silhouette widths for k = `r min(K_RANGE)` to `r max(K_RANGE)` are all between `r sprintf("%.2f", min(avg_sil))` and `r sprintf("%.2f", max(avg_sil))`, which indicates weak cluster structure, so k is kept as an explicit choice rather than picked by silhouette.
 
 ## Cluster Visualization
 
@@ -1497,7 +1519,20 @@ These tuning functions keep the model-fitting section organized while preserving
 
 ## Held-Out Test Evaluation
 
-```{r}
+```{r rq3-inputs-hash}
+# Fingerprint of everything the two cached RQ3 chunks depend on: data,
+# settings, tuning/metric functions and package versions. If any of these
+# change, knitr re-runs the cached chunks; otherwise it reuses the results.
+fn_code <- function(...) lapply(list(...), deparse)
+rq3_inputs_hash <- digest::digest(list(
+  df_final_rq3, train_data, test_data, RQ3_START_TRAIN, RQ3_STEP,
+  fn_code(tune_multinom, tune_enet, tune_rf, tune_xgb, get_metrics,
+          make_inner_split, to_xgb_label, rank_metric_table),
+  lapply(sessionInfo()$otherPkgs, `[[`, "Version")
+))
+```
+
+```{r rq3-holdout, cache=TRUE, cache.extra=rq3_inputs_hash}
 multinom_obj <- tune_multinom(train_data)
 multinom_fit <- multinom_obj$final_fit
 multinom_pred <- predict(multinom_fit, newdata = test_data)
@@ -1655,9 +1690,9 @@ These helper functions store fold-level metrics in a consistent format so the ro
 
 ### Rolling / Expanding Window Evaluation
 
-```{r}
-start_train <- 200
-step_size <- 12
+```{r rq3-rolling, cache=TRUE, cache.extra=list(rq3_inputs_hash, fn_code(get_fold_main_metrics, get_fold_extra_metrics, get_fold_classwise_metrics))}
+start_train <- RQ3_START_TRAIN
+step_size <- RQ3_STEP
 
 rolling_main_results <- list()
 rolling_extra_results <- list()
