@@ -117,8 +117,8 @@ and mark it done with a one-line outcome before moving on.
 
 | Decision | Status | Current direction |
 |---|---|---|
-| Static vs. reproducible / refreshed report | open | Reproducible pipeline that re-renders on a schedule (after each FOMC meeting), not a live server app |
-| Output format | open | Quarto (`.qmd`) rendered to HTML, published with GitHub Pages; keep PDF export available |
+| Static vs. reproducible / refreshed report | decided | Reproducible: one command rebuilds everything from raw data; publishing is manual. Scheduled refresh and prediction tracker deferred (optional later) |
+| Output format | decided | Quarto website on GitHub Pages: Home, The rule, The regimes, The prediction, Appendix. Code folded by default; `freeze` enabled for slow chunks |
 | Time-series extension of RQ3 | open | Meeting-level dynamic models (ordered probit with lagged decision, autoregressive conditional hazard) plus a monthly rate-path model (VAR / BVAR / local projections). Data is too small for deep sequence models |
 | Fixes to teammates' RQ1/RQ2 | approved | Teammates agreed to public MIT release and to changes, marked as Inuk's |
-| Narrative structure | open | One headline question (predicting FOMC decisions), with RQ1/RQ2 as supporting sections |
+| Narrative structure | decided | Data science portfolio. One question, "How does the Fed set rates, and can we predict its next move?", in three connected chapters: the rule (RQ1), the regimes (RQ2), the prediction (RQ3, headline). RQ1 break dates set RQ3 training windows; RQ2 regime labels are an RQ3 feature, fit per fold on training data only |
