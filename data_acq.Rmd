@@ -1,0 +1,197 @@
+---
+title: "data_acq"
+author: "Inuk Baik"
+date: "2026-03-02"
+output: pdf_document
+---
+
+```{r}
+# install.packages(c("rvest","stringr","dplyr","purrr","lubridate","quantmod","tibble","xts"))
+library(rvest)
+library(stringr)
+library(dplyr)
+library(purrr)
+library(lubridate)
+library(quantmod)
+library(tibble)
+library(xts)
+
+# -----------------------------
+# Helpers: parse meeting headings (historical pages)
+# -----------------------------
+.parse_end_date_from_heading <- function(heading, year) {
+  s <- heading %>%
+    str_replace_all("\\s+", " ") %>%
+    str_remove("\\s*Meeting\\s*-\\s*\\d{4}\\s*$") %>%
+    str_remove_all("\\(.*?\\)") %>%
+    str_trim()
+
+  if (!str_detect(s, "-")) {
+    return(suppressWarnings(mdy(paste(s, year))))
+  }
+
+  parts <- str_split(s, "-", n = 2, simplify = TRUE)
+  left  <- str_trim(parts[1])
+  right <- str_trim(parts[2])
+
+  start_month <- str_extract(left, "^[A-Za-z]+")
+  if (str_detect(right, "^[A-Za-z]+")) {
+    end_month <- str_extract(right, "^[A-Za-z]+")
+    end_day   <- str_extract(right, "\\d{1,2}$")
+  } else {
+    end_month <- start_month
+    end_day   <- str_extract(right, "\\d{1,2}")
+  }
+
+  suppressWarnings(mdy(paste(end_month, end_day, year)))
+}
+
+.get_meetings_historical_year <- function(year) {
+  url <- sprintf("https://www.federalreserve.gov/monetarypolicy/fomchistorical%d.htm", year)
+  pg <- read_html(url)
+
+  h <- pg %>%
+    html_elements("h5") %>%
+    html_text(trim = TRUE)
+
+  h <- h[str_detect(h, "Meeting\\s*-\\s*\\d{4}\\s*$")]
+
+  if (length(h) == 0) {
+    return(tibble(meeting_date = as.Date(character()), source_year = integer()))
+  }
+
+  tibble(
+    meeting_date = as.Date(map(h, ~ .parse_end_date_from_heading(.x, year)) |> unlist()),
+    source_year  = year
+  ) %>%
+    filter(!is.na(meeting_date)) %>%
+    distinct(meeting_date, .keep_all = TRUE) %>%
+    arrange(meeting_date)
+}
+
+.get_meetings_from_calendar_page <- function(year) {
+  url <- "https://www.federalreserve.gov/monetarypolicy/fomccalendars.htm"
+  txt <- read_html(url) %>% html_text(trim = TRUE)
+
+  start_pat <- sprintf("%d\\s+FOMC Meetings", year)
+  end_pat   <- sprintf("%d\\s+FOMC Meetings", year - 1)
+
+  start_pos <- str_locate(txt, start_pat)[1, 1]
+  if (is.na(start_pos)) return(tibble(meeting_date = as.Date(character()), source_year = integer()))
+
+  sub <- str_sub(txt, start_pos)
+  end_pos <- str_locate(sub, end_pat)[1, 1]
+  if (!is.na(end_pos)) sub <- str_sub(sub, 1, end_pos - 1)
+
+  rx <- "(January|February|March|April|May|June|July|August|September|October|November|December|Jan/Feb|Feb/Mar|Mar/Apr|Apr/May|May/Jun|Jun/Jul|Jul/Aug|Aug/Sep|Sep/Oct|Oct/Nov|Nov/Dec|Dec/Jan)\\s+(\\d{1,2}-\\d{1,2}\\*?)"
+  m <- str_match_all(sub, rx)[[1]]
+  if (nrow(m) == 0) return(tibble(meeting_date = as.Date(character()), source_year = integer()))
+
+  month_label <- m[, 2]
+  day_range   <- m[, 3] %>% str_remove("\\*")
+
+  end_day <- str_extract(day_range, "(?<=-)\\d{1,2}") %>% as.integer()
+
+  end_month <- map_chr(month_label, function(ml) {
+    if (str_detect(ml, "/")) str_split(ml, "/", simplify = TRUE)[2] else ml
+  })
+
+  month_map <- c(Jan="January", Feb="February", Mar="March", Apr="April", May="May", Jun="June",
+                 Jul="July", Aug="August", Sep="September", Oct="October", Nov="November", Dec="December")
+  end_month_full <- ifelse(end_month %in% names(month_map), month_map[end_month], end_month)
+
+  tibble(
+    meeting_date = as.Date(mdy(paste(end_month_full, end_day, year))),
+    source_year  = year
+  ) %>%
+    filter(!is.na(meeting_date)) %>%
+    distinct(meeting_date, .keep_all = TRUE) %>%
+    arrange(meeting_date)
+}
+
+# -----------------------------
+# 1) Get FOMC decision dates (rows = meeting decision date)
+# -----------------------------
+meet_82_20 <- map_dfr(1982:2020, .get_meetings_historical_year)
+meet_21_26 <- map_dfr(2021:2026, .get_meetings_from_calendar_page)
+
+meetings <- bind_rows(meet_82_20, meet_21_26) %>%
+  arrange(meeting_date) %>%
+  distinct(meeting_date, .keep_all = TRUE) %>%
+  filter(meeting_date <= as.Date("2026-03-31"))
+
+# -----------------------------
+# 2) Pull target series and create one "target level" series
+# -----------------------------
+getSymbols(c("DFEDTAR","DFEDTARL","DFEDTARU"), src = "FRED")
+
+cutover <- as.Date("2008-12-16")
+
+df_tar <- tibble(
+  date   = as.Date(index(DFEDTAR)),
+  target = as.numeric(DFEDTAR$DFEDTAR)
+) %>% filter(!is.na(target))
+
+df_rng <- tibble(
+  date  = as.Date(index(DFEDTARL)),
+  lower = as.numeric(DFEDTARL$DFEDTARL),
+  upper = as.numeric(DFEDTARU$DFEDTARU)
+) %>%
+  filter(!(is.na(lower) | is.na(upper))) %>%
+  transmute(date = date, target = (lower + upper) / 2)
+
+target_daily <- bind_rows(
+  df_tar %>% filter(date < cutover),
+  df_rng %>% filter(date >= cutover)
+) %>%
+  arrange(date) %>%
+  distinct(date, .keep_all = TRUE)
+
+target_xts <- xts(target_daily$target, order.by = target_daily$date)
+first_target_date <- min(target_daily$date)
+
+get_target_asof <- function(d) {
+  if (d < first_target_date) return(NA_real_)
+  x <- target_xts[paste0("/", d)]
+  if (NROW(x) == 0) return(NA_real_)
+  as.numeric(last(x))
+}
+
+# Option A (recommended): drop meetings before target data exists
+meetings2 <- meetings %>% filter(meeting_date >= first_target_date)
+
+# -----------------------------
+# 3) Build meeting-level dataset
+# -----------------------------
+fomc_target <- meetings2 %>%
+  mutate(target = map_dbl(meeting_date, get_target_asof)) %>%
+  arrange(meeting_date) %>%
+  mutate(
+    delta = target - lag(target),
+    label = case_when(
+      is.na(delta) ~ NA_character_,
+      delta > 0    ~ "hike",
+      delta < 0    ~ "cut",
+      TRUE         ~ "hold"
+    )
+  )
+
+fomc_target
+```
+
+```{r}
+library(dplyr)
+
+fomc_target_no_label <- fomc_target %>% select(-label)
+
+write.csv(
+  fomc_target_no_label,
+  file = "fomc_target_1982_2026M03_meeting_rows.csv",
+  row.names = FALSE
+)
+
+
+getwd()
+list.files(pattern = "fomc_target_1982_2026M03_meeting_rows.csv")
+```
+

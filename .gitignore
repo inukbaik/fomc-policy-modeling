@@ -47,3 +47,16 @@ po/*~
 
 # RStudio Connect folder
 rsconnect/
+
+# Secrets
+.env
+
+# Local-only portfolio material (not published for now)
+reports/
+figures/
+
+# macOS
+.DS_Store
+
+# Data files (local only for now)
+*.csv

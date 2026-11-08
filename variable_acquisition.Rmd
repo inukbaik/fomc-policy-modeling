@@ -1,0 +1,214 @@
+---
+title: "variables_acq"
+author: "Inuk Baik"
+date: "2026-03-02"
+output: pdf_document
+---
+```{r}
+
+suppressPackageStartupMessages({
+  library(httr)
+  library(jsonlite)
+  library(dplyr)
+  library(tidyr)
+  library(lubridate)
+  library(purrr)
+  library(readr)
+})
+
+readRenviron(".env")  # loads FRED_KEY from the git-ignored .env file
+FRED_KEY <- Sys.getenv("FRED_KEY")
+if (FRED_KEY == "") stop("FRED_KEY not set. Copy .env.example to .env and add your key.")
+
+# ---- 1) Helpers ----
+fred_obs <- function(series_id, observation_start = "1900-01-01", observation_end = Sys.Date()) {
+  url <- "https://api.stlouisfed.org/fred/series/observations"
+  resp <- GET(url, query = list(
+    series_id = series_id,
+    api_key = FRED_KEY,
+    file_type = "json",
+    observation_start = observation_start,
+    observation_end = as.character(observation_end)
+  ))
+  stop_for_status(resp)
+
+  x <- fromJSON(content(resp, as = "text", encoding = "UTF-8"))
+  tibble(
+    date  = as.Date(x$observations$date),
+    value = suppressWarnings(as.numeric(x$observations$value))
+  ) %>%
+    filter(!is.na(value)) %>%
+    arrange(date)
+}
+
+to_monthly_avg <- function(df, value_col = "value") {
+  df %>%
+    mutate(month = floor_date(date, "month")) %>%
+    group_by(month) %>%
+    summarise(value = mean(.data[[value_col]], na.rm = TRUE), .groups = "drop") %>%
+    rename(date = month)
+}
+
+# ---- 2) Fed target (continuous) + policy change flag ----
+# DFEDTAR ends 2008-12-15; range starts 2008-12-16.
+dfedtar <- fred_obs("DFEDTAR", observation_start = "1982-09-01") %>%
+  rename(dfedtar = value)
+
+dfedtaru <- fred_obs("DFEDTARU", observation_start = "2008-11-01") %>%
+  rename(dfedtaru = value)
+
+dfedtarl <- fred_obs("DFEDTARL", observation_start = "2008-11-01") %>%
+  rename(dfedtarl = value)
+
+# Midpoint of the range (daily)
+df_range_mid <- full_join(dfedtarl, dfedtaru, by = "date") %>%
+  mutate(dfedtar_mid = (dfedtarl + dfedtaru) / 2) %>%
+  select(date, dfedtar_mid)
+
+# Continuous target (daily): DFEDTAR where available, else midpoint
+ff_target_daily <- full_join(dfedtar, df_range_mid, by = "date") %>%
+  mutate(ff_target = coalesce(dfedtar, dfedtar_mid)) %>%
+  arrange(date) %>%
+  select(date, ff_target)
+
+# Policy Change (daily): TRUE if target changes from previous day
+# (This flags change days, not literally “meeting day” calendar)
+ff_target_daily <- ff_target_daily %>%
+  arrange(date) %>%
+  mutate(policy_change_day = (ff_target != lag(ff_target))) %>%
+  mutate(policy_change_day = if_else(is.na(policy_change_day), FALSE, policy_change_day))
+
+# Convert to monthly:
+# - ff_target: monthly average of daily target
+# - policy_change: TRUE if any change day happened within the month
+ff_target_monthly <- ff_target_daily %>%
+  mutate(month = floor_date(date, "month")) %>%
+  group_by(month) %>%
+  summarise(
+    ff_target = mean(ff_target, na.rm = TRUE),
+    policy_change = any(policy_change_day, na.rm = TRUE),
+    .groups = "drop"
+  ) %>%
+  rename(date = month)
+
+# ---- 3) Monthly series (already monthly on FRED) ----
+monthly_ids <- c(
+  "PCEPI", "PCEPILFE",
+  "MICH",
+  "UNRATE", "PAYEMS", "JTSJOL", "JTSQUR",
+  "INDPRO", "PCEC96", "HOUST", "RRSFS"
+)
+
+monthly_tbls <- map(monthly_ids, ~{
+  fred_obs(.x, observation_start = "1900-01-01") %>%
+    rename(!!.x := value)
+})
+
+monthly_data <- reduce(monthly_tbls, full_join, by = "date")
+
+# ---- 4) Daily/weekly series to monthly average ----
+# (All of these are resampled to monthly average)
+resample_ids <- c(
+  # Inflation expectations (daily)
+  "T5YIE",
+  # Yields / curve (daily)
+  "DGS3MO", "DGS2", "DGS10", "T10Y3M",
+  # Credit spreads (daily)
+  "BAMLH0A0HYM2", "BAA10Y",
+  # Financial conditions (weekly)
+  "ANFCI",
+  # Dollar & commodities (daily)
+  "DTWEXBGS", "DCOILWTICO"
+)
+
+resampled_tbls <- map(resample_ids, ~{
+  fred_obs(.x, observation_start = "1900-01-01") %>%
+    to_monthly_avg() %>%
+    rename(!!.x := value)
+})
+
+resampled_data <- reduce(resampled_tbls, full_join, by = "date")
+
+# ---- 5) Combine everything into one RAW monthly panel ----
+raw_monthly <- ff_target_monthly %>%
+  full_join(monthly_data, by = "date") %>%
+  full_join(resampled_data, by = "date") %>%
+  arrange(date)
+
+
+# ---- 6) Save ----
+write_csv(raw_monthly, "fred_raw_monthly_dataset.csv")
+
+# Print quick summary
+cat("Rows:", nrow(raw_monthly), "\n")
+cat("Date range:", as.character(min(raw_monthly$date, na.rm = TRUE)), "to",
+    as.character(max(raw_monthly$date, na.rm = TRUE)), "\n")
+cat("Saved: fred_raw_monthly_dataset.csv\n")
+
+# View head
+print(head(raw_monthly, 12))
+
+head(raw_monthly)
+
+write.csv(
+  raw_monthly,
+  file = "fed_funds_raw.csv",
+  row.names = FALSE
+)
+
+
+getwd()
+list.files(pattern = "fed_funds_raw.csv")
+```
+
+```{r}
+
+
+FRED_KEY <- Sys.getenv("FRED_KEY")
+
+library(httr)
+library(jsonlite)
+library(dplyr)
+library(tidyr)
+library(lubridate)
+library(purrr)
+library(readr)
+
+
+# ---- Helpers ----
+fred_obs <- function(series_id, observation_start = "1982-09-01", observation_end = Sys.Date()) {
+  url <- "https://api.stlouisfed.org/fred/series/observations"
+  resp <- GET(url, query = list(
+    series_id         = series_id,
+    api_key           = FRED_KEY,
+    file_type         = "json",
+    observation_start = observation_start,
+    observation_end   = as.character(observation_end)
+  ))
+  stop_for_status(resp)
+  x <- fromJSON(content(resp, as = "text", encoding = "UTF-8"))
+  tibble(
+    date  = as.Date(x$observations$date),
+    value = suppressWarnings(as.numeric(x$observations$value))
+  ) %>%
+    filter(!is.na(value)) %>%
+    arrange(date)
+}
+
+to_monthly_avg <- function(df, value_col = "value") {
+  df %>%
+    mutate(month = floor_date(date, "month")) %>%
+    group_by(month) %>%
+    summarise(value = mean(.data[[value_col]], na.rm = TRUE), .groups = "drop") %>%
+    rename(date = month)
+}
+
+# ---- Fetch DGS5 and DFII5 (daily → monthly average) ----
+WTISPLC <- fred_obs("WTISPLC", observation_start = "1982-09-01") %>%
+  to_monthly_avg() %>%
+  rename(WTISPLC = value)
+
+head(WTISPLC)
+
+write.csv(WTISPLC, "WTISPLC.csv", row.names=FALSE)
+```
