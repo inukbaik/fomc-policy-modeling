@@ -18,7 +18,7 @@ The original submission has three research questions in `fomc_policy_analysis.Rm
 |---|---|---|---|
 | RQ1 | How does the target relate to macro variables, and is that stable over time? | OLS, rolling coefficients, Bai-Perron breakpoints, Chow tests | teammate |
 | RQ2 | Can macro conditions be grouped into regimes? | PCA + k-means | teammate |
-| RQ3 | Can the meeting decision (cut / hold / hike) be predicted? | multinomial logit, elastic net, RF, XGBoost, expanding-window evaluation | Inuk |
+| RQ3 | Using only pre-meeting information, how do model families compare at predicting cut / hold / hike? (A fair comparison, not a race for the best forecast.) | multinomial logit, elastic net, RF, XGBoost, expanding-window evaluation | Inuk |
 
 Note: inside the notebook the object names are swapped (`data_rq2` holds the RQ1
 data, `data_rq1` the RQ2 data). Don't "fix" one without the other.
@@ -53,10 +53,17 @@ the old root-level CSVs belong to tag `v1.0-course-submission`.
   `cp .env.example .env`, then set `FRED_KEY`. The script stops if any FOMC
   heading fails to parse.
 - Render a notebook with `Rscript -e 'rmarkdown::render("fomc_policy_analysis.Rmd")'`.
-  Needs pandoc (bundled with Quarto). Without it, test code with
-  `knitr::purl()` and `source()` the result.
-- The RQ3 expanding-window loop refits four tuned models per fold and takes a while.
-  Run long renders in the background.
+  rmarkdown doesn't find Quarto's bundled pandoc on its own; set
+  `RSTUDIO_PANDOC=/Applications/quarto/bin/tools/aarch64` for the command.
+- **Don't run the full notebook just to check a change.** The two slow RQ3
+  chunks (`rq3-holdout`, `rq3-rolling`, ~2.5 of ~3 min) are cached by knitr
+  and keyed on `rq3_inputs_hash` (data, settings, tuning/metric functions,
+  package versions). Renders re-run them only when one of those changes.
+  The cache lives in `fomc_policy_analysis_cache/` (git-ignored). Delete it to
+  force a full re-run.
+- For checks outside RQ3, run only the part you changed: `knitr::purl()` the
+  notebook and source up to the section you need.
+- Run anything that re-fits the RQ3 models in the background.
 - `xgboost` 3.x is installed locally; its R API changed from 1.x. Check version
   differences before touching XGBoost code.
 
