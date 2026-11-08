@@ -38,7 +38,8 @@ library(factoextra)
 
 ```{r}
 set.seed(597)
-df_raw <- read.csv("fed_funds_raw.csv")
+# Produced by R/acquire_data.R
+df_raw <- read.csv("data/macro_monthly.csv")
 
 dim(df_raw)
 colnames(df_raw)
@@ -90,7 +91,9 @@ The date variable was converted to `Date` format so the dataset could be filtere
 
 ```{r}
 df_clean <- df_clean %>%
-  filter(!(date >= as.Date("2026-01-01") & date <= as.Date("2026-03-31")))
+  # Same sample end as the original submission (Dec 2025). TODO(B3): compute
+  # the cutoff from data availability instead of hardcoding it.
+  filter(date < as.Date("2026-01-01"))
 ```
 
 Observations from January 2026 through March 2026 were removed because multiple variables were incomplete in that period. Excluding these rows keeps the modeling dataset more consistent.
@@ -122,12 +125,9 @@ df_clean <- df_clean %>%
 `PCEC96` was removed because related consumption measures were already available in the dataset and this variable added substantial missingness without being central to the final feature set.
 
 ```{r}
-wtisplc <- read.csv("WTISPLC.csv") %>%
-  mutate(date = as.Date(date))
-
+# WTISPLC now comes in the main panel from R/acquire_data.R
 df_clean <- df_clean %>%
-  select(-DCOILWTICO) %>%
-  left_join(wtisplc, by = "date")
+  select(-DCOILWTICO)
 ```
 
 `DCOILWTICO` was replaced with `WTISPLC`, which captures the same WTI crude oil price concept while providing longer historical coverage.
@@ -153,8 +153,12 @@ Several derived variables were created to better capture macroeconomic condition
 ## Create Target-Related Variables
 
 ```{r}
-fomc_meetings <- read.csv("fed_meetings.csv") %>%
-  mutate(date = as.Date(date))
+# Produced by R/acquire_data.R. Keep meetings and conference calls; drop
+# notation votes and the cancelled March 2020 meeting. `date` is the first day
+# of the meeting, as in the original fed_meetings.csv.
+fomc_meetings <- read.csv("data/fomc_meetings.csv") %>%
+  filter(!type %in% c("cancelled", "notation_vote")) %>%
+  mutate(date = as.Date(start_date))
 
 fomc_monthly <- fomc_meetings %>%
   mutate(month = as.Date(format(date, "%Y-%m-01"))) %>%
