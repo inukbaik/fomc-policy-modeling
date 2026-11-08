@@ -27,13 +27,16 @@ data, `data_rq1` the RQ2 data). Don't "fix" one without the other.
 
 | File | What it does |
 |---|---|
-| `data_acq.Rmd` | Scrapes FOMC meeting dates from federalreserve.gov and pulls DFEDTAR/DFEDTARL/DFEDTARU via `quantmod`; writes `fomc_target_1982_2026M03_meeting_rows.csv`. Not currently used by the analysis. |
-| `variable_acquisition.Rmd` | Pulls the monthly FRED panel through the FRED API (needs `FRED_KEY`); writes `fred_raw_monthly_dataset.csv` / `fed_funds_raw.csv` and `WTISPLC.csv`. |
-| `fomc_policy_analysis.Rmd` | Cleaning, feature engineering, EDA, RQ1–RQ3. Reads `fed_funds_raw.csv`, `WTISPLC.csv`, `fed_meetings.csv`. |
-| `fed_meetings.csv` | Meeting dates + scheduled flag. **No script in the repo produces it** (dates look like meeting start dates). |
+| `R/acquire_data.R` | Scrapes the FOMC calendar from federalreserve.gov (`rvest`) and pulls FRED series (`fredr`). Writes the three files in `data/`. |
+| `data/fomc_meetings.csv` | One row per FOMC event: `start_date`, `decision_date`, `type` (scheduled, unscheduled_meeting, conference_call, notation_vote, cancelled), `is_scheduled`, `has_sep`. Includes future scheduled meetings. |
+| `data/fed_target_daily.csv` | Daily target: DFEDTAR until 2008-12-15, then the midpoint of DFEDTARL/DFEDTARU (`lower`, `upper` kept). Use this for meeting-level labels. |
+| `data/macro_monthly.csv` | Monthly panel: monthly-average target, `policy_change`, monthly FRED series, and daily/weekly series averaged locally. |
+| `fomc_policy_analysis.Rmd` | Cleaning, feature engineering, EDA, RQ1–RQ3. Reads `data/macro_monthly.csv` and `data/fomc_meetings.csv`. |
 | `reports/`, `figures/` | Original PDFs and plots. Git-ignored, local only. |
 
-All `*.csv` files are git-ignored. Data is fetched, not committed.
+All `*.csv` files are git-ignored. Data is fetched, not committed. The
+original acquisition notebooks (`data_acq.Rmd`, `variable_acquisition.Rmd`) and
+the old root-level CSVs belong to tag `v1.0-course-submission`.
 
 ## Running
 
@@ -46,8 +49,12 @@ All `*.csv` files are git-ignored. Data is fetched, not committed.
   `renv::record(list(recipes = list(Package = "recipes", Version = "<ver>", Source = "Repository", Repository = "CRAN")))`,
   and delete any top-level `"Bioconductor"` block from `renv.lock`.
   `renv::status()` still lists `recipes` as out of sync; that's harmless.
+- Fetch data: `Rscript R/acquire_data.R` (about a minute). Needs a FRED API key:
+  `cp .env.example .env`, then set `FRED_KEY`. The script stops if any FOMC
+  heading fails to parse.
 - Render a notebook with `Rscript -e 'rmarkdown::render("fomc_policy_analysis.Rmd")'`.
-- Acquisition needs a FRED API key: `cp .env.example .env`, then set `FRED_KEY`.
+  Needs pandoc (bundled with Quarto). Without it, test code with
+  `knitr::purl()` and `source()` the result.
 - The RQ3 expanding-window loop refits four tuned models per fold and takes a while.
   Run long renders in the background.
 - `xgboost` 3.x is installed locally; its R API changed from 1.x. Check version
@@ -57,8 +64,12 @@ All `*.csv` files are git-ignored. Data is fetched, not committed.
 
 - **Never commit secrets.** `.env` holds `FRED_KEY` and stays ignored. Never print
   the key or put it in a URL that gets logged or rendered.
-- **Don't commit data.** Some FRED series (ICE BofA `BAMLH0A0HYM2`) carry
-  redistribution limits. Fetch at build time.
+- **Don't commit data.** Some FRED series carry redistribution limits. Fetch at
+  build time. ICE BofA series (e.g. `BAMLH0A0HYM2`) are limited to ~3 years on
+  FRED, so don't use them.
+- **FRED data gets revised.** Re-fetching changes past values (PCE, JOLTS,
+  payrolls; ANFCI is re-estimated weekly), so results can shift slightly
+  between pulls.
 - **No look-ahead.** Any predictor for meeting *t* must be information available
   before meeting *t*. Respect release lags (PCE for month m comes out near the end
   of month m+1) and prefer real-time vintages (ALFRED) once the pipeline supports them.
