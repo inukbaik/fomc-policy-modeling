@@ -64,6 +64,7 @@ RQ3_STEP        <- 12                     # meetings per test block
 RQ3_WEIGHT_OPTIONS <- c(FALSE, TRUE)      # tuning tries unweighted and inverse-frequency class weights (RQ3)
 RQ3_SEED        <- 597                    # seed for model fitting and the bootstrap (RQ3)
 RQ3_BOOT_REPS   <- 1000                   # bootstrap resamples for score intervals (RQ3)
+RQ3_CORES       <- max(1, parallel::detectCores(logical = FALSE) - 2)  # parallel folds (1 on Windows)
 RQ3_BOOT_BLOCK  <- 8                      # meetings per bootstrap block (~1 year)
 
 # Events tested with Chow tests alongside the estimated break dates (RQ1)
@@ -1492,32 +1493,37 @@ tune_xgb <- function(train_part) {
 
   results <- list()
 
+  # Boosting is sequential and deterministic here (no subsampling), so the
+  # first k trees of a 500-round fit are exactly a k-round fit. Train the
+  # largest nrounds once per setting and score each smaller nrounds from it.
   for (w in RQ3_WEIGHT_OPTIONS) for (eta_val in eta_grid) {
     dtrain <- xgb.DMatrix(
       data = x_inner_train, label = y_inner_train,
       weight = class_weights(inner_train$policy_action_class, w)
     )
     for (depth_val in max_depth_grid) {
-      for (nrounds_val in nrounds_grid) {
-        for (mcw_val in min_child_weight_grid) {
+      for (mcw_val in min_child_weight_grid) {
 
-          fit <- xgb.train(
-            params = list(
-              objective = "multi:softmax",
-              num_class = 3,
-              eval_metric = "merror",
-              eta = eta_val,
-              max_depth = depth_val,
-              min_child_weight = mcw_val,
-              subsample = 1,
-              colsample_bytree = 1
-            ),
-            data = dtrain,
-            nrounds = nrounds_val,
-            verbose = 0
-          )
+        fit <- xgb.train(
+          params = list(
+            objective = "multi:softmax",
+            num_class = 3,
+            eval_metric = "merror",
+            eta = eta_val,
+            max_depth = depth_val,
+            min_child_weight = mcw_val,
+            subsample = 1,
+            colsample_bytree = 1,
+            nthread = 1
+          ),
+          data = dtrain,
+          nrounds = max(nrounds_grid),
+          verbose = 0
+        )
 
-          pred_numeric <- predict(fit, newdata = dvalid)
+        for (nrounds_val in nrounds_grid) {
+          # xgboost 3.x: iterationrange is 1-based and inclusive
+          pred_numeric <- predict(fit, newdata = dvalid, iterationrange = c(1, nrounds_val))
           pred_factor <- factor(
             c("cut", "hold", "hike")[pred_numeric + 1],
             levels = c("cut", "hold", "hike")
@@ -1540,7 +1546,16 @@ tune_xgb <- function(train_part) {
     }
   }
 
-  results_df <- bind_rows(results) %>%
+  # Restore the original grid order (weighted, eta, depth, nrounds, mcw) so
+  # ties are broken exactly as before.
+  results <- bind_rows(results) %>%
+    arrange(
+      match(weighted, RQ3_WEIGHT_OPTIONS), match(eta, eta_grid),
+      match(max_depth, max_depth_grid), match(nrounds, nrounds_grid),
+      match(min_child_weight, min_child_weight_grid)
+    )
+
+  results_df <- results %>%
     rank_scores()
 
   best <- results_df[1, ]
@@ -1562,7 +1577,8 @@ tune_xgb <- function(train_part) {
       max_depth = best$max_depth,
       min_child_weight = best$min_child_weight,
       subsample = 1,
-      colsample_bytree = 1
+      colsample_bytree = 1,
+      nthread = 1
     ),
     data = dtrain_full,
     nrounds = best$nrounds,
@@ -1790,7 +1806,9 @@ fold_ends  <- seq(RQ3_START_TRAIN, n_meetings - 1, by = RQ3_STEP)
 # Each fold: tune every model on meetings 1..end_train, predict the next
 # RQ3_STEP meetings (fewer in the last fold). Keep every out-of-sample
 # prediction so all scores are computed afterwards from one table.
-rolling <- map(seq_along(fold_ends), function(fold) {
+# Folds run in parallel (forked workers). Each fold seeds every model
+# itself, so results do not depend on how folds are spread over cores.
+rolling <- parallel::mclapply(seq_along(fold_ends), function(fold) {
   end_train  <- fold_ends[fold]
   train_part <- df_final_rq3[1:end_train, ]
   test_part  <- df_final_rq3[(end_train + 1):min(end_train + RQ3_STEP, n_meetings), ]
@@ -1814,7 +1832,10 @@ rolling <- map(seq_along(fold_ends), function(fold) {
     tuning = imap(keep(fits, ~ !is.null(.x$obj$best_params)),
                   ~ cbind(Fold = fold, Model = .y, .x$obj$best_params))
   )
-})
+}, mc.cores = RQ3_CORES, mc.preschedule = FALSE)
+
+failed <- map_lgl(rolling, ~ inherits(.x, "try-error"))
+if (any(failed)) stop("Fold(s) failed: ", paste(which(failed), collapse = ", "), "\n", rolling[[which(failed)[1]]])
 
 fold_info     <- map_dfr(rolling, "info")
 rolling_preds <- map_dfr(rolling, "preds")
