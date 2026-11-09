@@ -20,8 +20,9 @@ The original submission has three research questions in `fomc_policy_analysis.Rm
 | RQ2 | Can macro conditions be grouped into regimes? | PCA + k-means | teammate |
 | RQ3 | Using only pre-meeting information, how do model families compare at predicting cut / hold / hike? (A fair comparison, not a race for the best forecast.) | multinomial logit, elastic net, RF, XGBoost, expanding-window evaluation | Inuk |
 
-Note: inside the notebook the object names are swapped (`data_rq2` holds the RQ1
-data, `data_rq1` the RQ2 data). Don't "fix" one without the other.
+Object names follow their section: `data_rq1` / `df_reg_rq1` (RQ1),
+`data_rq2` (RQ2), `*_rq3` (RQ3). The original submission had RQ1 and RQ2
+swapped; tag `v1.0-course-submission` still does.
 
 ## Layout
 

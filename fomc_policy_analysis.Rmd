@@ -364,7 +364,7 @@ This section studies how the federal funds target is related to selected macroec
 ## Variable Selection
 
 ```{r}
-data_rq2 <- df_final %>%
+data_rq1 <- df_final %>%
   arrange(date)
 
 vars <- c(
@@ -375,14 +375,14 @@ vars <- c(
   "fomc_meetings", "days_since_last_fomc"
 )
 
-df_full_rq2 <- data_rq2[, vars]
-na_ratio <- colMeans(is.na(df_full_rq2))
-df_clean_rq2 <- df_full_rq2[, na_ratio < 0.2]
+df_full_rq1 <- data_rq1[, vars]
+na_ratio <- colMeans(is.na(df_full_rq1))
+df_clean_rq1 <- df_full_rq1[, na_ratio < 0.2]
 ```
 
 ```{r}
-x <- model.matrix(ff_target ~ ., df_clean_rq2)[, -1]
-y <- df_clean_rq2$ff_target
+x <- model.matrix(ff_target ~ ., df_clean_rq1)[, -1]
+y <- df_clean_rq1$ff_target
 
 lasso <- cv.glmnet(x, y, alpha = 1)
 
@@ -394,7 +394,7 @@ Variable selection narrows the model to a smaller set of predictors that appear 
 ## Final Regression Dataset
 
 ```{r}
-df_reg_rq2 <- data_rq2[, c(
+df_reg_rq1 <- data_rq1[, c(
   "date", "ff_target", "core_pce_yoy", "UNRATE",
   "term_spread_10y_3m", "BAA10Y", "ANFCI"
 )]
@@ -405,15 +405,15 @@ The regression section uses a focused set of explanatory variables rather than t
 ## Exploratory Time-Series Checks
 
 ```{r}
-plot(df_reg_rq2$date, df_reg_rq2$ff_target, type = "l", main = "Federal Funds Target Rate")
+plot(df_reg_rq1$date, df_reg_rq1$ff_target, type = "l", main = "Federal Funds Target Rate")
 
-plot(df_reg_rq2$date, df_reg_rq2$core_pce_yoy, type = "l", main = "Core PCE Inflation (YoY %)")
+plot(df_reg_rq1$date, df_reg_rq1$core_pce_yoy, type = "l", main = "Core PCE Inflation (YoY %)")
 
-plot(df_reg_rq2$date, df_reg_rq2$UNRATE, type = "l", main = "Unemployment Rate")
+plot(df_reg_rq1$date, df_reg_rq1$UNRATE, type = "l", main = "Unemployment Rate")
 
-plot(df_reg_rq2$date, df_reg_rq2$term_spread_10y_3m, type = "l", main = "Term Spread")
+plot(df_reg_rq1$date, df_reg_rq1$term_spread_10y_3m, type = "l", main = "Term Spread")
 
-cor(df_reg_rq2[, -1], use = "complete.obs")
+cor(df_reg_rq1[, -1], use = "complete.obs")
 ```
 
 These plots and the correlation matrix give a first look at the time-series behavior and cross-variable relationships before formal estimation.
@@ -421,12 +421,12 @@ These plots and the correlation matrix give a first look at the time-series beha
 ## ADF Tests
 
 ```{r}
-adf.test(df_reg_rq2$ff_target)
-adf.test(df_reg_rq2$core_pce_yoy)
-adf.test(df_reg_rq2$UNRATE)
-adf.test(df_reg_rq2$term_spread_10y_3m)
-adf.test(df_reg_rq2$BAA10Y)
-adf.test(df_reg_rq2$ANFCI)
+adf.test(df_reg_rq1$ff_target)
+adf.test(df_reg_rq1$core_pce_yoy)
+adf.test(df_reg_rq1$UNRATE)
+adf.test(df_reg_rq1$term_spread_10y_3m)
+adf.test(df_reg_rq1$BAA10Y)
+adf.test(df_reg_rq1$ANFCI)
 ```
 
 The ADF tests motivate the later robustness checks in differences and the stability analysis.
@@ -436,7 +436,7 @@ The ADF tests motivate the later robustness checks in differences and the stabil
 ```{r}
 model_baseline <- lm(
   ff_target ~ core_pce_yoy + UNRATE + term_spread_10y_3m + BAA10Y + ANFCI,
-  data = df_reg_rq2
+  data = df_reg_rq1
 )
 
 summary(model_baseline)
@@ -447,12 +447,12 @@ The baseline model estimates the full-sample association between the policy rate
 ## Robustness Check 1: Dynamic Model
 
 ```{r}
-df_reg_rq2$ff_target_lag1 <- dplyr::lag(df_reg_rq2$ff_target, 1)
+df_reg_rq1$ff_target_lag1 <- dplyr::lag(df_reg_rq1$ff_target, 1)
 
 model_dyn <- lm(
   ff_target ~ ff_target_lag1 + core_pce_yoy + UNRATE +
     term_spread_10y_3m + BAA10Y + ANFCI,
-  data = df_reg_rq2
+  data = df_reg_rq1
 )
 
 summary(model_dyn)
@@ -464,11 +464,11 @@ The dynamic specification captures persistence in the policy rate through a lagg
 
 ```{r}
 df_diff <- data.frame(
-  date = df_reg_rq2$date[-1],
-  d_ff = diff(df_reg_rq2$ff_target),
-  d_core_pce = diff(df_reg_rq2$core_pce_yoy),
-  d_unrate = diff(df_reg_rq2$UNRATE),
-  term_spread_10y_3m = df_reg_rq2$term_spread_10y_3m[-1]
+  date = df_reg_rq1$date[-1],
+  d_ff = diff(df_reg_rq1$ff_target),
+  d_core_pce = diff(df_reg_rq1$core_pce_yoy),
+  d_unrate = diff(df_reg_rq1$UNRATE),
+  term_spread_10y_3m = df_reg_rq1$term_spread_10y_3m[-1]
 )
 
 model_diff <- lm(
@@ -485,7 +485,7 @@ The first-difference model checks whether the main relationships remain visible 
 
 ```{r}
 get_coef <- function(idx) {
-  window_data <- df_reg_rq2[idx, ]
+  window_data <- df_reg_rq1[idx, ]
   coef(lm(
     ff_target ~ core_pce_yoy + UNRATE +
       term_spread_10y_3m + BAA10Y + ANFCI,
@@ -494,7 +494,7 @@ get_coef <- function(idx) {
 }
 
 roll <- rollapply(
-  data = 1:nrow(df_reg_rq2),
+  data = 1:nrow(df_reg_rq1),
   width = 60,
   FUN = get_coef,
   by = 1,
@@ -502,7 +502,7 @@ roll <- rollapply(
 )
 
 roll <- as.data.frame(roll)
-roll_dates <- df_reg_rq2$date[60:nrow(df_reg_rq2)]
+roll_dates <- df_reg_rq1$date[60:nrow(df_reg_rq1)]
 ```
 
 ```{r}
@@ -527,7 +527,7 @@ Rolling coefficients provide a visual way to assess whether the reaction functio
 rq1_formula <- ff_target ~ core_pce_yoy + UNRATE +
   term_spread_10y_3m + BAA10Y + ANFCI
 
-bp <- breakpoints(rq1_formula, data = df_reg_rq2, breaks = BP_MAX_BREAKS)
+bp <- breakpoints(rq1_formula, data = df_reg_rq1, breaks = BP_MAX_BREAKS)
 
 summary(bp)
 plot(bp)
@@ -541,7 +541,7 @@ bic_breaks
 
 bp_rows  <- breakpoints(bp, breaks = BP_N_BREAKS)$breakpoints
 n_breaks <- length(bp_rows)
-bp_dates <- df_reg_rq2$date[bp_rows]
+bp_dates <- df_reg_rq1$date[bp_rows]
 
 n_breaks
 bp_dates
@@ -549,7 +549,7 @@ confint(bp, breaks = n_breaks)
 ```
 
 ```{r}
-plot(df_reg_rq2$date, df_reg_rq2$ff_target, type = "l")
+plot(df_reg_rq1$date, df_reg_rq1$ff_target, type = "l")
 abline(v = bp_dates, col = "red")
 ```
 
@@ -561,9 +561,9 @@ The analysis uses `r n_breaks` breaks, estimated at `r paste(format(bp_dates, "%
 chow_dates <- sort(unique(c(CHOW_EVENT_DATES, bp_dates)))
 
 for (d in as.list(chow_dates)) {
-  idx <- which(df_reg_rq2$date == d)
+  idx <- which(df_reg_rq1$date == d)
   if (length(idx) > 0) {
-    test <- sctest(rq1_formula, type = "Chow", point = idx, data = df_reg_rq2)
+    test <- sctest(rq1_formula, type = "Chow", point = idx, data = df_reg_rq1)
     cat("Date:", format(d),
         if (d %in% bp_dates) "(estimated break)" else "(event)",
         "| F =", round(test$statistic, 2),
@@ -578,19 +578,19 @@ The Chow tests evaluate whether the regression relationship shifts at both estim
 
 ```{r}
 # Sub-periods run between the estimated break dates.
-period_starts <- c(min(df_reg_rq2$date), bp_dates)
-period_ends   <- c(bp_dates, max(df_reg_rq2$date) + 1)
+period_starts <- c(min(df_reg_rq1$date), bp_dates)
+period_ends   <- c(bp_dates, max(df_reg_rq1$date) + 1)
 period_labels <- paste0(format(period_starts, "%Y"), "-", format(period_ends - 1, "%Y"))
 
-df_reg_rq2$period <- cut(
-  df_reg_rq2$date,
-  breaks = c(period_starts, max(df_reg_rq2$date) + 1),
+df_reg_rq1$period <- cut(
+  df_reg_rq1$date,
+  breaks = c(period_starts, max(df_reg_rq1$date) + 1),
   labels = period_labels,
   right = FALSE
 )
 
 models <- lapply(period_labels, function(p) {
-  lm(rq1_formula, data = subset(df_reg_rq2, period == p))
+  lm(rq1_formula, data = subset(df_reg_rq1, period == p))
 })
 names(models) <- period_labels
 
@@ -626,10 +626,10 @@ Sub-period regressions make it easier to interpret how the policy rule differs a
 ## Data Preparation
 
 ```{r}
-data_rq1 <- df_final %>%
+data_rq2 <- df_final %>%
   arrange(date)
 
-data_rq1$policy_change <- as.numeric(data_rq1$policy_change)
+data_rq2$policy_change <- as.numeric(data_rq2$policy_change)
 ```
 
 The dataset is sorted in chronological order so the clustering results can later be interpreted as evolving regimes rather than disconnected groups.
@@ -637,13 +637,13 @@ The dataset is sorted in chronological order so the clustering results can later
 ## Event-Sensitive Feature Construction
 
 ```{r}
-data_rq1$ff_change_1m     <- c(NA, diff(data_rq1$ff_target))
-data_rq1$unrate_change_1m <- c(NA, diff(data_rq1$UNRATE))
-data_rq1$oil_change_1m    <- c(NA, diff(data_rq1$WTISPLC))
-data_rq1$house_change_1m  <- c(NA, diff(data_rq1$HOUST))
-data_rq1$credit_change_1m <- c(NA, diff(data_rq1$BAA10Y))
-data_rq1$fci_change_1m    <- c(NA, diff(data_rq1$ANFCI))
-data_rq1$infl_change_1m   <- c(NA, diff(data_rq1$core_pce_yoy))
+data_rq2$ff_change_1m     <- c(NA, diff(data_rq2$ff_target))
+data_rq2$unrate_change_1m <- c(NA, diff(data_rq2$UNRATE))
+data_rq2$oil_change_1m    <- c(NA, diff(data_rq2$WTISPLC))
+data_rq2$house_change_1m  <- c(NA, diff(data_rq2$HOUST))
+data_rq2$credit_change_1m <- c(NA, diff(data_rq2$BAA10Y))
+data_rq2$fci_change_1m    <- c(NA, diff(data_rq2$ANFCI))
+data_rq2$infl_change_1m   <- c(NA, diff(data_rq2$core_pce_yoy))
 ```
 
 Monthly changes were added so the clustering can reflect both the level of macroeconomic conditions and how quickly those conditions are shifting.
@@ -651,7 +651,7 @@ Monthly changes were added so the clustering can reflect both the level of macro
 ## Missingness Screening
 
 ```{r}
-num_data <- data_rq1[, setdiff(names(data_rq1), "date")]
+num_data <- data_rq2[, setdiff(names(data_rq2), "date")]
 num_data <- num_data[, sapply(num_data, is.numeric)]
 
 na_share <- colMeans(is.na(num_data))
@@ -695,10 +695,10 @@ cluster_vars_extra <- c(
   "days_since_last_fomc"
 )
 
-cluster_vars_model <- intersect(cluster_vars_model, names(data_rq1))
-cluster_vars_extra <- intersect(cluster_vars_extra, names(data_rq1))
+cluster_vars_model <- intersect(cluster_vars_model, names(data_rq2))
+cluster_vars_extra <- intersect(cluster_vars_extra, names(data_rq2))
 
-cluster_df <- data_rq1[, c("date", cluster_vars_model, cluster_vars_extra)]
+cluster_df <- data_rq2[, c("date", cluster_vars_model, cluster_vars_extra)]
 cluster_df <- na.omit(cluster_df)
 
 cluster_x <- cluster_df[, cluster_vars_model]
