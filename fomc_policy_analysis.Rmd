@@ -1226,25 +1226,6 @@ to_xgb_label <- function(y_factor) {
 
 The inner split is also chronological so tuning remains time-aware.
 
-## Baseline Model
-
-```{r}
-baseline_pred <- factor(
-  rep("hold", nrow(test_data)),
-  levels = levels(test_data$policy_action_class)
-)
-
-baseline_eval <- get_metrics(
-  baseline_pred,
-  test_data$policy_action_class
-)
-
-baseline_cm <- baseline_eval$cm
-baseline_cm
-```
-
-The baseline always predicts hold and acts as a naive benchmark.
-
 ## Tuned Models
 
 ```{r}
@@ -1530,6 +1511,56 @@ tune_xgb <- function(train_part) {
 
 These tuning functions keep the model-fitting section organized while preserving the full comparison pipeline.
 
+## Model Registry
+
+Every model, including the baseline, is a pair of functions: `tune()` fits
+it on a training window (with time-ordered inner validation) and
+`predict()` returns cut / hold / hike for new meetings. The held-out split
+and the expanding-window evaluation both run through `fit_and_predict()`,
+so every model is evaluated by identical code.
+
+The baseline always predicts hold and acts as a naive benchmark.
+
+```{r rq3-registry}
+RQ3_CLASSES <- c("cut", "hold", "hike")
+as_class <- function(x) factor(as.vector(x), levels = RQ3_CLASSES)
+rq3_x <- function(data) model.matrix(policy_action_class ~ . - date, data = data)[, -1]
+
+rq3_models <- list(
+  Baseline_Hold = list(
+    tune    = function(train_part) list(best_params = NULL),
+    predict = function(obj, newdata) as_class(rep("hold", nrow(newdata)))
+  ),
+  Multinomial_Logit_Tuned = list(
+    tune    = tune_multinom,
+    predict = function(obj, newdata) as_class(predict(obj$final_fit, newdata = newdata))
+  ),
+  Elastic_Net_Tuned = list(
+    tune    = tune_enet,
+    predict = function(obj, newdata) {
+      as_class(predict(obj$final_fit, newx = rq3_x(newdata), s = "lambda.1se", type = "class"))
+    }
+  ),
+  Random_Forest_Tuned = list(
+    tune    = tune_rf,
+    predict = function(obj, newdata) as_class(predict(obj$final_fit, newdata = newdata))
+  ),
+  XGBoost_Tuned = list(
+    tune    = tune_xgb,
+    predict = function(obj, newdata) {
+      as_class(RQ3_CLASSES[predict(obj$final_fit, newdata = xgb.DMatrix(data = rq3_x(newdata))) + 1])
+    }
+  )
+)
+
+fit_and_predict <- function(train_part, test_part, models = rq3_models) {
+  map(models, function(m) {
+    obj <- m$tune(train_part)
+    list(obj = obj, pred = m$predict(obj, test_part))
+  })
+}
+```
+
 ## Held-Out Test Evaluation
 
 ```{r rq3-inputs-hash}
@@ -1540,43 +1571,16 @@ fn_code <- function(...) lapply(list(...), deparse)
 rq3_inputs_hash <- digest::digest(list(
   df_final_rq3, train_data, test_data, RQ3_START_TRAIN, RQ3_STEP,
   fn_code(tune_multinom, tune_enet, tune_rf, tune_xgb, get_metrics,
-          make_inner_split, to_xgb_label, rank_metric_table),
+          make_inner_split, to_xgb_label, rank_metric_table, fit_and_predict,
+          as_class, rq3_x),
+  lapply(rq3_models, function(m) lapply(m, deparse)),
   lapply(sessionInfo()$otherPkgs, `[[`, "Version")
 ))
 ```
 
 ```{r rq3-holdout, cache=TRUE, cache.extra=rq3_inputs_hash}
-multinom_obj <- tune_multinom(train_data)
-multinom_fit <- multinom_obj$final_fit
-multinom_pred <- predict(multinom_fit, newdata = test_data)
-multinom_eval <- get_metrics(multinom_pred, test_data$policy_action_class)
-multinom_cm <- multinom_eval$cm
-
-enet_obj <- tune_enet(train_data)
-enet_fit <- enet_obj$final_fit
-x_test <- model.matrix(policy_action_class ~ . - date, data = test_data)[, -1]
-enet_pred <- predict(enet_fit, newx = x_test, s = "lambda.1se", type = "class")
-enet_pred <- factor(as.vector(enet_pred), levels = levels(test_data$policy_action_class))
-enet_eval <- get_metrics(enet_pred, test_data$policy_action_class)
-enet_cm <- enet_eval$cm
-
-rf_obj <- tune_rf(train_data)
-rf_fit <- rf_obj$final_fit
-rf_pred <- predict(rf_fit, newdata = test_data)
-rf_eval <- get_metrics(rf_pred, test_data$policy_action_class)
-rf_cm <- rf_eval$cm
-
-xgb_obj <- tune_xgb(train_data)
-xgb_fit <- xgb_obj$final_fit
-x_test_xgb <- model.matrix(policy_action_class ~ . - date, data = test_data)[, -1]
-dtest_xgb <- xgb.DMatrix(data = x_test_xgb)
-xgb_pred_numeric <- predict(xgb_fit, newdata = dtest_xgb)
-xgb_pred <- factor(
-  c("cut", "hold", "hike")[xgb_pred_numeric + 1],
-  levels = c("cut", "hold", "hike")
-)
-xgb_eval <- get_metrics(xgb_pred, test_data$policy_action_class)
-xgb_cm <- xgb_eval$cm
+holdout <- fit_and_predict(train_data, test_data)
+holdout_eval <- map(holdout, ~ get_metrics(.x$pred, test_data$policy_action_class))
 ```
 
 This block tunes each model on the training portion and evaluates it once on the held-out test set.
@@ -1584,28 +1588,20 @@ This block tunes each model on the training portion and evaluates it once on the
 ## Model Comparison
 
 ```{r}
-results_table <- bind_rows(
-  cbind(Model = "Baseline_Hold", baseline_eval$summary),
-  cbind(Model = "Multinomial_Logit_Tuned", multinom_eval$summary),
-  cbind(Model = "Elastic_Net_Tuned", enet_eval$summary),
-  cbind(Model = "Random_Forest_Tuned", rf_eval$summary),
-  cbind(Model = "XGBoost_Tuned", xgb_eval$summary)
-) %>%
+results_table <- imap_dfr(holdout_eval, ~ cbind(Model = .y, .x$summary)) %>%
   rank_metric_table()
 
 results_table
 ```
 
 ```{r}
-multinom_obj$best_params
-enet_obj$best_params
-rf_obj$best_params
-xgb_obj$best_params
+map(holdout[-1], ~ .x$obj$best_params)
 ```
 
 ## Variable Importance
 
 ```{r}
+rf_fit <- holdout$Random_Forest_Tuned$obj$final_fit
 rf_importance <- importance(rf_fit)
 
 rf_importance_df <- data.frame(
@@ -1619,7 +1615,8 @@ head(rf_importance_df, 10)
 ```
 
 ```{r}
-xgb_feature_names <- colnames(model.matrix(policy_action_class ~ . - date, data = train_data)[, -1])
+xgb_fit <- holdout$XGBoost_Tuned$obj$final_fit
+xgb_feature_names <- colnames(rq3_x(train_data))
 
 xgb_importance <- xgb.importance(
   feature_names = xgb_feature_names,
@@ -1704,202 +1701,35 @@ These helper functions store fold-level metrics in a consistent format so the ro
 ### Rolling / Expanding Window Evaluation
 
 ```{r rq3-rolling, cache=TRUE, cache.extra=list(rq3_inputs_hash, fn_code(get_fold_main_metrics, get_fold_extra_metrics, get_fold_classwise_metrics))}
-start_train <- RQ3_START_TRAIN
-step_size <- RQ3_STEP
+fold_ends <- seq(RQ3_START_TRAIN, nrow(df_final_rq3) - RQ3_STEP, by = RQ3_STEP)
 
-rolling_main_results <- list()
-rolling_extra_results <- list()
-rolling_class_results <- list()
-tuning_log <- list()
-
-fold_num <- 1
-
-for (end_train in seq(start_train, nrow(df_final_rq3) - step_size, by = step_size)) {
-
+# Each fold: tune every model on meetings 1..end_train, predict the next
+# RQ3_STEP meetings. Keep every out-of-sample prediction, so any metric can
+# be computed afterwards from one table.
+rolling <- map(seq_along(fold_ends), function(fold) {
+  end_train  <- fold_ends[fold]
   train_part <- df_final_rq3[1:end_train, ]
-  test_part  <- df_final_rq3[(end_train + 1):(end_train + step_size), ]
+  test_part  <- df_final_rq3[(end_train + 1):(end_train + RQ3_STEP), ]
 
-  train_part$policy_action_class <- factor(
-    train_part$policy_action_class,
-    levels = c("cut", "hold", "hike")
+  fits <- fit_and_predict(train_part, test_part)
+
+  list(
+    info = data.frame(
+      Fold = fold,
+      Train_End  = max(train_part$date),
+      Test_Start = min(test_part$date),
+      Test_End   = max(test_part$date)
+    ),
+    preds = imap_dfr(fits, ~ tibble(
+      Fold  = fold,
+      Model = .y,
+      date  = test_part$date,
+      truth = test_part$policy_action_class,
+      pred  = .x$pred
+    )),
+    tuning = imap(fits[-1], ~ cbind(Fold = fold, Model = .y, .x$obj$best_params))
   )
-
-  test_part$policy_action_class <- factor(
-    test_part$policy_action_class,
-    levels = c("cut", "hold", "hike")
-  )
-
-  train_end_date  <- max(train_part$date)
-  test_start_date <- min(test_part$date)
-  test_end_date   <- max(test_part$date)
-
-  baseline_pred <- factor(
-    rep("hold", nrow(test_part)),
-    levels = levels(test_part$policy_action_class)
-  )
-
-  baseline_cm <- confusionMatrix(
-    baseline_pred,
-    test_part$policy_action_class
-  )
-
-  rolling_main_results[[length(rolling_main_results) + 1]] <-
-    get_fold_main_metrics(
-      baseline_cm, "Baseline_Hold", fold_num,
-      train_end_date, test_start_date, test_end_date
-    )
-
-  rolling_extra_results[[length(rolling_extra_results) + 1]] <-
-    get_fold_extra_metrics(
-      baseline_cm, "Baseline_Hold", fold_num,
-      train_end_date, test_start_date, test_end_date
-    )
-
-  rolling_class_results[[length(rolling_class_results) + 1]] <-
-    get_fold_classwise_metrics(
-      baseline_cm, "Baseline_Hold", fold_num
-    )
-
-  multinom_obj <- tune_multinom(train_part)
-  multinom_fit <- multinom_obj$final_fit
-
-  multinom_pred <- predict(multinom_fit, newdata = test_part)
-  multinom_cm <- confusionMatrix(multinom_pred, test_part$policy_action_class)
-
-  rolling_main_results[[length(rolling_main_results) + 1]] <-
-    get_fold_main_metrics(
-      multinom_cm, "Multinomial_Logit_Tuned", fold_num,
-      train_end_date, test_start_date, test_end_date
-    )
-
-  rolling_extra_results[[length(rolling_extra_results) + 1]] <-
-    get_fold_extra_metrics(
-      multinom_cm, "Multinomial_Logit_Tuned", fold_num,
-      train_end_date, test_start_date, test_end_date
-    )
-
-  rolling_class_results[[length(rolling_class_results) + 1]] <-
-    get_fold_classwise_metrics(
-      multinom_cm, "Multinomial_Logit_Tuned", fold_num
-    )
-
-  tuning_log[[length(tuning_log) + 1]] <- cbind(
-    Fold = fold_num,
-    Model = "Multinomial_Logit_Tuned",
-    multinom_obj$best_params
-  )
-
-  enet_obj <- tune_enet(train_part)
-  enet_fit <- enet_obj$final_fit
-
-  x_test <- model.matrix(policy_action_class ~ . - date, data = test_part)[, -1]
-
-  enet_pred <- predict(
-    enet_fit,
-    newx = x_test,
-    s = "lambda.1se",
-    type = "class"
-  )
-
-  enet_pred <- factor(
-    as.vector(enet_pred),
-    levels = levels(test_part$policy_action_class)
-  )
-
-  enet_cm <- confusionMatrix(enet_pred, test_part$policy_action_class)
-
-  rolling_main_results[[length(rolling_main_results) + 1]] <-
-    get_fold_main_metrics(
-      enet_cm, "Elastic_Net_Tuned", fold_num,
-      train_end_date, test_start_date, test_end_date
-    )
-
-  rolling_extra_results[[length(rolling_extra_results) + 1]] <-
-    get_fold_extra_metrics(
-      enet_cm, "Elastic_Net_Tuned", fold_num,
-      train_end_date, test_start_date, test_end_date
-    )
-
-  rolling_class_results[[length(rolling_class_results) + 1]] <-
-    get_fold_classwise_metrics(
-      enet_cm, "Elastic_Net_Tuned", fold_num
-    )
-
-  tuning_log[[length(tuning_log) + 1]] <- cbind(
-    Fold = fold_num,
-    Model = "Elastic_Net_Tuned",
-    enet_obj$best_params
-  )
-
-  rf_obj <- tune_rf(train_part)
-  rf_fit <- rf_obj$final_fit
-
-  rf_pred <- predict(rf_fit, newdata = test_part)
-  rf_cm <- confusionMatrix(rf_pred, test_part$policy_action_class)
-
-  rolling_main_results[[length(rolling_main_results) + 1]] <-
-    get_fold_main_metrics(
-      rf_cm, "Random_Forest_Tuned", fold_num,
-      train_end_date, test_start_date, test_end_date
-    )
-
-  rolling_extra_results[[length(rolling_extra_results) + 1]] <-
-    get_fold_extra_metrics(
-      rf_cm, "Random_Forest_Tuned", fold_num,
-      train_end_date, test_start_date, test_end_date
-    )
-
-  rolling_class_results[[length(rolling_class_results) + 1]] <-
-    get_fold_classwise_metrics(
-      rf_cm, "Random_Forest_Tuned", fold_num
-    )
-
-  tuning_log[[length(tuning_log) + 1]] <- cbind(
-    Fold = fold_num,
-    Model = "Random_Forest_Tuned",
-    rf_obj$best_params
-  )
-
-  xgb_obj <- tune_xgb(train_part)
-  xgb_fit <- xgb_obj$final_fit
-
-  x_test_xgb <- model.matrix(policy_action_class ~ . - date, data = test_part)[, -1]
-  dtest_xgb <- xgb.DMatrix(data = x_test_xgb)
-
-  xgb_pred_numeric <- predict(xgb_fit, newdata = dtest_xgb)
-
-  xgb_pred <- factor(
-    c("cut", "hold", "hike")[xgb_pred_numeric + 1],
-    levels = c("cut", "hold", "hike")
-  )
-
-  xgb_cm <- confusionMatrix(xgb_pred, test_part$policy_action_class)
-
-  rolling_main_results[[length(rolling_main_results) + 1]] <-
-    get_fold_main_metrics(
-      xgb_cm, "XGBoost_Tuned", fold_num,
-      train_end_date, test_start_date, test_end_date
-    )
-
-  rolling_extra_results[[length(rolling_extra_results) + 1]] <-
-    get_fold_extra_metrics(
-      xgb_cm, "XGBoost_Tuned", fold_num,
-      train_end_date, test_start_date, test_end_date
-    )
-
-  rolling_class_results[[length(rolling_class_results) + 1]] <-
-    get_fold_classwise_metrics(
-      xgb_cm, "XGBoost_Tuned", fold_num
-    )
-
-  tuning_log[[length(tuning_log) + 1]] <- cbind(
-    Fold = fold_num,
-    Model = "XGBoost_Tuned",
-    xgb_obj$best_params
-  )
-
-  fold_num <- fold_num + 1
-}
+})
 ```
 
 This evaluation uses an expanding training window and a fixed future test block, which gives a more reliable time-ordered assessment than relying on one single split.
@@ -1907,10 +1737,24 @@ This evaluation uses an expanding training window and a fixed future test block,
 ### Combine Rolling Results
 
 ```{r}
-rolling_main_table  <- bind_rows(rolling_main_results)
-rolling_extra_table <- bind_rows(rolling_extra_results)
-rolling_class_table <- bind_rows(rolling_class_results)
-tuning_table        <- bind_rows(tuning_log)
+fold_info     <- map_dfr(rolling, "info")
+rolling_preds <- map_dfr(rolling, "preds")
+tuning_table  <- bind_rows(flatten(map(rolling, "tuning")))
+
+fold_cms <- rolling_preds %>%
+  group_by(Fold, Model) %>%
+  summarise(cm = list(confusionMatrix(pred, truth)), .groups = "drop") %>%
+  left_join(fold_info, by = "Fold")
+
+rolling_main_table <- pmap_dfr(fold_cms, function(Fold, Model, cm, Train_End, Test_Start, Test_End) {
+  get_fold_main_metrics(cm, Model, Fold, Train_End, Test_Start, Test_End)
+})
+rolling_extra_table <- pmap_dfr(fold_cms, function(Fold, Model, cm, Train_End, Test_Start, Test_End) {
+  get_fold_extra_metrics(cm, Model, Fold, Train_End, Test_Start, Test_End)
+})
+rolling_class_table <- pmap_dfr(fold_cms, function(Fold, Model, cm, ...) {
+  get_fold_classwise_metrics(cm, Model, Fold)
+})
 ```
 
 ```{r}
