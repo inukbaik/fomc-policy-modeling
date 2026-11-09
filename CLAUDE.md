@@ -12,7 +12,8 @@ turned into a portfolio project by Inuk Baik.
 Don't name the course, course number, or group number in any tracked file,
 commit message, or tag. Refer to it as "the course project".
 
-The original submission has three research questions in `fomc_policy_analysis.Rmd`:
+The original submission (one notebook, `fomc_policy_analysis.Rmd`, now split into
+Quarto pages) has three research questions:
 
 | Section | Question | Method | Owner |
 |---|---|---|---|
@@ -33,7 +34,11 @@ swapped; tag `v1.0-course-submission` still does.
 | `data/fed_target_daily.csv` | Daily target: DFEDTAR until 2008-12-15, then the midpoint of DFEDTARL/DFEDTARU (`lower`, `upper` kept). Use this for meeting-level labels. |
 | `data/macro_monthly.csv` | Monthly panel: monthly-average target, `policy_change`, monthly FRED series, and daily/weekly series averaged locally. |
 | `data/market_daily.csv` | Daily market series kept daily (`DGS2`), for the RQ3 market-signal baseline. |
-| `fomc_policy_analysis.Rmd` | Cleaning, feature engineering, EDA, RQ1–RQ3. Reads `data/macro_monthly.csv` and `data/fomc_meetings.csv`. |
+| `R/settings.R` | Libraries and every analysis setting (one place). Sourced by every page. |
+| `R/prepare_data.R` | Load, clean and build features (`df_clean`, `df_final`). Sourced by every page; `index.qmd` shows it section by section via `knitr::read_chunk` (`## ---- label ----` markers). |
+| `index.qmd` | Data page: settings, cleaning, feature engineering, EDA. |
+| `rule.qmd` / `regimes.qmd` / `prediction.qmd` | RQ1 / RQ2 / RQ3. Each runs on its own after sourcing the two `R/` files. |
+| `_quarto.yml` | Website project. `_site/` (output), `*_cache/`, `*_files/` are git-ignored. |
 | `reports/`, `figures/` | Original PDFs and plots. Git-ignored, local only. |
 
 All `*.csv` files are git-ignored. Data is fetched, not committed. The
@@ -54,17 +59,17 @@ the old root-level CSVs belong to tag `v1.0-course-submission`.
 - Fetch data: `Rscript R/acquire_data.R` (about a minute). Needs a FRED API key:
   `cp .env.example .env`, then set `FRED_KEY`. The script stops if any FOMC
   heading fails to parse.
-- Render a notebook with `Rscript -e 'rmarkdown::render("fomc_policy_analysis.Rmd")'`.
-  rmarkdown doesn't find Quarto's bundled pandoc on its own; set
-  `RSTUDIO_PANDOC=/Applications/quarto/bin/tools/aarch64` for the command.
-- **Don't run the full notebook just to check a change.** The two slow RQ3
-  chunks (`rq3-holdout`, `rq3-rolling`, ~2.5 of ~3 min) are cached by knitr
+- Build the site: `quarto render` (all pages, ~30 s with a warm cache, ~1.5
+  min cold). Render one chapter: `quarto render rule.qmd`. Check a change by
+  rendering only the page it touches; a change to `R/settings.R` or
+  `R/prepare_data.R` touches every page.
+- Quarto `freeze` is off on purpose: it only notices edits to a page's own
+  `.qmd`, not to `R/` scripts or data, so pages could go stale.
+- The two slow RQ3 chunks (`rq3-holdout`, `rq3-rolling`) are cached by knitr
   and keyed on `rq3_inputs_hash` (data, settings, tuning/metric functions,
-  package versions). Renders re-run them only when one of those changes.
-  The cache lives in `fomc_policy_analysis_cache/` (git-ignored). Delete it to
-  force a full re-run.
-- For checks outside RQ3, run only the part you changed: `knitr::purl()` the
-  notebook and source up to the section you need.
+  package versions); they re-run only when one of those changes. The cache
+  lives in `prediction_cache/` (git-ignored). Delete it to force a re-run.
+  Folds run in parallel (`RQ3_CORES`).
 - Run anything that re-fits the RQ3 models in the background.
 - `xgboost` 3.x is installed locally; its R API changed from 1.x. Check version
   differences before touching XGBoost code.
@@ -92,7 +97,7 @@ the old root-level CSVs belong to tag `v1.0-course-submission`.
 
 ## Analysis decisions
 
-Settled choices that code changes must respect. The notebook text explains
+Settled choices that code changes must respect. The page text explains
 each one to readers; keep the two in sync.
 
 - **RQ3 unit = one scheduled FOMC meeting** (decided 2026-11-08). Conference

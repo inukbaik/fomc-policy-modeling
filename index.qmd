@@ -1,0 +1,222 @@
+---
+title: "How Does the Fed Set Rates, and Can We Predict Its Next Move?"
+author: "Inuk Baik, Asal Delkhosh, Zihong Xiong"
+---
+
+```{r}
+#| include: false
+knitr::read_chunk("R/settings.R")
+knitr::read_chunk("R/prepare_data.R")
+```
+
+This page builds the monthly dataset used by every chapter and explores it.
+The chapters are [The rule](rule.qmd) (RQ1), [The regimes](regimes.qmd)
+(RQ2) and [The prediction](prediction.qmd) (RQ3).
+
+# Setup
+
+```{r libraries}
+```
+
+# Settings
+
+Analysis choices in one place. Everything else (sample end, break dates,
+number of clusters) is computed from the data.
+
+```{r settings}
+```
+
+# Load Data
+
+```{r load}
+```
+
+# Initial Data Checks
+
+```{r}
+# missing values by column
+colSums(is.na(df_raw))
+
+# duplicated rows
+sum(duplicated(df_raw))
+
+# blank strings in character columns
+sapply(df_raw[, sapply(df_raw, is.character), drop = FALSE], function(x) sum(trimws(x) == ""))
+
+# check whether date conversion may fail
+if ("date" %in% names(df_raw)) {
+  sum(is.na(as.Date(df_raw$date)))
+  range(as.Date(df_raw$date), na.rm = TRUE)
+}
+
+# look for columns with only one unique value
+sapply(df_raw, function(x) length(unique(x[!is.na(x)])))
+
+# check for infinite values in numeric columns
+sapply(df_raw[, sapply(df_raw, is.numeric), drop = FALSE], function(x) sum(is.infinite(x)))
+
+# inspect suspicious numeric ranges
+summary(df_raw[, sapply(df_raw, is.numeric), drop = FALSE])
+```
+
+```{r}
+raw_dates  <- as.Date(df_raw$date)
+na_share   <- sort(colMeans(is.na(df_raw[, -1])), decreasing = TRUE)
+most_missing <- names(na_share[na_share > 0.2])
+```
+
+The raw dataset has `r sum(duplicated(df_raw))` duplicate rows and covers `r format(min(raw_dates))` to `r format(max(raw_dates))`. The main issue is missingness: series that start later (`r paste(most_missing, collapse = ", ")`) are missing for more than 20% of months, and the most recent months are incomplete because of publication delays. These are handled in the cleaning steps below.
+
+# Data Cleaning
+
+## Fix Variable Types
+
+```{r fix-types}
+```
+
+The date variable was converted to `Date` format so the dataset could be filtered, joined, and ordered consistently in later preprocessing steps.
+
+## Remove Invalid or Incomplete Observations
+
+```{r sample-end}
+```
+
+The sample ends in `r format(SAMPLE_END, "%B %Y")`, the last month in which every series has been published. Later months are dropped because some series are released with a delay of one to two months.
+
+## Handle Missing Values
+
+```{r fill-gaps}
+```
+
+`r nrow(filled)` value(s) were missing inside a series and filled with the previous month's value: `r paste(filled$series, format(filled$date, "%b %Y"), collapse = ", ")`.
+
+Oil prices come from `WTISPLC`, the monthly WTI spot price, which has a longer history than the daily series.
+
+# Feature Engineering
+
+## Create Derived Variables
+
+```{r derived}
+```
+
+Several derived variables were created to better capture macroeconomic conditions relevant to policy decisions, including core inflation growth, lagged unemployment, payroll growth, the term spread, and the inflation gap relative to the 2 percent target.
+
+## Create Target-Related Variables
+
+```{r fomc-counts}
+```
+
+Monthly FOMC meeting counts were merged into the main dataset so the analysis could distinguish between months with scheduled meetings, unscheduled meetings, and no meetings.
+
+```{r fomc-timing}
+```
+
+The variable `days_since_last_fomc` was added to measure how much time had passed since the most recent FOMC meeting, providing a simple timing feature related to policy activity.
+
+```{r final}
+```
+
+After preprocessing and feature construction, the final working dataset was restricted to the post-1986 period to align with the availability of the selected variables and the scope of the modeling analysis.
+
+# Final Modeling Dataset
+
+The final modeling dataset is obtained after preprocessing, variable replacement, and feature engineering. The sample is restricted to the post-1986 period so that the analysis is based on a more consistent set of available variables. This dataset is used as the input for the remaining exploratory and modeling steps.
+
+```{r}
+dim(df_final)
+head(df_final)
+```
+
+# Exploratory Data Analysis
+
+## Distribution Checks
+
+```{r}
+ggplot(df_final, aes(x = ff_target)) +
+  geom_histogram(bins = 30) +
+  labs(
+    title = "Distribution of Federal Funds Target Rate",
+    x = "Federal Funds Target Rate",
+    y = "Frequency"
+  )
+```
+
+```{r}
+ggplot(df_final, aes(x = date, y = ff_target)) +
+  geom_line() +
+  labs(
+    title = "Federal Funds Target Rate Over Time",
+    x = "Date",
+    y = "Federal Funds Target Rate"
+  )
+```
+
+```{r}
+missing_summary <- colSums(is.na(df_final))
+
+missing_df <- data.frame(
+  Variable = names(missing_summary),
+  Missing_Count = as.numeric(missing_summary)
+) %>%
+  arrange(desc(Missing_Count))
+
+missing_df %>%
+  filter(Missing_Count > 0) %>%
+  ggplot(aes(x = reorder(Variable, Missing_Count), y = Missing_Count)) +
+  geom_col() +
+  coord_flip() +
+  labs(
+    title = "Missing Values by Variable",
+    x = "Variable",
+    y = "Number of Missing Values"
+  )
+```
+
+The distribution of the federal funds target rate and its movement over time were examined to understand the scale and temporal behavior of the response variable. Missing-value patterns were also reviewed to identify whether any variables still contained gaps after preprocessing.
+
+## Relationship Exploration
+
+```{r}
+candidate_vars <- c("UNRATE", "PCEPI", "DGS10", "T10Y3M")
+selected_vars <- candidate_vars[candidate_vars %in% names(df_final)]
+
+if (length(selected_vars) > 0) {
+  df_long <- df_final %>%
+    select(date, all_of(selected_vars)) %>%
+    pivot_longer(-date, names_to = "Variable", values_to = "Value")
+
+  ggplot(df_long, aes(x = date, y = Value)) +
+    geom_line() +
+    facet_wrap(~ Variable, scales = "free_y", ncol = 2) +
+    labs(
+      title = "Selected Predictors Over Time",
+      x = "Date",
+      y = "Value"
+    )
+}
+```
+
+```{r}
+numeric_df <- df_final %>% select(where(is.numeric))
+
+cor_mat <- cor(numeric_df, use = "complete.obs")
+
+cor_long <- as.data.frame(as.table(cor_mat))
+
+ggplot(cor_long, aes(x = Var1, y = Var2, fill = Freq)) +
+  geom_tile() +
+  scale_fill_gradient2(low = "blue", mid = "white", high = "red", midpoint = 0) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  labs(
+    title = "Correlation Heatmap of Numeric Variables",
+    x = "",
+    y = "",
+    fill = "Correlation"
+  )
+```
+
+Selected macroeconomic predictors were examined over time to compare their movement with changes in the policy target. Correlation analysis was also used to identify strong linear relationships among numeric variables, which is useful for understanding redundancy and potential multicollinearity in later modeling steps.
+
+## Key EDA Findings
+
+Overall, the exploratory analysis showed that the dataset is time-ordered and contains variables that vary meaningfully across different monetary policy environments. The federal funds target displays clear changes over time rather than a uniform distribution, and several predictors appear to move in related patterns. The correlation analysis also suggests that some variables are highly related, which supports paying attention to multicollinearity and model flexibility in the later modeling stage.

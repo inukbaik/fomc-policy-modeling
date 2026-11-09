@@ -1,0 +1,380 @@
+---
+title: "The Regimes: Grouping Macro Conditions (RQ2)"
+---
+
+```{r}
+#| include: false
+source("R/settings.R")
+source("R/prepare_data.R")
+```
+
+
+## Data Preparation
+
+```{r}
+data_rq2 <- df_final %>%
+  arrange(date)
+
+data_rq2$policy_change <- as.numeric(data_rq2$policy_change)
+```
+
+The dataset is sorted in chronological order so the clustering results can later be interpreted as evolving regimes rather than disconnected groups.
+
+## Event-Sensitive Feature Construction
+
+```{r}
+data_rq2$ff_change_1m     <- c(NA, diff(data_rq2$ff_target))
+data_rq2$unrate_change_1m <- c(NA, diff(data_rq2$UNRATE))
+data_rq2$oil_change_1m    <- c(NA, diff(data_rq2$WTISPLC))
+data_rq2$house_change_1m  <- c(NA, diff(data_rq2$HOUST))
+data_rq2$credit_change_1m <- c(NA, diff(data_rq2$BAA10Y))
+data_rq2$fci_change_1m    <- c(NA, diff(data_rq2$ANFCI))
+data_rq2$infl_change_1m   <- c(NA, diff(data_rq2$core_pce_yoy))
+```
+
+Monthly changes were added so the clustering can reflect both the level of macroeconomic conditions and how quickly those conditions are shifting.
+
+## Missingness Screening
+
+```{r}
+num_data <- data_rq2[, setdiff(names(data_rq2), "date")]
+num_data <- num_data[, sapply(num_data, is.numeric)]
+
+na_share <- colMeans(is.na(num_data))
+na_share
+```
+
+```{r}
+num_data <- num_data[, na_share <= 0.20]
+```
+
+Variables with more than 20% missingness were excluded from the initial numeric screening step to keep the clustering input reasonably complete.
+
+## Variable Selection for Clustering
+
+```{r}
+cluster_vars_model <- c(
+  "ff_target",
+  "PCEPILFE",
+  "MICH",
+  "UNRATE",
+  "HOUST",
+  "T10Y3M",
+  "BAA10Y",
+  "ANFCI",
+  "WTISPLC",
+  "core_pce_yoy",
+  "payems_yoy",
+  "ff_change_1m",
+  "unrate_change_1m",
+  "oil_change_1m",
+  "credit_change_1m",
+  "fci_change_1m",
+  "infl_change_1m"
+)
+
+cluster_vars_extra <- c(
+  "policy_change",
+  "fomc_meetings",
+  "fomc_scheduled",
+  "fomc_unscheduled",
+  "days_since_last_fomc"
+)
+
+cluster_vars_model <- intersect(cluster_vars_model, names(data_rq2))
+cluster_vars_extra <- intersect(cluster_vars_extra, names(data_rq2))
+
+cluster_df <- data_rq2[, c("date", cluster_vars_model, cluster_vars_extra)]
+cluster_df <- na.omit(cluster_df)
+
+cluster_x <- cluster_df[, cluster_vars_model]
+cluster_x_extra <- cluster_df[, cluster_vars_extra]
+dates <- cluster_df$date
+
+nrow(cluster_x)
+```
+
+The model variables are used for clustering itself, while the extra variables are kept for later interpretation of the resulting regimes.
+
+## Correlation Check on Final Clustering Inputs
+
+```{r}
+cor_mat2 <- cor(cluster_x)
+corrplot(cor_mat2, method = "color", tl.cex = 0.6)
+```
+
+```{r}
+remove_auto <- findCorrelation(cor_mat2, cutoff = 0.9, names = TRUE)
+cat("Variables removed due to high correlation:\n")
+print(remove_auto)
+
+cluster_x2 <- cluster_x[, !names(cluster_x) %in% remove_auto]
+```
+
+## Scaling and PCA
+
+```{r}
+cluster_scaled <- scale(cluster_x2)
+
+pca <- prcomp(cluster_scaled)
+summary(pca)
+```
+
+```{r}
+plot(pca, type = "l", main = "Scree Plot")
+```
+
+```{r}
+cum_var <- cumsum(pca$sdev^2 / sum(pca$sdev^2))
+cum_var
+```
+
+```{r}
+n_pc <- which(cum_var >= 0.80)[1]
+cat("Number of PCs explaining at least 80% variance:", n_pc, "\n")
+
+pc_scores <- pca$x[, 1:n_pc, drop = FALSE]
+head(pc_scores)
+```
+
+PCA is used to reduce dimensionality while retaining most of the variation in the clustering inputs.
+
+## Clustering
+
+```{r}
+fviz_nbclust(pc_scores, kmeans, method = "wss")
+fviz_nbclust(pc_scores, kmeans, method = "silhouette")
+```
+
+```{r}
+# Silhouette diagnostics over K_RANGE; k itself is a setting (K_CLUSTERS).
+set.seed(123)
+dist_pc <- dist(pc_scores)
+avg_sil <- sapply(K_RANGE, function(kk) {
+  fit <- kmeans(pc_scores, centers = kk, nstart = 50)
+  mean(silhouette(fit$cluster, dist_pc)[, "sil_width"])
+})
+data.frame(k = K_RANGE, avg_silhouette = round(avg_sil, 3))
+
+k <- K_CLUSTERS
+set.seed(123)
+km <- kmeans(pc_scores, centers = k, nstart = 100)
+
+result <- data.frame(
+  date = dates,
+  cluster = factor(km$cluster),
+  cluster_x_extra
+)
+
+head(result)
+```
+
+The clustering uses k-means on the retained principal components. The analysis uses k = `r k` clusters. Average silhouette widths for k = `r min(K_RANGE)` to `r max(K_RANGE)` are all between `r sprintf("%.2f", min(avg_sil))` and `r sprintf("%.2f", max(avg_sil))`, which indicates weak cluster structure, so k is kept as an explicit choice rather than picked by silhouette.
+
+## Cluster Visualization
+
+```{r}
+plot_df <- data.frame(
+  date = dates,
+  PC1 = pca$x[, 1],
+  PC2 = pca$x[, 2],
+  cluster = factor(km$cluster)
+)
+
+ggplot(plot_df, aes(x = PC1, y = PC2, color = cluster)) +
+  geom_point(size = 2, alpha = 0.7) +
+  geom_path(aes(group = 1), color = "gray70", alpha = 0.3, linewidth = 0.4) +
+  theme_minimal() +
+  labs(
+    title = "Clusters in PCA Space",
+    subtitle = "Points connected in time order",
+    x = "PC1",
+    y = "PC2"
+  )
+```
+
+```{r}
+pc_time_df <- data.frame(
+  date = dates,
+  PC1 = pca$x[, 1],
+  cluster = factor(km$cluster)
+)
+
+ggplot(pc_time_df, aes(x = date, y = PC1, color = cluster)) +
+  geom_line(linewidth = 0.8) +
+  theme_minimal() +
+  labs(
+    title = "PC1 Over Time",
+    x = "Date",
+    y = "PC1"
+  )
+```
+
+These plots show both the separation of regimes in reduced-dimensional space and the way regime structure evolves over time.
+
+## Regimes Over Time
+
+```{r}
+ggplot(result, aes(x = date, y = 1, fill = cluster)) +
+  geom_tile(height = 0.8) +
+  theme_minimal() +
+  theme(
+    axis.title.y = element_blank(),
+    axis.text.y = element_blank(),
+    axis.ticks.y = element_blank()
+  ) +
+  labs(
+    title = "Economic Regimes Over Time",
+    x = "Date",
+    fill = "Cluster"
+  )
+```
+
+This plot gives a compact time-line view of how regime membership changes across the sample.
+
+## Regimes and Historical Events
+
+```{r}
+event_df <- data.frame(
+  date = as.Date(c(
+    "1990-08-01",  # Gulf War
+    "2001-09-01",  # 9/11
+    "2008-09-01",  # GFC / Lehman
+    "2020-03-01",  # COVID shock
+    "2022-02-01"   # Russia-Ukraine war
+  )),
+  label = c(
+    "Gulf War",
+    "9/11",
+    "GFC",
+    "COVID",
+    "Russia-Ukraine"
+  )
+)
+
+ggplot(result, aes(x = date, y = 1, fill = cluster)) +
+  geom_tile(height = 0.8) +
+  geom_vline(
+    data = event_df,
+    aes(xintercept = as.numeric(date)),
+    linetype = "dashed"
+  ) +
+  geom_text(
+    data = event_df,
+    aes(x = date, y = 1.35, label = label),
+    angle = 90,
+    vjust = -0.3,
+    size = 3,
+    inherit.aes = FALSE
+  ) +
+  theme_minimal() +
+  theme(
+    axis.title.y = element_blank(),
+    axis.text.y = element_blank(),
+    axis.ticks.y = element_blank()
+  ) +
+  labs(
+    title = "Economic Regimes with Major Historical Events",
+    x = "Date",
+    fill = "Cluster"
+  )
+```
+
+Major historical events are overlaid on the regime timeline to assess whether regime changes line up with well-known macroeconomic disruptions.
+
+## Regime Duration
+
+```{r}
+result_spell <- result %>%
+  mutate(
+    change_flag = cluster != lag(cluster, default = first(cluster)),
+    spell_id = cumsum(change_flag)
+  )
+
+spell_summary <- result_spell %>%
+  group_by(spell_id, cluster) %>%
+  summarise(
+    start = min(date),
+    end = max(date),
+    months = n(),
+    .groups = "drop"
+  ) %>%
+  arrange(start)
+
+print(spell_summary)
+```
+
+Spell analysis helps show whether the clusters behave like persistent macroeconomic regimes rather than very short-lived fluctuations.
+
+## Cluster Profiles
+
+```{r}
+cluster_profile <- data.frame(cluster_x2, cluster = factor(km$cluster)) %>%
+  group_by(cluster) %>%
+  summarise(across(everything(), mean), .groups = "drop")
+
+print(cluster_profile)
+```
+
+```{r}
+cluster_profile_scaled <- data.frame(cluster_scaled, cluster = factor(km$cluster)) %>%
+  group_by(cluster) %>%
+  summarise(across(everything(), mean), .groups = "drop")
+
+cluster_profile_long <- cluster_profile_scaled %>%
+  pivot_longer(-cluster, names_to = "variable", values_to = "mean_z")
+
+ggplot(cluster_profile_long, aes(x = variable, y = cluster, fill = mean_z)) +
+  geom_tile() +
+  scale_fill_gradient2() +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 60, hjust = 1)) +
+  labs(
+    title = "Cluster Profiles",
+    subtitle = "Average standardized value in each cluster",
+    x = "",
+    y = "Cluster",
+    fill = "Mean z-score"
+  )
+```
+
+These tables and heatmaps help interpret the economic meaning of each cluster in terms of inflation, labor markets, financial conditions, and policy timing.
+
+## Extra Variable Summary
+
+```{r}
+if (ncol(cluster_x_extra) > 0) {
+  extra_summary <- data.frame(cluster_x_extra, cluster = factor(km$cluster)) %>%
+    group_by(cluster) %>%
+    summarise(across(everything(), mean), .groups = "drop")
+  print(extra_summary)
+}
+```
+
+This summary adds policy-related interpretation variables that were not used directly to build the clusters.
+
+## Event Window Summary
+
+```{r}
+event_windows <- data.frame(
+  event = c("Gulf War", "Dot-com / 9-11", "GFC", "COVID", "Russia-Ukraine"),
+  start = as.Date(c("1990-08-01", "2001-03-01", "2007-12-01", "2020-03-01", "2022-02-01")),
+  end = as.Date(c("1991-03-01", "2002-12-01", "2009-06-01", "2020-12-01", "2023-12-01"))
+)
+
+event_cluster_summary <- lapply(1:nrow(event_windows), function(i) {
+  temp <- result[result$date >= event_windows$start[i] &
+                   result$date <= event_windows$end[i], ]
+  tb <- table(temp$cluster)
+  data.frame(
+    event = event_windows$event[i],
+    dominant_cluster = names(which.max(tb)),
+    dominant_share = as.numeric(max(tb) / sum(tb))
+  )
+})
+
+event_cluster_summary <- do.call(rbind, event_cluster_summary)
+print(event_cluster_summary)
+```
+
+The event-window summary checks whether each major shock period is dominated by a particular regime.

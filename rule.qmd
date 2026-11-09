@@ -1,0 +1,272 @@
+---
+title: "The Rule: How the Target Relates to the Economy (RQ1)"
+---
+
+```{r}
+#| include: false
+source("R/settings.R")
+source("R/prepare_data.R")
+```
+
+
+This section studies how the federal funds target is related to selected macroeconomic and financial variables, and whether those relationships remain stable over time.
+
+## Variable Selection
+
+```{r}
+data_rq1 <- df_final %>%
+  arrange(date)
+
+vars <- c(
+  "ff_target",
+  "core_pce_yoy", "inflation_gap",
+  "UNRATE", "payems_yoy",
+  "term_spread_10y_3m", "BAA10Y", "ANFCI",
+  "fomc_meetings", "days_since_last_fomc"
+)
+
+df_full_rq1 <- data_rq1[, vars]
+na_ratio <- colMeans(is.na(df_full_rq1))
+df_clean_rq1 <- df_full_rq1[, na_ratio < 0.2]
+```
+
+```{r}
+x <- model.matrix(ff_target ~ ., df_clean_rq1)[, -1]
+y <- df_clean_rq1$ff_target
+
+lasso <- cv.glmnet(x, y, alpha = 1)
+
+coef(lasso, s = "lambda.min")
+```
+
+Variable selection narrows the model to a smaller set of predictors that appear most relevant to the policy rate.
+
+## Final Regression Dataset
+
+```{r}
+df_reg_rq1 <- data_rq1[, c(
+  "date", "ff_target", "core_pce_yoy", "UNRATE",
+  "term_spread_10y_3m", "BAA10Y", "ANFCI"
+)]
+```
+
+The regression section uses a focused set of explanatory variables rather than the full macro dataset.
+
+## Exploratory Time-Series Checks
+
+```{r}
+plot(df_reg_rq1$date, df_reg_rq1$ff_target, type = "l", main = "Federal Funds Target Rate")
+
+plot(df_reg_rq1$date, df_reg_rq1$core_pce_yoy, type = "l", main = "Core PCE Inflation (YoY %)")
+
+plot(df_reg_rq1$date, df_reg_rq1$UNRATE, type = "l", main = "Unemployment Rate")
+
+plot(df_reg_rq1$date, df_reg_rq1$term_spread_10y_3m, type = "l", main = "Term Spread")
+
+cor(df_reg_rq1[, -1], use = "complete.obs")
+```
+
+These plots and the correlation matrix give a first look at the time-series behavior and cross-variable relationships before formal estimation.
+
+## ADF Tests
+
+```{r}
+adf.test(df_reg_rq1$ff_target)
+adf.test(df_reg_rq1$core_pce_yoy)
+adf.test(df_reg_rq1$UNRATE)
+adf.test(df_reg_rq1$term_spread_10y_3m)
+adf.test(df_reg_rq1$BAA10Y)
+adf.test(df_reg_rq1$ANFCI)
+```
+
+The ADF tests motivate the later robustness checks in differences and the stability analysis.
+
+## Baseline Model
+
+```{r}
+model_baseline <- lm(
+  ff_target ~ core_pce_yoy + UNRATE + term_spread_10y_3m + BAA10Y + ANFCI,
+  data = df_reg_rq1
+)
+
+summary(model_baseline)
+```
+
+The baseline model estimates the full-sample association between the policy rate and the selected explanatory variables.
+
+## Robustness Check 1: Dynamic Model
+
+```{r}
+df_reg_rq1$ff_target_lag1 <- dplyr::lag(df_reg_rq1$ff_target, 1)
+
+model_dyn <- lm(
+  ff_target ~ ff_target_lag1 + core_pce_yoy + UNRATE +
+    term_spread_10y_3m + BAA10Y + ANFCI,
+  data = df_reg_rq1
+)
+
+summary(model_dyn)
+```
+
+The dynamic specification captures persistence in the policy rate through a lagged dependent variable.
+
+## Robustness Check 2: Differenced Model
+
+```{r}
+df_diff <- data.frame(
+  date = df_reg_rq1$date[-1],
+  d_ff = diff(df_reg_rq1$ff_target),
+  d_core_pce = diff(df_reg_rq1$core_pce_yoy),
+  d_unrate = diff(df_reg_rq1$UNRATE),
+  term_spread_10y_3m = df_reg_rq1$term_spread_10y_3m[-1]
+)
+
+model_diff <- lm(
+  d_ff ~ d_core_pce + d_unrate + term_spread_10y_3m,
+  data = df_diff
+)
+
+summary(model_diff)
+```
+
+The first-difference model checks whether the main relationships remain visible when the focus shifts from levels to short-run changes.
+
+## Rolling Coefficient Plots
+
+```{r}
+get_coef <- function(idx) {
+  window_data <- df_reg_rq1[idx, ]
+  coef(lm(
+    ff_target ~ core_pce_yoy + UNRATE +
+      term_spread_10y_3m + BAA10Y + ANFCI,
+    data = window_data
+  ))
+}
+
+roll <- rollapply(
+  data = 1:nrow(df_reg_rq1),
+  width = 60,
+  FUN = get_coef,
+  by = 1,
+  align = "right"
+)
+
+roll <- as.data.frame(roll)
+roll_dates <- df_reg_rq1$date[60:nrow(df_reg_rq1)]
+```
+
+```{r}
+plot(roll_dates, roll$core_pce_yoy, type = "l",
+     main = "Rolling Coefficient: core_pce_yoy",
+     xlab = "Date", ylab = "Coefficient")
+
+plot(roll_dates, roll$UNRATE, type = "l",
+     main = "Rolling Coefficient: UNRATE",
+     xlab = "Date", ylab = "Coefficient")
+
+plot(roll_dates, roll$term_spread_10y_3m, type = "l",
+     main = "Rolling Coefficient: Term Spread",
+     xlab = "Date", ylab = "Coefficient")
+```
+
+Rolling coefficients provide a visual way to assess whether the reaction function changes across different periods.
+
+## Breakpoint Analysis
+
+```{r}
+rq1_formula <- ff_target ~ core_pce_yoy + UNRATE +
+  term_spread_10y_3m + BAA10Y + ANFCI
+
+bp <- breakpoints(rq1_formula, data = df_reg_rq1, breaks = BP_MAX_BREAKS)
+
+summary(bp)
+plot(bp)
+```
+
+```{r}
+# Number of breaks is a setting (BP_N_BREAKS); the dates come from the fitted
+# model. BIC's own choice is printed for comparison.
+bic_breaks <- length(breakpoints(bp)$breakpoints)
+bic_breaks
+
+bp_rows  <- breakpoints(bp, breaks = BP_N_BREAKS)$breakpoints
+n_breaks <- length(bp_rows)
+bp_dates <- df_reg_rq1$date[bp_rows]
+
+n_breaks
+bp_dates
+confint(bp, breaks = n_breaks)
+```
+
+```{r}
+plot(df_reg_rq1$date, df_reg_rq1$ff_target, type = "l")
+abline(v = bp_dates, col = "red")
+```
+
+The analysis uses `r n_breaks` breaks, estimated at `r paste(format(bp_dates, "%b %Y"), collapse = ", ")`. BIC alone would pick `r bic_breaks`, the most the test allows; with trending variables and serially correlated errors BIC tends to over-select breaks, so the number of breaks is kept as an explicit choice.
+
+## Chow Tests
+
+```{r}
+chow_dates <- sort(unique(c(CHOW_EVENT_DATES, bp_dates)))
+
+for (d in as.list(chow_dates)) {
+  idx <- which(df_reg_rq1$date == d)
+  if (length(idx) > 0) {
+    test <- sctest(rq1_formula, type = "Chow", point = idx, data = df_reg_rq1)
+    cat("Date:", format(d),
+        if (d %in% bp_dates) "(estimated break)" else "(event)",
+        "| F =", round(test$statistic, 2),
+        "| p-value =", format(test$p.value, scientific = TRUE), "\n")
+  }
+}
+```
+
+The Chow tests evaluate whether the regression relationship shifts at both estimated and theory-motivated break dates.
+
+## Sub-Period Regressions
+
+```{r}
+# Sub-periods run between the estimated break dates.
+period_starts <- c(min(df_reg_rq1$date), bp_dates)
+period_ends   <- c(bp_dates, max(df_reg_rq1$date) + 1)
+period_labels <- paste0(format(period_starts, "%Y"), "-", format(period_ends - 1, "%Y"))
+
+df_reg_rq1$period <- cut(
+  df_reg_rq1$date,
+  breaks = c(period_starts, max(df_reg_rq1$date) + 1),
+  labels = period_labels,
+  right = FALSE
+)
+
+models <- lapply(period_labels, function(p) {
+  lm(rq1_formula, data = subset(df_reg_rq1, period == p))
+})
+names(models) <- period_labels
+
+lapply(models, summary)
+```
+
+```{r}
+coef_table <- do.call(rbind, lapply(models, coef))
+coef_table
+```
+
+```{r}
+coef_table <- do.call(rbind, lapply(names(models), function(p) {
+  df <- tidy(models[[p]])
+  df$period <- p
+  return(df)
+}))
+
+coef_table
+```
+
+```{r}
+ggplot(coef_table[coef_table$term != "(Intercept)", ],
+       aes(x = period, y = estimate, color = term, group = term)) +
+  geom_line() +
+  geom_point()
+```
+
+Sub-period regressions make it easier to interpret how the policy rule differs across historical regimes.

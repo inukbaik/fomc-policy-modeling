@@ -1,0 +1,36 @@
+project:
+  type: website
+  execute-dir: project
+  output-dir: _site
+  render:
+    - index.qmd
+    - rule.qmd
+    - regimes.qmd
+    - prediction.qmd
+
+website:
+  title: "FOMC Policy Modeling"
+  navbar:
+    left:
+      - href: index.qmd
+        text: Data
+      - href: rule.qmd
+        text: The rule
+      - href: regimes.qmd
+        text: The regimes
+      - href: prediction.qmd
+        text: The prediction
+
+format:
+  html:
+    code-fold: true
+    toc: true
+
+execute:
+  echo: true
+  warning: false
+  message: false
+  # No freeze: freeze only notices edits to a page's own .qmd, not to R/
+  # scripts or data, so pages could go stale. The slow RQ3 fits are skipped
+  # by the knitr cache instead, which is keyed on data and code.
+  freeze: false

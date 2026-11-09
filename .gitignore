@@ -64,3 +64,10 @@ data/
 
 # Local planning notes
 TODO.md
+_site/
+_freeze/
+.quarto/
+*_files/
+
+/.quarto/
+**/*.quarto_ipynb
