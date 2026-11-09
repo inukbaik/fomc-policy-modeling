@@ -61,7 +61,7 @@ RELEASE_DELAY_DAYS <- c(
 )
 RQ3_START_TRAIN <- 200                    # meetings in the first training window
 RQ3_STEP        <- 12                     # meetings per test block
-RQ3_CLASS_WEIGHTS <- TRUE                 # weight classes by inverse frequency (RQ3)
+RQ3_WEIGHT_OPTIONS <- c(FALSE, TRUE)      # tuning tries unweighted and inverse-frequency class weights (RQ3)
 RQ3_SEED        <- 597                    # seed for model fitting and the bootstrap (RQ3)
 RQ3_BOOT_REPS   <- 1000                   # bootstrap resamples for score intervals (RQ3)
 RQ3_BOOT_BLOCK  <- 8                      # meetings per bootstrap block (~1 year)
@@ -1269,23 +1269,30 @@ to_xgb_label <- function(y_factor) {
 
 # Inverse-frequency class weights from the training rows only: each class
 # gets the same total weight, so a rare cut counts as much as several holds.
-class_freq_weights <- function(y) {
+# `weighted = FALSE` gives every row weight 1.
+class_freq_weights <- function(y, weighted) {
   counts <- table(factor(y, levels = levels(y)))
-  if (!RQ3_CLASS_WEIGHTS) return(setNames(rep(1, length(counts)), names(counts)))
+  if (!weighted) return(setNames(rep(1, length(counts)), names(counts)))
   length(y) / (length(counts) * pmax(counts, 1))
 }
 
-class_weights <- function(y) as.numeric(class_freq_weights(y)[as.character(y)])
+class_weights <- function(y, weighted) {
+  as.numeric(class_freq_weights(y, weighted)[as.character(y)])
+}
 ```
 
 The inner split is also chronological so tuning remains time-aware.
 
-**Class imbalance.** About 70% of meetings are holds, so a model can look
-accurate while ignoring cuts and hikes. Every model is trained with the
-same inverse-frequency class weights, computed from its own training rows:
-case weights for the multinomial logit, elastic net and XGBoost, and class
-weights (`classwt`) for the random forest. This trades some accuracy for
-catching more moves, which is what macro-F1 rewards.
+**Class imbalance.** About 70% of meetings are holds, so a model can learn
+to ignore cuts and hikes. Inverse-frequency class weights (computed from
+the training rows only) counter this, but they can also overshoot: when
+moves are rarer in the test period than in training, weighted models raise
+too many false alarms. Applied to every model, weights lowered pooled
+macro-F1 for all four. So weighting is treated as a tuning setting: each
+model tries both unweighted and weighted fits, and its own time-ordered
+validation block decides. Weights enter as case weights for the
+multinomial logit, elastic net and XGBoost, and as `classwt` for the
+random forest.
 
 ## Tuned Models
 
@@ -1298,11 +1305,11 @@ tune_multinom <- function(train_part) {
   decay_grid <- c(0, 1e-4, 1e-3, 1e-2, 1e-1)
   results <- list()
 
-  for (d in decay_grid) {
+  for (w in RQ3_WEIGHT_OPTIONS) for (d in decay_grid) {
     fit <- multinom(
       policy_action_class ~ . - date,
       data = inner_train,
-      weights = class_weights(inner_train$policy_action_class),
+      weights = class_weights(inner_train$policy_action_class, w),
       decay = d,
       trace = FALSE,
       MaxNWts = 5000
@@ -1312,7 +1319,7 @@ tune_multinom <- function(train_part) {
     metric_row <- score_predictions(pred, inner_valid$policy_action_class)
 
     results[[length(results) + 1]] <- cbind(
-      data.frame(decay = d),
+      data.frame(weighted = w, decay = d),
       metric_row
     )
   }
@@ -1321,11 +1328,12 @@ tune_multinom <- function(train_part) {
     rank_scores()
 
   best_decay <- results_df$decay[1]
+  best_weighted <- results_df$weighted[1]
 
   final_fit <- multinom(
     policy_action_class ~ . - date,
     data = train_part,
-    weights = class_weights(train_part$policy_action_class),
+    weights = class_weights(train_part$policy_action_class, best_weighted),
     decay = best_decay,
     trace = FALSE,
     MaxNWts = 5000
@@ -1353,11 +1361,13 @@ tune_enet <- function(train_part) {
   # with random folds, training on later meetings to score earlier ones.)
   alpha_grid <- c(0, 0.25, 0.5, 0.75, 1)
 
-  results_df <- map_dfr(alpha_grid, function(a) {
+  grid <- expand.grid(weighted = RQ3_WEIGHT_OPTIONS, alpha = alpha_grid)
+
+  results_df <- map2_dfr(grid$weighted, grid$alpha, function(w, a) {
     fit <- glmnet(
       x = x_inner_train,
       y = y_inner_train,
-      weights = class_weights(y_inner_train),
+      weights = class_weights(y_inner_train, w),
       family = "multinomial",
       alpha = a,
       standardize = TRUE,
@@ -1368,7 +1378,7 @@ tune_enet <- function(train_part) {
     pred <- predict(fit, newx = x_inner_valid, type = "class")
     map_dfr(seq_along(fit$lambda), function(j) {
       bind_cols(
-        tibble(alpha = a, lambda = fit$lambda[j]),
+        tibble(weighted = w, alpha = a, lambda = fit$lambda[j]),
         score_predictions(as_class(pred[, j]), y_inner_valid)
       )
     })
@@ -1381,7 +1391,7 @@ tune_enet <- function(train_part) {
   final_fit <- glmnet(
     x = rq3_x(train_part),
     y = train_part$policy_action_class,
-    weights = class_weights(train_part$policy_action_class),
+    weights = class_weights(train_part$policy_action_class, best$weighted),
     family = "multinomial",
     alpha = best$alpha,
     standardize = TRUE,
@@ -1412,13 +1422,13 @@ tune_rf <- function(train_part) {
 
   results <- list()
 
-  for (m in mtry_grid) {
+  for (w in RQ3_WEIGHT_OPTIONS) for (m in mtry_grid) {
     for (ns in nodesize_grid) {
       for (nt in ntree_grid) {
         fit <- randomForest(
           policy_action_class ~ . - date,
           data = inner_train,
-          classwt = class_freq_weights(inner_train$policy_action_class),
+          classwt = class_freq_weights(inner_train$policy_action_class, w),
           ntree = nt,
           mtry = m,
           nodesize = ns,
@@ -1429,7 +1439,7 @@ tune_rf <- function(train_part) {
         metric_row <- score_predictions(pred, inner_valid$policy_action_class)
 
         results[[length(results) + 1]] <- cbind(
-          data.frame(mtry = m, nodesize = ns, ntree = nt),
+          data.frame(weighted = w, mtry = m, nodesize = ns, ntree = nt),
           metric_row
         )
       }
@@ -1446,7 +1456,7 @@ tune_rf <- function(train_part) {
   final_fit <- randomForest(
     policy_action_class ~ . - date,
     data = train_part,
-    classwt = class_freq_weights(train_part$policy_action_class),
+    classwt = class_freq_weights(train_part$policy_action_class, results_df$weighted[1]),
     ntree = best_ntree,
     mtry = best_mtry,
     nodesize = best_nodesize,
@@ -1473,10 +1483,6 @@ tune_xgb <- function(train_part) {
   x_inner_valid <- model.matrix(policy_action_class ~ . - date, data = inner_valid)[, -1]
   y_inner_valid_factor <- inner_valid$policy_action_class
 
-  dtrain <- xgb.DMatrix(
-    data = x_inner_train, label = y_inner_train,
-    weight = class_weights(inner_train$policy_action_class)
-  )
   dvalid <- xgb.DMatrix(data = x_inner_valid)
 
   eta_grid <- c(0.01, 0.05, 0.1)
@@ -1486,7 +1492,11 @@ tune_xgb <- function(train_part) {
 
   results <- list()
 
-  for (eta_val in eta_grid) {
+  for (w in RQ3_WEIGHT_OPTIONS) for (eta_val in eta_grid) {
+    dtrain <- xgb.DMatrix(
+      data = x_inner_train, label = y_inner_train,
+      weight = class_weights(inner_train$policy_action_class, w)
+    )
     for (depth_val in max_depth_grid) {
       for (nrounds_val in nrounds_grid) {
         for (mcw_val in min_child_weight_grid) {
@@ -1517,6 +1527,7 @@ tune_xgb <- function(train_part) {
 
           results[[length(results) + 1]] <- cbind(
             data.frame(
+              weighted = w,
               eta = eta_val,
               max_depth = depth_val,
               nrounds = nrounds_val,
@@ -1539,7 +1550,7 @@ tune_xgb <- function(train_part) {
 
   dtrain_full <- xgb.DMatrix(
     data = x_train, label = y_train,
-    weight = class_weights(train_part$policy_action_class)
+    weight = class_weights(train_part$policy_action_class, best$weighted)
   )
 
   final_fit <- xgb.train(
@@ -1629,7 +1640,7 @@ fit_and_predict <- function(train_part, test_part, seed, models = rq3_models) {
 fn_code <- function(...) lapply(list(...), deparse)
 rq3_inputs_hash <- digest::digest(list(
   df_final_rq3, train_data, test_data, RQ3_START_TRAIN, RQ3_STEP,
-  RQ3_SEED, RQ3_CLASS_WEIGHTS,
+  RQ3_SEED, RQ3_WEIGHT_OPTIONS,
   fn_code(class_weights, class_freq_weights, tune_multinom, tune_enet, tune_rf, tune_xgb, class_scores,
           score_predictions, cohen_kappa, rank_scores, make_inner_split,
           to_xgb_label, fit_and_predict, as_class, rq3_x),
