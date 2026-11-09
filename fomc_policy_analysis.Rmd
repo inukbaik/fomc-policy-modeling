@@ -49,7 +49,7 @@ K_CLUSTERS      <- 3                      # clusters used (RQ2); silhouette is f
 LABEL_WINDOW_DAYS <- 2                    # days after a decision to read the new target (RQ3)
 RQ3_START_TRAIN <- 200                    # meetings in the first training window
 RQ3_STEP        <- 12                     # meetings per test block
-RQ3_SEED        <- 597                    # seed for the bootstrap (RQ3)
+RQ3_SEED        <- 597                    # seed for model fitting and the bootstrap (RQ3)
 RQ3_BOOT_REPS   <- 1000                   # bootstrap resamples for score intervals (RQ3)
 RQ3_BOOT_BLOCK  <- 8                      # meetings per bootstrap block (~1 year)
 
@@ -1144,54 +1144,15 @@ A chronological split is used so the evaluation respects time order.
 
 ## Metric Helpers
 
-```{r}
-get_metrics <- function(pred, truth) {
-  cm <- confusionMatrix(pred, truth)
-
-  by_class <- as.data.frame(cm$byClass)
-
-  precision <- by_class[, "Pos Pred Value"]
-  recall <- by_class[, "Sensitivity"]
-  bal_acc <- by_class[, "Balanced Accuracy"]
-
-  f1 <- ifelse(
-    (precision + recall) == 0,
-    NA,
-    2 * precision * recall / (precision + recall)
-  )
-
-  list(
-    cm = cm,
-    summary = data.frame(
-      Macro_F1 = mean(f1, na.rm = TRUE),
-      Mean_Balanced_Accuracy = mean(bal_acc, na.rm = TRUE),
-      Kappa = unname(cm$overall["Kappa"]),
-      Accuracy = unname(cm$overall["Accuracy"])
-    )
-  )
-}
-
-rank_metric_table <- function(results_df) {
-  results_df %>%
-    arrange(
-      desc(Macro_F1),
-      desc(Mean_Balanced_Accuracy),
-      desc(Kappa),
-      desc(Accuracy)
-    )
-}
-```
-
-`get_metrics()` is what the tuning functions use to compare settings on the
-inner validation block.
-
-### Scoring rule for the comparison
+### Scoring rule
 
 Models are compared on **macro-F1**: the F1 score for each class (cut, hold,
 hike), averaged with equal weight. A model that never predicts a class gets
 F1 = 0 for that class. An earlier version dropped such classes from the
 average, which scored "always hold" on the hold class alone and ranked it
-first; it never catches a move, so it should not. A class's F1 is left out
+first; it never catches a move, so it should not. The same rule picks the
+tuning settings on the inner validation block. Under the old rule, tuning
+also favoured settings that predict only holds. A class's F1 is left out
 only when it appears neither in the predictions nor in the actual outcomes.
 
 Ties are broken by **balanced accuracy** (the average of the three class
@@ -1290,7 +1251,7 @@ tune_multinom <- function(train_part) {
     )
 
     pred <- predict(fit, newdata = inner_valid)
-    metric_row <- get_metrics(pred, inner_valid$policy_action_class)$summary
+    metric_row <- score_predictions(pred, inner_valid$policy_action_class)
 
     results[[length(results) + 1]] <- cbind(
       data.frame(decay = d),
@@ -1299,7 +1260,7 @@ tune_multinom <- function(train_part) {
   }
 
   results_df <- bind_rows(results) %>%
-    rank_metric_table()
+    rank_scores()
 
   best_decay <- results_df$decay[1]
 
@@ -1322,70 +1283,54 @@ tune_multinom <- function(train_part) {
 ```{r}
 tune_enet <- function(train_part) {
   split_obj <- make_inner_split(train_part)
-  inner_train <- split_obj$inner_train
-  inner_valid <- split_obj$inner_valid
 
-  x_inner_train <- model.matrix(policy_action_class ~ . - date, data = inner_train)[, -1]
-  y_inner_train <- inner_train$policy_action_class
+  x_inner_train <- rq3_x(split_obj$inner_train)
+  y_inner_train <- split_obj$inner_train$policy_action_class
+  x_inner_valid <- rq3_x(split_obj$inner_valid)
+  y_inner_valid <- split_obj$inner_valid$policy_action_class
 
-  x_inner_valid <- model.matrix(policy_action_class ~ . - date, data = inner_valid)[, -1]
-  y_inner_valid <- inner_valid$policy_action_class
-
+  # alpha and lambda are chosen together on the time-ordered validation
+  # block, like every other model's settings. (cv.glmnet would pick lambda
+  # with random folds, training on later meetings to score earlier ones.)
   alpha_grid <- c(0, 0.25, 0.5, 0.75, 1)
-  results <- list()
 
-  for (a in alpha_grid) {
-    cv_fit <- cv.glmnet(
+  results_df <- map_dfr(alpha_grid, function(a) {
+    fit <- glmnet(
       x = x_inner_train,
       y = y_inner_train,
       family = "multinomial",
       alpha = a,
-      type.measure = "class",
-      nfolds = 5,
       standardize = TRUE,
       nlambda = 50,
       lambda.min.ratio = 1e-3,
       maxit = 200000
     )
+    pred <- predict(fit, newx = x_inner_valid, type = "class")
+    map_dfr(seq_along(fit$lambda), function(j) {
+      bind_cols(
+        tibble(alpha = a, lambda = fit$lambda[j]),
+        score_predictions(as_class(pred[, j]), y_inner_valid)
+      )
+    })
+  }) %>%
+    # ties go to the larger lambda (the simpler model)
+    arrange(desc(Macro_F1), desc(Balanced_Accuracy), desc(Kappa), desc(Accuracy), desc(lambda))
 
-    pred <- predict(
-      cv_fit,
-      newx = x_inner_valid,
-      s = "lambda.1se",
-      type = "class"
-    )
+  best <- results_df[1, ]
 
-    pred <- factor(as.vector(pred), levels = levels(y_inner_valid))
-    metric_row <- get_metrics(pred, y_inner_valid)$summary
-
-    results[[length(results) + 1]] <- cbind(
-      data.frame(alpha = a, lambda = cv_fit$lambda.1se),
-      metric_row
-    )
-  }
-
-  results_df <- bind_rows(results) %>%
-    rank_metric_table()
-
-  best_alpha <- results_df$alpha[1]
-
-  x_train <- model.matrix(policy_action_class ~ . - date, data = train_part)[, -1]
-  y_train <- train_part$policy_action_class
-
-  final_fit <- cv.glmnet(
-    x = x_train,
-    y = y_train,
+  final_fit <- glmnet(
+    x = rq3_x(train_part),
+    y = train_part$policy_action_class,
     family = "multinomial",
-    alpha = best_alpha,
-    type.measure = "class",
-    nfolds = 5,
+    alpha = best$alpha,
     standardize = TRUE,
     nlambda = 50,
+    lambda.min.ratio = 1e-3,
     maxit = 200000
   )
 
   list(
-    best_params = results_df[1, ],
+    best_params = best,
     tuning_results = results_df,
     final_fit = final_fit
   )
@@ -1419,7 +1364,7 @@ tune_rf <- function(train_part) {
         )
 
         pred <- predict(fit, newdata = inner_valid)
-        metric_row <- get_metrics(pred, inner_valid$policy_action_class)$summary
+        metric_row <- score_predictions(pred, inner_valid$policy_action_class)
 
         results[[length(results) + 1]] <- cbind(
           data.frame(mtry = m, nodesize = ns, ntree = nt),
@@ -1430,7 +1375,7 @@ tune_rf <- function(train_part) {
   }
 
   results_df <- bind_rows(results) %>%
-    rank_metric_table()
+    rank_scores()
 
   best_mtry <- results_df$mtry[1]
   best_nodesize <- results_df$nodesize[1]
@@ -1502,7 +1447,7 @@ tune_xgb <- function(train_part) {
             levels = c("cut", "hold", "hike")
           )
 
-          metric_row <- get_metrics(pred_factor, y_inner_valid_factor)$summary
+          metric_row <- score_predictions(pred_factor, y_inner_valid_factor)
 
           results[[length(results) + 1]] <- cbind(
             data.frame(
@@ -1519,7 +1464,7 @@ tune_xgb <- function(train_part) {
   }
 
   results_df <- bind_rows(results) %>%
-    rank_metric_table()
+    rank_scores()
 
   best <- results_df[1, ]
 
@@ -1580,7 +1525,7 @@ rq3_models <- list(
   Elastic_Net_Tuned = list(
     tune    = tune_enet,
     predict = function(obj, newdata) {
-      as_class(predict(obj$final_fit, newx = rq3_x(newdata), s = "lambda.1se", type = "class"))
+      as_class(predict(obj$final_fit, newx = rq3_x(newdata), s = obj$best_params$lambda, type = "class"))
     }
   ),
   Random_Forest_Tuned = list(
@@ -1595,8 +1540,11 @@ rq3_models <- list(
   )
 )
 
-fit_and_predict <- function(train_part, test_part, models = rq3_models) {
+# Every model starts from the same seed, so a model's result does not depend
+# on which models ran before it (random forest is the random one).
+fit_and_predict <- function(train_part, test_part, seed, models = rq3_models) {
   map(models, function(m) {
+    set.seed(seed)
     obj <- m$tune(train_part)
     list(obj = obj, pred = m$predict(obj, test_part))
   })
@@ -1612,16 +1560,17 @@ fit_and_predict <- function(train_part, test_part, models = rq3_models) {
 fn_code <- function(...) lapply(list(...), deparse)
 rq3_inputs_hash <- digest::digest(list(
   df_final_rq3, train_data, test_data, RQ3_START_TRAIN, RQ3_STEP,
-  fn_code(tune_multinom, tune_enet, tune_rf, tune_xgb, get_metrics,
-          make_inner_split, to_xgb_label, rank_metric_table, fit_and_predict,
-          as_class, rq3_x),
+  RQ3_SEED,
+  fn_code(tune_multinom, tune_enet, tune_rf, tune_xgb, class_scores,
+          score_predictions, cohen_kappa, rank_scores, make_inner_split,
+          to_xgb_label, fit_and_predict, as_class, rq3_x),
   lapply(rq3_models, function(m) lapply(m, deparse)),
   lapply(sessionInfo()$otherPkgs, `[[`, "Version")
 ))
 ```
 
 ```{r rq3-holdout, cache=TRUE, cache.extra=rq3_inputs_hash}
-holdout <- fit_and_predict(train_data, test_data)
+holdout <- fit_and_predict(train_data, test_data, seed = RQ3_SEED)
 ```
 
 This block tunes each model on the first 80% of meetings and predicts the
@@ -1697,7 +1646,7 @@ rolling <- map(seq_along(fold_ends), function(fold) {
   train_part <- df_final_rq3[1:end_train, ]
   test_part  <- df_final_rq3[(end_train + 1):min(end_train + RQ3_STEP, n_meetings), ]
 
-  fits <- fit_and_predict(train_part, test_part)
+  fits <- fit_and_predict(train_part, test_part, seed = RQ3_SEED + fold)
 
   list(
     info = data.frame(
