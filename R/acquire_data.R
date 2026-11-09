@@ -7,6 +7,7 @@
 #   fomc_meetings.csv     one row per FOMC event (meetings, calls, votes)
 #   fed_target_daily.csv  daily fed funds target (point target, then range midpoint)
 #   macro_monthly.csv     monthly panel used by the analysis
+#   market_daily.csv      daily market series (market-signal baseline, RQ3)
 
 suppressPackageStartupMessages({
   library(dplyr)
@@ -47,6 +48,10 @@ AVERAGED_SERIES <- c(
   "ANFCI",                           # Chicago Fed adjusted financial conditions
   "DTWEXBGS"                         # broad dollar index
 )
+
+# Daily series kept at daily frequency, so a meeting can use the value on
+# the day before it starts.
+DAILY_SERIES <- c("DGS2")                # 2-year Treasury yield
 
 # Not fetched: PCEC96 (real consumption, starts 2007) and DCOILWTICO (daily WTI,
 # starts 1986). WTISPLC covers oil with a longer history.
@@ -106,6 +111,12 @@ build_macro_monthly <- function(target_daily) {
 
   reduce(c(list(target_monthly), monthly, averaged), full_join, by = "date") %>%
     filter(date >= floor_date(min(target_daily$date), "month")) %>%
+    arrange(date)
+}
+
+build_market_daily <- function() {
+  map(DAILY_SERIES, fetch_series) %>%
+    reduce(full_join, by = "date") %>%
     arrange(date)
 }
 
@@ -249,6 +260,10 @@ main <- function() {
   message("Fetching macro series...")
   macro <- build_macro_monthly(target_daily)
   write_csv(macro, file.path(OUT_DIR, "macro_monthly.csv"))
+
+  message("Fetching daily market series...")
+  market <- build_market_daily()
+  write_csv(market, file.path(OUT_DIR, "market_daily.csv"))
 
   message(sprintf(
     "Done: %d FOMC events (%s to %s), %d target days, %d months x %d columns.",

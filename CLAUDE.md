@@ -27,10 +27,11 @@ data, `data_rq1` the RQ2 data). Don't "fix" one without the other.
 
 | File | What it does |
 |---|---|
-| `R/acquire_data.R` | Scrapes the FOMC calendar from federalreserve.gov (`rvest`) and pulls FRED series (`fredr`). Writes the three files in `data/`. |
+| `R/acquire_data.R` | Scrapes the FOMC calendar from federalreserve.gov (`rvest`) and pulls FRED series (`fredr`). Writes the four files in `data/`. |
 | `data/fomc_meetings.csv` | One row per FOMC event: `start_date`, `decision_date`, `type` (scheduled, unscheduled_meeting, conference_call, notation_vote, cancelled), `is_scheduled`, `has_sep`. Includes future scheduled meetings. |
 | `data/fed_target_daily.csv` | Daily target: DFEDTAR until 2008-12-15, then the midpoint of DFEDTARL/DFEDTARU (`lower`, `upper` kept). Use this for meeting-level labels. |
 | `data/macro_monthly.csv` | Monthly panel: monthly-average target, `policy_change`, monthly FRED series, and daily/weekly series averaged locally. |
+| `data/market_daily.csv` | Daily market series kept daily (`DGS2`), for the RQ3 market-signal baseline. |
 | `fomc_policy_analysis.Rmd` | Cleaning, feature engineering, EDA, RQ1–RQ3. Reads `data/macro_monthly.csv` and `data/fomc_meetings.csv`. |
 | `reports/`, `figures/` | Original PDFs and plots. Git-ignored, local only. |
 
