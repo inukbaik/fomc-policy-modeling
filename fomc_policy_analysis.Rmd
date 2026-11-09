@@ -49,6 +49,9 @@ K_CLUSTERS      <- 3                      # clusters used (RQ2); silhouette is f
 LABEL_WINDOW_DAYS <- 2                    # days after a decision to read the new target (RQ3)
 RQ3_START_TRAIN <- 200                    # meetings in the first training window
 RQ3_STEP        <- 12                     # meetings per test block
+RQ3_SEED        <- 597                    # seed for the bootstrap (RQ3)
+RQ3_BOOT_REPS   <- 1000                   # bootstrap resamples for score intervals (RQ3)
+RQ3_BOOT_BLOCK  <- 8                      # meetings per bootstrap block (~1 year)
 
 # Events tested with Chow tests alongside the estimated break dates (RQ1)
 CHOW_EVENT_DATES <- as.Date(c(
@@ -1168,28 +1171,6 @@ get_metrics <- function(pred, truth) {
   )
 }
 
-extract_model_metrics <- function(cm, model_name) {
-  by_class <- as.data.frame(cm$byClass)
-
-  precision <- by_class[, "Pos Pred Value"]
-  recall <- by_class[, "Sensitivity"]
-  bal_acc <- by_class[, "Balanced Accuracy"]
-
-  f1 <- ifelse(
-    (precision + recall) == 0,
-    NA,
-    2 * precision * recall / (precision + recall)
-  )
-
-  data.frame(
-    Model = model_name,
-    Macro_F1 = mean(f1, na.rm = TRUE),
-    Mean_Balanced_Accuracy = mean(bal_acc, na.rm = TRUE),
-    Kappa = unname(cm$overall["Kappa"]),
-    Accuracy = unname(cm$overall["Accuracy"])
-  )
-}
-
 rank_metric_table <- function(results_df) {
   results_df %>%
     arrange(
@@ -1201,7 +1182,69 @@ rank_metric_table <- function(results_df) {
 }
 ```
 
-These helpers ensure the same metric framework is used across all candidate models.
+`get_metrics()` is what the tuning functions use to compare settings on the
+inner validation block.
+
+### Scoring rule for the comparison
+
+Models are compared on **macro-F1**: the F1 score for each class (cut, hold,
+hike), averaged with equal weight. A model that never predicts a class gets
+F1 = 0 for that class. An earlier version dropped such classes from the
+average, which scored "always hold" on the hold class alone and ranked it
+first; it never catches a move, so it should not. A class's F1 is left out
+only when it appears neither in the predictions nor in the actual outcomes.
+
+Ties are broken by **balanced accuracy** (the average of the three class
+recalls). Kappa and accuracy are reported too. Accuracy alone rewards
+predicting hold, since about 70% of meetings are holds.
+
+```{r}
+RQ3_CLASSES <- c("cut", "hold", "hike")
+
+class_scores <- function(pred, truth) {
+  tab <- table(
+    Predicted = factor(pred, levels = RQ3_CLASSES),
+    Actual    = factor(truth, levels = RQ3_CLASSES)
+  )
+  tp <- diag(tab)
+  fp <- rowSums(tab) - tp
+  fn <- colSums(tab) - tp
+  tibble(
+    Class     = RQ3_CLASSES,
+    Actual    = as.integer(colSums(tab)),
+    Predicted = as.integer(rowSums(tab)),
+    Precision = ifelse(tp + fp == 0, 0, tp / (tp + fp)),
+    Recall    = ifelse(tp + fn == 0, NA, tp / (tp + fn)),
+    F1        = ifelse(2 * tp + fp + fn == 0, NA, 2 * tp / (2 * tp + fp + fn))
+  )
+}
+
+macro_f1 <- function(pred, truth) mean(class_scores(pred, truth)$F1, na.rm = TRUE)
+
+cohen_kappa <- function(pred, truth) {
+  tab <- table(factor(pred, levels = RQ3_CLASSES), factor(truth, levels = RQ3_CLASSES))
+  n  <- sum(tab)
+  po <- sum(diag(tab)) / n
+  pe <- sum(rowSums(tab) * colSums(tab)) / n^2
+  if (pe == 1) return(0)
+  (po - pe) / (1 - pe)
+}
+
+score_predictions <- function(pred, truth) {
+  cs <- class_scores(pred, truth)
+  tibble(
+    Macro_F1          = mean(cs$F1, na.rm = TRUE),
+    Balanced_Accuracy = mean(cs$Recall, na.rm = TRUE),
+    Kappa             = cohen_kappa(pred, truth),
+    Accuracy          = mean(as.character(pred) == as.character(truth)),
+    n                 = length(truth)
+  )
+}
+
+rank_scores <- function(scores) {
+  scores %>% arrange(desc(Macro_F1), desc(Balanced_Accuracy), desc(Kappa), desc(Accuracy))
+}
+```
 
 ## Inner Validation Helpers
 
@@ -1522,7 +1565,6 @@ so every model is evaluated by identical code.
 The baseline always predicts hold and acts as a naive benchmark.
 
 ```{r rq3-registry}
-RQ3_CLASSES <- c("cut", "hold", "hike")
 as_class <- function(x) factor(as.vector(x), levels = RQ3_CLASSES)
 rq3_x <- function(data) model.matrix(policy_action_class ~ . - date, data = data)[, -1]
 
@@ -1580,18 +1622,25 @@ rq3_inputs_hash <- digest::digest(list(
 
 ```{r rq3-holdout, cache=TRUE, cache.extra=rq3_inputs_hash}
 holdout <- fit_and_predict(train_data, test_data)
-holdout_eval <- map(holdout, ~ get_metrics(.x$pred, test_data$policy_action_class))
 ```
 
-This block tunes each model on the training portion and evaluates it once on the held-out test set.
+This block tunes each model on the first 80% of meetings and predicts the
+last 20% once. One split is a single period with few moves, so it is not
+used to rank the models (the expanding-window evaluation below is). It is
+kept for the confusion matrices, tuned settings and variable importance.
 
-## Model Comparison
+## Held-Out Results
 
 ```{r}
-results_table <- imap_dfr(holdout_eval, ~ cbind(Model = .y, .x$summary)) %>%
-  rank_metric_table()
+holdout_scores <- imap_dfr(holdout, ~ score_predictions(.x$pred, test_data$policy_action_class) %>%
+  mutate(Model = .y, .before = 1)) %>%
+  rank_scores()
 
-results_table
+holdout_scores
+```
+
+```{r}
+map(holdout, ~ table(Predicted = .x$pred, Actual = test_data$policy_action_class))
 ```
 
 ```{r}
@@ -1628,88 +1677,25 @@ head(xgb_importance, 10)
 
 Variable importance helps interpret which lagged macro variables are most useful for predicting meeting outcomes.
 
-## Robustnesss Checks
+## Expanding-Window Evaluation (Main Comparison)
 
-This section tests whether the model comparison remains stable when performance is evaluated across multiple future periods rather than one single hold-out split.
+The models are ranked here. The first training window holds the first
+`r RQ3_START_TRAIN` meetings. Each fold tunes every model on all meetings
+so far and predicts the next `r RQ3_STEP`; then the window grows and the
+next block is predicted. Every meeting after the first window is predicted
+exactly once, by models that saw only earlier meetings.
 
-### Rolling / Expanding Evaluation
-
-```{r}
-get_fold_main_metrics <- function(cm, model_name, fold, train_end_date, test_start_date, test_end_date) {
-  data.frame(
-    Fold = fold,
-    Model = model_name,
-    Train_End = train_end_date,
-    Test_Start = test_start_date,
-    Test_End = test_end_date,
-    Accuracy = unname(cm$overall["Accuracy"]),
-    Kappa = unname(cm$overall["Kappa"])
-  )
-}
-
-get_fold_extra_metrics <- function(cm, model_name, fold, train_end_date, test_start_date, test_end_date) {
-  by_class <- as.data.frame(cm$byClass)
-
-  precision <- by_class[, "Pos Pred Value"]
-  recall <- by_class[, "Sensitivity"]
-  bal_acc <- by_class[, "Balanced Accuracy"]
-
-  f1 <- ifelse(
-    (precision + recall) == 0,
-    NA,
-    2 * precision * recall / (precision + recall)
-  )
-
-  data.frame(
-    Fold = fold,
-    Model = model_name,
-    Train_End = train_end_date,
-    Test_Start = test_start_date,
-    Test_End = test_end_date,
-    Macro_F1 = mean(f1, na.rm = TRUE),
-    Mean_Balanced_Accuracy = mean(bal_acc, na.rm = TRUE),
-    Mean_Precision = mean(precision, na.rm = TRUE),
-    Mean_Recall = mean(recall, na.rm = TRUE)
-  )
-}
-
-get_fold_classwise_metrics <- function(cm, model_name, fold) {
-  by_class <- as.data.frame(cm$byClass)
-  by_class$Class <- rownames(by_class)
-  rownames(by_class) <- NULL
-
-  by_class %>%
-    transmute(
-      Fold = fold,
-      Model = model_name,
-      Class = gsub("^Class: ", "", Class),
-      Precision = `Pos Pred Value`,
-      Recall = Sensitivity,
-      Specificity = Specificity,
-      Balanced_Accuracy = `Balanced Accuracy`,
-      F1 = ifelse(
-        (`Pos Pred Value` + Sensitivity) == 0,
-        NA,
-        2 * (`Pos Pred Value`) * Sensitivity / (`Pos Pred Value` + Sensitivity)
-      )
-    )
-}
-```
-
-These helper functions store fold-level metrics in a consistent format so the rolling results can later be summarized and plotted.
-
-### Rolling / Expanding Window Evaluation
-
-```{r rq3-rolling, cache=TRUE, cache.extra=list(rq3_inputs_hash, fn_code(get_fold_main_metrics, get_fold_extra_metrics, get_fold_classwise_metrics))}
-fold_ends <- seq(RQ3_START_TRAIN, nrow(df_final_rq3) - RQ3_STEP, by = RQ3_STEP)
+```{r rq3-rolling, cache=TRUE, cache.extra=rq3_inputs_hash}
+n_meetings <- nrow(df_final_rq3)
+fold_ends  <- seq(RQ3_START_TRAIN, n_meetings - 1, by = RQ3_STEP)
 
 # Each fold: tune every model on meetings 1..end_train, predict the next
-# RQ3_STEP meetings. Keep every out-of-sample prediction, so any metric can
-# be computed afterwards from one table.
+# RQ3_STEP meetings (fewer in the last fold). Keep every out-of-sample
+# prediction so all scores are computed afterwards from one table.
 rolling <- map(seq_along(fold_ends), function(fold) {
   end_train  <- fold_ends[fold]
   train_part <- df_final_rq3[1:end_train, ]
-  test_part  <- df_final_rq3[(end_train + 1):(end_train + RQ3_STEP), ]
+  test_part  <- df_final_rq3[(end_train + 1):min(end_train + RQ3_STEP, n_meetings), ]
 
   fits <- fit_and_predict(train_part, test_part)
 
@@ -1730,150 +1716,138 @@ rolling <- map(seq_along(fold_ends), function(fold) {
     tuning = imap(fits[-1], ~ cbind(Fold = fold, Model = .y, .x$obj$best_params))
   )
 })
-```
 
-This evaluation uses an expanding training window and a fixed future test block, which gives a more reliable time-ordered assessment than relying on one single split.
-
-### Combine Rolling Results
-
-```{r}
 fold_info     <- map_dfr(rolling, "info")
 rolling_preds <- map_dfr(rolling, "preds")
 tuning_table  <- bind_rows(flatten(map(rolling, "tuning")))
+```
 
-fold_cms <- rolling_preds %>%
+### Pooled Scores
+
+Each test block holds only `r RQ3_STEP` meetings, and many blocks contain no
+cut or no hike, so a score computed per block is noisy and often undefined.
+Instead, the out-of-sample predictions from all
+`r nrow(fold_info)` folds (`r n_distinct(rolling_preds$date)` meetings,
+`r format(min(rolling_preds$date), "%b %Y")` to
+`r format(max(rolling_preds$date), "%b %Y")`) are pooled and each model is
+scored once.
+
+```{r}
+rolling_scores <- rolling_preds %>%
+  group_by(Model) %>%
+  group_modify(~ score_predictions(.x$pred, .x$truth)) %>%
+  ungroup() %>%
+  rank_scores()
+
+rolling_scores
+```
+
+### How Sure Is the Ranking?
+
+With about `r n_distinct(rolling_preds$date)` test meetings, small gaps
+between models can be luck. A moving-block bootstrap resamples blocks of
+`r RQ3_BOOT_BLOCK` consecutive meetings (keeping runs of hikes or cuts
+together) `r RQ3_BOOT_REPS` times and re-scores every model on the same
+resample. The table gives a 90% interval for each model's macro-F1 and for
+its gap to the best baseline. An interval for the gap that includes zero
+means the data cannot tell the model apart from that baseline.
+
+```{r}
+block_bootstrap_f1 <- function(preds, reps, block, seed) {
+  dates <- sort(unique(preds$date))
+  n <- length(dates)
+  wide <- preds %>%
+    select(Model, date, truth, pred) %>%
+    arrange(date)
+  by_model <- split(wide, wide$Model)
+
+  set.seed(seed)
+  map_dfr(seq_len(reps), function(r) {
+    starts <- sample.int(n - block + 1, ceiling(n / block), replace = TRUE)
+    idx <- unlist(lapply(starts, function(s) s:(s + block - 1)))[1:n]
+    imap_dfr(by_model, ~ tibble(rep = r, Model = .y,
+                                Macro_F1 = macro_f1(.x$pred[idx], .x$truth[idx])))
+  })
+}
+
+boot_f1 <- block_bootstrap_f1(rolling_preds, RQ3_BOOT_REPS, RQ3_BOOT_BLOCK, RQ3_SEED)
+
+best_baseline <- rolling_scores %>%
+  filter(startsWith(Model, "Baseline_")) %>%
+  slice(1) %>%
+  pull(Model)
+
+rolling_intervals <- boot_f1 %>%
+  group_by(rep) %>%
+  mutate(Gap = Macro_F1 - Macro_F1[Model == best_baseline]) %>%
+  group_by(Model) %>%
+  summarise(
+    F1_low  = quantile(Macro_F1, 0.05),
+    F1_high = quantile(Macro_F1, 0.95),
+    Gap_low  = quantile(Gap, 0.05),
+    Gap_high = quantile(Gap, 0.95),
+    .groups = "drop"
+  )
+
+rolling_ranking <- rolling_scores %>%
+  select(Model, Macro_F1, Balanced_Accuracy, Kappa, Accuracy) %>%
+  left_join(rolling_intervals, by = "Model")
+
+rolling_ranking
+```
+
+Best baseline: `r best_baseline`.
+
+```{r}
+ggplot(rolling_ranking, aes(x = reorder(Model, Macro_F1), y = Macro_F1)) +
+  geom_pointrange(aes(ymin = F1_low, ymax = F1_high)) +
+  coord_flip() +
+  labs(
+    title = "Expanding-window macro-F1 by model (90% block-bootstrap interval)",
+    x = NULL,
+    y = "Macro-F1 (pooled out-of-sample predictions)"
+  )
+```
+
+### Class-wise Results
+
+```{r}
+rolling_class_scores <- rolling_preds %>%
+  group_by(Model) %>%
+  group_modify(~ class_scores(.x$pred, .x$truth)) %>%
+  ungroup()
+
+rolling_class_scores
+```
+
+This shows which moves each model catches: recall is the share of actual
+cuts (or hikes, or holds) the model predicted correctly.
+
+### Stability Across Folds
+
+```{r}
+fold_scores <- rolling_preds %>%
   group_by(Fold, Model) %>%
-  summarise(cm = list(confusionMatrix(pred, truth)), .groups = "drop") %>%
+  group_modify(~ score_predictions(.x$pred, .x$truth)) %>%
+  ungroup() %>%
   left_join(fold_info, by = "Fold")
 
-rolling_main_table <- pmap_dfr(fold_cms, function(Fold, Model, cm, Train_End, Test_Start, Test_End) {
-  get_fold_main_metrics(cm, Model, Fold, Train_End, Test_Start, Test_End)
-})
-rolling_extra_table <- pmap_dfr(fold_cms, function(Fold, Model, cm, Train_End, Test_Start, Test_End) {
-  get_fold_extra_metrics(cm, Model, Fold, Train_End, Test_Start, Test_End)
-})
-rolling_class_table <- pmap_dfr(fold_cms, function(Fold, Model, cm, ...) {
-  get_fold_classwise_metrics(cm, Model, Fold)
-})
+ggplot(fold_scores, aes(x = Test_Start, y = Macro_F1, color = Model)) +
+  geom_line() +
+  geom_point() +
+  labs(
+    title = "Macro-F1 per test block",
+    x = "Start of test block",
+    y = "Macro-F1"
+  )
 ```
 
-```{r}
-rolling_main_summary <- rolling_main_table %>%
-  group_by(Model) %>%
-  summarise(
-    Mean_Accuracy = mean(Accuracy, na.rm = TRUE),
-    SD_Accuracy = sd(Accuracy, na.rm = TRUE),
-    Mean_Kappa = mean(Kappa, na.rm = TRUE),
-    SD_Kappa = sd(Kappa, na.rm = TRUE),
-    .groups = "drop"
-  )
-
-rolling_extra_summary <- rolling_extra_table %>%
-  group_by(Model) %>%
-  summarise(
-    Mean_Macro_F1 = mean(Macro_F1, na.rm = TRUE),
-    Mean_Balanced_Accuracy = mean(Mean_Balanced_Accuracy, na.rm = TRUE),
-    Mean_Precision = mean(Mean_Precision, na.rm = TRUE),
-    Mean_Recall = mean(Mean_Recall, na.rm = TRUE),
-    .groups = "drop"
-  )
-
-rolling_final_summary <- rolling_main_summary %>%
-  left_join(rolling_extra_summary, by = "Model") %>%
-  arrange(
-    desc(Mean_Macro_F1),
-    desc(Mean_Balanced_Accuracy),
-    desc(Mean_Kappa),
-    desc(Mean_Accuracy)
-  )
-
-rolling_final_summary
-```
-
-The rolling summary compares the models on their average performance across many future test windows rather than a single test period.
-
-```{r}
-rolling_class_summary <- rolling_class_table %>%
-  group_by(Model, Class) %>%
-  summarise(
-    Mean_Precision = mean(Precision, na.rm = TRUE),
-    Mean_Recall = mean(Recall, na.rm = TRUE),
-    Mean_Specificity = mean(Specificity, na.rm = TRUE),
-    Mean_F1 = mean(F1, na.rm = TRUE),
-    Mean_Balanced_Accuracy = mean(Balanced_Accuracy, na.rm = TRUE),
-    .groups = "drop"
-  ) %>%
-  arrange(Model, Class)
-
-rolling_class_summary
-```
-
-This class-wise summary shows whether a model performs differently for cuts, holds, and hikes.
+Per-block scores swing widely because each block has few moves; they show
+when models do well or badly, not which model is better overall.
 
 ### Tuning Stability Log
 
 ```{r}
 tuning_table
 ```
-
-### Rolling Macro F1 Plot
-
-```{r}
-ggplot(
-  rolling_final_summary,
-  aes(x = reorder(Model, Mean_Macro_F1), y = Mean_Macro_F1)
-) +
-  geom_col() +
-  coord_flip() +
-  labs(
-    title = "Rolling / Expanding Window Mean Macro F1 by Model",
-    x = "Model",
-    y = "Mean Macro F1"
-  )
-```
-
-This plot summarizes average multiclass performance across the full rolling evaluation.
-
-### Fold-by-Fold Macro F1 Plot
-
-```{r}
-rolling_extra_table_plot <- rolling_extra_table %>%
-  filter(is.finite(Macro_F1))
-
-ggplot(
-  rolling_extra_table_plot,
-  aes(x = Fold, y = Macro_F1, color = Model)
-) +
-  geom_line() +
-  geom_point() +
-  labs(
-    title = "Fold-by-Fold Macro F1 Across Expanding Windows",
-    x = "Fold",
-    y = "Macro F1"
-  )
-```
-
-Some fold-level Macro F1 values for the naive baseline can become undefined when a class is never predicted, so non-finite values are removed before plotting.
-
-### Fold-by-Fold Accuracy Plot
-
-```{r}
-ggplot(
-  rolling_main_table,
-  aes(x = Fold, y = Accuracy, color = Model)
-) +
-  geom_line() +
-  geom_point() +
-  labs(
-    title = "Fold-by-Fold Accuracy Across Expanding Windows",
-    x = "Fold",
-    y = "Accuracy"
-  )
-```
-
-The fold-by-fold accuracy plot shows how stable each model is across different forecast periods.
-
-### Robustness Check Summary
-
-The rolling and expanding evaluation provides a broader view of model behavior across time. If a model performs well only on the single hold-out split but not across repeated future windows, that would suggest the single-split result may not be stable. By contrast, models that remain strong across rolling folds provide more credible evidence of predictive usefulness.
 
