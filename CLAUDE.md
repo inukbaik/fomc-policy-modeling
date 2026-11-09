@@ -112,6 +112,22 @@ each one to readers; keep the two in sync.
   and C5 fix the methods (BIC hits its cap; silhouette is flat).
 - **Missing values inside a series**: carry the last value forward, one month
   at most (no look-ahead).
+- **RQ3 scoring** (decided 2026-11-08): macro-F1 where a class that occurs
+  but is never predicted correctly scores F1 = 0 (never drop it with
+  `na.rm`); ties broken by balanced accuracy (mean class recall). Rank on
+  the pooled out-of-sample predictions of all expanding-window folds, with a
+  moving-block bootstrap for intervals. The 80/20 split does not rank models.
+  Tuning uses the same score.
+- **RQ3 tuning is time-ordered everywhere**: every model, including elastic
+  net's lambda, is tuned on the last block of its training window. No
+  `cv.glmnet` random folds. Each model is fit from seed `RQ3_SEED + fold`.
+- **RQ3 predictors = data published before the meeting starts**, using
+  `RELEASE_DELAY_DAYS` (cautious approximations, until ALFRED in D3).
+- **Class weights are a tuning setting** (user decision 2026-11-08): fixed
+  inverse-frequency weights lowered macro-F1 for every model, so each model's
+  validation block picks weighted or unweighted.
+- **RQ3 baselines**: always hold, same as last meeting, and a 2-year-yield
+  market signal. Models are judged against the best baseline.
 
 ## Git conventions
 
