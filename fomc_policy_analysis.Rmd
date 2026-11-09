@@ -47,6 +47,18 @@ BP_N_BREAKS     <- 3                      # breaks used (RQ1); BIC picks the max
 K_RANGE         <- 2:8                    # cluster counts shown in diagnostics (RQ2)
 K_CLUSTERS      <- 3                      # clusters used (RQ2); silhouette is flat, see C5
 LABEL_WINDOW_DAYS <- 2                    # days after a decision to read the new target (RQ3)
+# Days after the end of month m by which month m's value is published.
+# Cautious approximations of the usual release calendar; series not listed
+# (market data, Michigan survey, oil, the target itself) are known by the
+# end of month m. Real release dates (ALFRED) will replace this later.
+RELEASE_DELAY_DAYS <- c(
+  UNRATE   = 10,  # Employment Situation, first Friday of m+1
+  PAYEMS   = 10,
+  INDPRO   = 18,  # industrial production, mid m+1
+  HOUST    = 20,  # housing starts, around the 17th-19th of m+1
+  PCEPILFE = 31,  # personal income and outlays, end of m+1
+  PCEPI    = 31
+)
 RQ3_START_TRAIN <- 200                    # meetings in the first training window
 RQ3_STEP        <- 12                     # meetings per test block
 RQ3_SEED        <- 597                    # seed for model fitting and the bootstrap (RQ3)
@@ -1003,7 +1015,7 @@ Each row is one **scheduled** FOMC meeting, labelled by what was decided at that
 
 **Why scheduled meetings only.** Conference calls and unscheduled meetings are excluded:
 
-- They respond to sudden shocks (9/11, January and October 2008, COVID). The predictors are last month's macro data, which cannot see those shocks coming, so every model misses them for the same reason. They add noise to the comparison, not information about the models.
+- They respond to sudden shocks (9/11, January and October 2008, COVID). The predictors are the latest published monthly data, which cannot see those shocks coming, so every model misses them for the same reason. They add noise to the comparison, not information about the models.
 - Whether an emergency call happens at all is itself a signal of stress. Mixing those rows with regular meetings changes what is being predicted.
 - Scheduled meetings happen on known dates (about eight a year), so every row is a decision the Fed was going to make regardless. That matches the question: how do model families compare at predicting the decision at each meeting.
 
@@ -1048,69 +1060,96 @@ meetings_rq3 %>%
   mutate(percent = round(100 * n / sum(n), 2))
 ```
 
-## Lagged Predictors
+## Predictors Available Before Each Meeting
+
+A predictor for a meeting must have been published before the meeting
+started. Market data (yields, spreads, financial conditions, oil) for a
+month is known when the month ends, so a meeting gets the previous month's
+average. Government statistics come out later: the unemployment rate for
+March is published in early April, industrial production mid-April, and
+PCE inflation only at the end of April. A meeting on April 1 has February's
+PCE, not March's.
+
+Each predictor is therefore taken from the latest month published before
+the meeting's first day, using the release delays in the settings. Derived
+variables follow their source: `inflation_gap` and `core_pce_yoy` follow
+core PCE, `payems_yoy` follows payrolls.
 
 ```{r}
-exclude_from_lag <- c(
-  "date",
-  "ff_target",
-  "unrate_lag1",
-  "term_spread_10y_3m"
+rq3_predictors <- setdiff(
+  names(df_rq3),
+  c("date", "ff_target",
+    "unrate_lag1",          # duplicate of UNRATE one month back
+    "term_spread_10y_3m")   # duplicate of T10Y3M
 )
 
-df_rq3_lagged <- df_rq3 %>%
-  arrange(date) %>%
-  mutate(
-    across(
-      -all_of(exclude_from_lag),
-      ~ lag(.x),
-      .names = "{.col}_lag1"
-    )
-  )
+derived_from <- c(core_pce_yoy = "PCEPILFE", inflation_gap = "PCEPILFE", payems_yoy = "PAYEMS")
 
-# Each meeting gets the previous month's values (the `_lag1` columns of the
-# month the meeting starts in). `date` becomes the decision date.
-df_meeting_model <- meetings_rq3 %>%
-  select(month, decision_date, policy_action_class) %>%
-  left_join(
-    df_rq3_lagged %>% select(date, ends_with("_lag1")),
-    by = c("month" = "date")
-  ) %>%
-  rename(date = decision_date) %>%
-  select(-month) %>%
+release_delay <- function(col) {
+  src <- if (col %in% names(derived_from)) derived_from[[col]] else col
+  if (src %in% names(RELEASE_DELAY_DAYS)) RELEASE_DELAY_DAYS[[src]] else 0
+}
+
+# Month m is published once (last day of m) + delay < meeting start, so
+# the latest published month is the month before (start - delay).
+latest_published_month <- function(start_date, delay) {
+  as.Date(zoo::as.yearmon(start_date - delay) - 1 / 12)
+}
+
+# Look values up in the full cleaned panel (from 1982), not the 1986+
+# sample: early-1986 meetings need data from late 1985.
+predictor_panel <- df_clean %>%
+  mutate(policy_change = as.integer(policy_change)) %>%
   arrange(date)
 
-df_meeting_model %>%
-  count(policy_action_class) %>%
-  mutate(percent = round(100 * n / sum(n), 2))
+df_meeting_model <- meetings_rq3 %>%
+  select(start_date, decision_date, policy_action_class)
+
+for (col in rq3_predictors) {
+  data_month <- latest_published_month(df_meeting_model$start_date, release_delay(col))
+  df_meeting_model[[col]] <- predictor_panel[[col]][match(data_month, predictor_panel$date)]
+}
+
+release_table <- tibble(
+  Predictor  = rq3_predictors,
+  Delay_Days = map_dbl(rq3_predictors, release_delay)
+) %>%
+  filter(Delay_Days > 0) %>%
+  mutate(Share_Two_Months_Back = map_dbl(Delay_Days, function(d) {
+    mean(latest_published_month(df_meeting_model$start_date, d) <
+         latest_published_month(df_meeting_model$start_date, 0))
+  }))
+
+release_table
+
+# `date` becomes the decision date.
+df_meeting_model <- df_meeting_model %>%
+  rename(date = decision_date) %>%
+  select(-start_date) %>%
+  arrange(date)
 ```
 
-Only lagged information is used so that the predictors reflect information available before the meeting.
+`Share_Two_Months_Back` is the share of meetings whose latest published
+value for that series was from two months earlier. The previous version gave every
+meeting the previous month's value of every series, which used PCE
+inflation before it was published at almost every meeting.
 
 ## Complete Predictor Set
 
 ```{r}
-lagged_predictors <- names(df_meeting_model)[grepl("_lag1$", names(df_meeting_model))]
-
-lagged_predictors_complete <- lagged_predictors[
-  sapply(df_meeting_model[, lagged_predictors], function(x) sum(is.na(x)) == 0)
+predictors_complete <- rq3_predictors[
+  sapply(df_meeting_model[rq3_predictors], function(x) !anyNA(x))
 ]
 
 df_final_rq3 <- df_meeting_model %>%
-  select(date, policy_action_class, all_of(lagged_predictors_complete)) %>%
-  select(
-    -core_pce_yoy_lag1,
-    -PCEPI_lag1,
-    -DGS3MO_lag1,
-    -PAYEMS_lag1,
-    -DGS10_lag1
-  )
+  select(date, policy_action_class, all_of(predictors_complete)) %>%
+  select(-any_of(c("core_pce_yoy", "PCEPI", "DGS3MO", "PAYEMS", "DGS10")))
 
 str(df_final_rq3)
 table(df_final_rq3$policy_action_class)
 ```
 
-This step keeps only complete lagged predictors and removes a few highly redundant variables.
+This step keeps predictors observed at every meeting since 1986 and removes a few highly redundant variables.
 
 ## Train/Test Split
 
@@ -1624,7 +1663,7 @@ xgb_importance <- xgb.importance(
 head(xgb_importance, 10)
 ```
 
-Variable importance helps interpret which lagged macro variables are most useful for predicting meeting outcomes.
+Variable importance helps interpret which pre-meeting macro variables are most useful for predicting meeting outcomes.
 
 ## Expanding-Window Evaluation (Main Comparison)
 
