@@ -795,6 +795,83 @@ tune_oprobit <- function(train_part) {
 }
 ```
 
+## Dynamic Models: Two-Step Hazard
+
+Fed moves come in runs separated by long pauses, so how long it has been
+since the last change matters. Hamilton and Jordà (2002) model this with
+an *autoregressive conditional hazard*: the chance of a move at each
+meeting depends on the time since the last one, and an ordered probit then
+picks the direction. This page uses a simpler two-step version of the same
+idea, built from two logistic regressions:
+
+1. **Will they move?** Move vs. hold, from the log of days since the last
+   target change, whether the last meeting moved, the size of the market
+   signal, the zero-bound flag, inflation and unemployment.
+2. **Which way?** Hike vs. cut, fitted only on meetings with a move, from
+   the previous decision, inflation, unemployment and the signed market
+   signal.
+
+The two combine into probabilities: P(hold) = 1 − P(move),
+P(hike) = P(move) × P(hike | move), P(cut) = P(move) × P(cut | move); the
+most likely outcome is the prediction. Like the ordered probit it uses
+fixed inputs and chooses class weights on its validation block.
+
+```{r}
+HAZARD_MOVE_VARS <- c("log_days_since_change", "abs_prev_move", "abs_market_spread",
+                      "at_zlb", "inflation_gap", "UNRATE")
+HAZARD_DIR_VARS  <- c("prev_move", "inflation_gap", "UNRATE", "market_2y_spread")
+
+hazard_frame <- function(df) {
+  df %>%
+    mutate(
+      moved = as.integer(policy_action_class != "hold"),
+      hiked = as.integer(policy_action_class == "hike"),
+      log_days_since_change = log(days_since_change),
+      abs_prev_move = abs(prev_move),
+      abs_market_spread = abs(market_2y_spread)
+    )
+}
+
+fit_hazard <- function(df, weighted) {
+  d <- hazard_frame(df)
+  w_move <- class_weights(factor(d$moved), weighted)
+  move_fit <- glm(reformulate(varying_vars(d, HAZARD_MOVE_VARS), response = "moved"),
+                  data = d, weights = w_move, family = binomial)
+  d_moves <- d[d$moved == 1, ]
+  w_dir <- class_weights(factor(d_moves$hiked), weighted)
+  dir_fit <- glm(reformulate(varying_vars(d_moves, HAZARD_DIR_VARS), response = "hiked"),
+                 data = d_moves, weights = w_dir, family = binomial)
+  list(move = move_fit, dir = dir_fit)
+}
+
+predict_hazard <- function(fit, newdata) {
+  d <- hazard_frame(newdata)
+  p_move <- predict(fit$move, newdata = d, type = "response")
+  p_hike <- predict(fit$dir, newdata = d, type = "response")
+  probs <- cbind(cut = p_move * (1 - p_hike), hold = 1 - p_move, hike = p_move * p_hike)
+  as_class(RQ3_CLASSES[max.col(probs, ties.method = "first")])
+}
+
+tune_hazard <- function(train_part) {
+  split_obj <- make_inner_split(train_part)
+  results_df <- map_dfr(RQ3_WEIGHT_OPTIONS, function(w) {
+    fit <- fit_hazard(split_obj$inner_train, w)
+    bind_cols(
+      tibble(weighted = w),
+      score_predictions(predict_hazard(fit, split_obj$inner_valid),
+                        split_obj$inner_valid$policy_action_class)
+    )
+  }) %>%
+    rank_scores()
+
+  list(
+    best_params = results_df[1, ],
+    tuning_results = results_df,
+    final_fit = fit_hazard(train_part, results_df$weighted[1])
+  )
+}
+```
+
 ## Model Registry
 
 Every model, including the baseline, is a pair of functions: `tune()` fits
@@ -900,6 +977,10 @@ rq3_models <- list(
   Ordered_Probit = list(
     tune    = tune_oprobit,
     predict = function(obj, newdata) predict_oprobit(obj$final_fit, newdata)
+  ),
+  Hazard_Two_Step = list(
+    tune    = tune_hazard,
+    predict = function(obj, newdata) predict_hazard(obj$final_fit, newdata)
   )
 )
 
@@ -925,7 +1006,8 @@ rq3_inputs_hash <- digest::digest(list(
   df_final_rq3, train_data, test_data, RQ3_START_TRAIN, RQ3_STEP,
   RQ3_SEED, RQ3_WEIGHT_OPTIONS, prev_decision, market_signal,
   RQ3_TAYLOR_VARS,
-  fn_code(varying_vars, fit_oprobit, predict_oprobit, tune_oprobit, make_scaler, apply_scaler, class_weights, class_freq_weights, tune_multinom, tune_enet, tune_rf, tune_xgb, class_scores,
+  HAZARD_MOVE_VARS, HAZARD_DIR_VARS,
+  fn_code(hazard_frame, fit_hazard, predict_hazard, tune_hazard, varying_vars, fit_oprobit, predict_oprobit, tune_oprobit, make_scaler, apply_scaler, class_weights, class_freq_weights, tune_multinom, tune_enet, tune_rf, tune_xgb, class_scores,
           score_predictions, cohen_kappa, rank_scores, make_inner_split,
           to_xgb_label, fit_and_predict, as_class, rq3_x),
   lapply(rq3_models, function(m) lapply(m, deparse)),
@@ -968,6 +1050,16 @@ push toward a hike, negative toward a cut; the two cut-offs (`cut|hold`,
 
 ```{r}
 summary(holdout$Ordered_Probit$obj$final_fit)
+```
+
+## Hazard Model Coefficients
+
+Step 1 (move vs. hold) and step 2 (hike vs. cut, given a move), fitted on
+the held-out split's training meetings.
+
+```{r}
+summary(holdout$Hazard_Two_Step$obj$final_fit$move)
+summary(holdout$Hazard_Two_Step$obj$final_fit$dir)
 ```
 
 ## Variable Importance
