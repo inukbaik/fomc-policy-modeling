@@ -89,17 +89,36 @@ PCE, not March's.
 Each predictor is therefore taken from the latest month published before
 the meeting's first day, using the release delays in the settings. Derived
 variables follow their source: `inflation_gap` and `core_pce_yoy` follow
-core PCE, `payems_yoy` follows payrolls.
+core PCE, `payems_yoy` follows payrolls, and so on.
+
+Series that trend over decades (price indexes, industrial production,
+housing starts, oil prices) enter as year-over-year percentage changes
+rather than levels. A level mostly tells a model which era a meeting is
+in, and in later test folds it lies outside anything seen in training,
+which tree models in particular cannot extrapolate.
 
 ```{r}
-rq3_predictors <- setdiff(
-  names(df_rq3),
-  c("date", "ff_target",
-    "unrate_lag1",          # duplicate of UNRATE one month back
-    "term_spread_10y_3m")   # duplicate of T10Y3M
+# Price indexes, production, housing starts and oil prices trend over
+# decades, so their levels mostly say what era it is (and later test folds
+# sit outside the training range). They enter as year-over-year % changes.
+trending_levels <- c("PCEPILFE", "PCEPI", "INDPRO", "HOUST", "WTISPLC")
+yoy <- function(x) 100 * (x / lag(x, 12) - 1)
+
+rq3_predictors <- c(
+  setdiff(
+    names(df_rq3),
+    c("date", "ff_target",
+      "unrate_lag1",          # duplicate of UNRATE one month back
+      "term_spread_10y_3m",   # duplicate of T10Y3M
+      trending_levels)
+  ),
+  "indpro_yoy", "houst_yoy", "oil_yoy"
 )
 
-derived_from <- c(core_pce_yoy = "PCEPILFE", inflation_gap = "PCEPILFE", payems_yoy = "PAYEMS")
+derived_from <- c(
+  core_pce_yoy = "PCEPILFE", inflation_gap = "PCEPILFE", payems_yoy = "PAYEMS",
+  indpro_yoy = "INDPRO", houst_yoy = "HOUST", oil_yoy = "WTISPLC"
+)
 
 release_delay <- function(col) {
   src <- if (col %in% names(derived_from)) derived_from[[col]] else col
@@ -115,8 +134,13 @@ latest_published_month <- function(start_date, delay) {
 # Look values up in the full cleaned panel (from 1982), not the 1986+
 # sample: early-1986 meetings need data from late 1985.
 predictor_panel <- df_clean %>%
-  mutate(policy_change = as.integer(policy_change)) %>%
-  arrange(date)
+  arrange(date) %>%
+  mutate(
+    policy_change = as.integer(policy_change),
+    indpro_yoy    = yoy(INDPRO),
+    houst_yoy     = yoy(HOUST),
+    oil_yoy       = yoy(WTISPLC)
+  )
 
 df_meeting_model <- meetings_rq3 %>%
   select(start_date, decision_date, policy_action_class)
