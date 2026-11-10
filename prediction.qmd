@@ -116,12 +116,6 @@ already at zero.
 meeting minus the current target, the same signal the market baseline
 uses. When markets expect hikes, the 2-year yield sits above the target.
 
-**Momentum.** Three-month changes in unemployment and annualized core
-inflation, and the Sahm rule indicator (the rise in the 3-month average
-unemployment rate over its low of the previous year). Levels say where the
-economy is; these say which way it is moving, which is what the Fed reacts
-to before cuts.
-
 ```{r}
 # Price indexes, production, housing starts and oil prices trend over
 # decades, so their levels mostly say what era it is (and later test folds
@@ -139,14 +133,12 @@ rq3_predictors <- c(
       # monthly calendar counts, replaced by meeting-based timing below
       "fomc_meetings", "fomc_scheduled", "fomc_unscheduled", "days_since_last_fomc")
   ),
-  "indpro_yoy", "houst_yoy", "oil_yoy",
-  "unrate_3m_change", "core_infl_3m", "sahm"
+  "indpro_yoy", "houst_yoy", "oil_yoy"
 )
 
 derived_from <- c(
   core_pce_yoy = "PCEPILFE", inflation_gap = "PCEPILFE", payems_yoy = "PAYEMS",
-  indpro_yoy = "INDPRO", houst_yoy = "HOUST", oil_yoy = "WTISPLC",
-  unrate_3m_change = "UNRATE", sahm = "UNRATE", core_infl_3m = "PCEPILFE"
+  indpro_yoy = "INDPRO", houst_yoy = "HOUST", oil_yoy = "WTISPLC"
 )
 
 release_delay <- function(col) {
@@ -168,15 +160,7 @@ predictor_panel <- df_clean %>%
     policy_change = as.integer(policy_change),
     indpro_yoy    = yoy(INDPRO),
     houst_yoy     = yoy(HOUST),
-    oil_yoy       = yoy(WTISPLC),
-    # Momentum: recent direction, not just the level.
-    unrate_3m_change = UNRATE - lag(UNRATE, 3),
-    core_infl_3m     = 100 * ((PCEPILFE / lag(PCEPILFE, 3))^4 - 1),  # annualized
-    # Sahm rule: 3-month average unemployment minus its lowest 3-month
-    # average over the previous 12 months (0.5+ has signalled recessions).
-    unrate_3m_avg    = zoo::rollmeanr(UNRATE, 3, fill = NA),
-    sahm             = unrate_3m_avg -
-                       zoo::rollapplyr(lag(unrate_3m_avg), 12, min, fill = NA)
+    oil_yoy       = yoy(WTISPLC)
   )
 
 df_meeting_model <- meetings_rq3 %>%
