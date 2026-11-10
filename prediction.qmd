@@ -1294,6 +1294,9 @@ cut_table <- rolling_class_scores %>%
   filter(Class == "cut") %>%
   select(Model, Actual, Predicted, Precision, Recall)
 cut_table
+best_ml <- rolling_scores %>%
+  filter(endsWith(Model, "_Tuned")) %>%
+  slice(1)
 list_or_none <- function(x) if (length(x) == 0) "none" else paste(x, collapse = ", ")
 ```
 
@@ -1315,11 +1318,21 @@ most recent change, where rates are (including the zero lower bound), and
 what markets expect. Adding those let the models match or pass the simple
 baselines.
 
+**Machine learning vs. dynamic models.** The two models built for policy
+decisions use five or six fixed inputs and no hyperparameter tuning: the two-step hazard
+model scores `r round(rolling_scores$Macro_F1[rolling_scores$Model == "Hazard_Two_Step"], 3)`
+and the ordered probit
+`r round(rolling_scores$Macro_F1[rolling_scores$Model == "Ordered_Probit"], 3)`,
+against `r round(best_ml$Macro_F1, 3)` for the best tuned machine-learning
+model (`r best_ml$Model`), which sees all
+`r ncol(df_final_rq3) - 2` inputs. Splitting the decision into "move or not" and
+"which way" fits the Fed's runs-and-pauses pattern; a single ordered
+score is less flexible.
+
 **How sure is that?** The test period holds
-`r n_distinct(rolling_preds$date)` meetings, so the gaps between the best
-models and the best baseline are within the range that luck alone could
-produce. The fair conclusion is that, given the same information as the
-baselines, these model families perform about as well as the best simple
-rule, and the data cannot yet separate them. Modelling the decision
-sequence directly (ordered probit with the lagged decision, a hazard
-model) is the next comparison.
+`r n_distinct(rolling_preds$date)` meetings, and the bootstrap intervals
+for the gaps to the best baseline
+`r if (length(models_beating_baseline) == 0) "all include zero" else paste("exclude zero only for", list_or_none(models_beating_baseline))`.
+The fair conclusion is that, given the same information as the
+baselines, the best model families perform at least as well as the best
+simple rule, but this test period is too short to show a reliable edge.
