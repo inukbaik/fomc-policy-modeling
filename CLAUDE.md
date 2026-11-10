@@ -140,6 +140,9 @@ each one to readers; keep the two in sync.
 - **Class weights are a tuning setting** (user decision 2026-11-08): fixed
   inverse-frequency weights lowered macro-F1 for every model, so each model's
   validation block picks weighted or unweighted.
+- **RQ3 window check** (2026-11-10): rolling window of `RQ3_ROLLING_WINDOW`
+  (120) meetings vs. expanding, paired block bootstrap; replaces D4. Full
+  history clearly helps five of six fitted models.
 - **RQ3 baselines**: always hold, same as last meeting, and a 2-year-yield
   market signal. Models are judged against the best baseline.
 - **RQ3 features** (decided 2026-11-09/10): trending levels enter as YoY
@@ -213,4 +216,4 @@ and mark it done with a one-line outcome before moving on.
 | Output format | decided | Quarto website on GitHub Pages: Home, The rule, The regimes, The prediction, Appendix. Code folded by default; `freeze` enabled for slow chunks |
 | Time-series extension of RQ3 | in progress | Done (D1): ordered probit and a two-step hazard model (simplified Hamilton–Jordà ACH), both on fixed Taylor-style inputs (`RQ3_TAYLOR_VARS`), in the RQ3 registry. Open: monthly rate-path model (VAR / BVAR / local projections). Data is too small for deep sequence models |
 | Fixes to teammates' RQ1/RQ2 | on hold | Chapters kept as original work with a short known-limitations note (2026-11-09). Teammates had agreed to MIT release and changes |
-| Narrative structure | decided | Data science portfolio. One question, "How does the Fed set rates, and can we predict its next move?", in three connected chapters: the rule (RQ1), the regimes (RQ2), the prediction (RQ3, headline). RQ1 break dates set RQ3 training windows; RQ2 regime labels are an RQ3 feature, fit per fold on training data only |
+| Narrative structure | decided | Data science portfolio. One question, "How does the Fed set rates, and can we predict its next move?", in three connected chapters: the rule (RQ1), the regimes (RQ2), the prediction (RQ3, headline). RQ1 and RQ2 stay original (limitations notes); the planned links into RQ3 (break dates as training windows, regime labels as features) are dropped/on hold. RQ3 instead checks rolling vs. expanding windows itself |
