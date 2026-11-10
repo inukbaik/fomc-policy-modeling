@@ -786,11 +786,22 @@ fit_oprobit <- function(df, weighted) {
   d <- df[, c("policy_action_class", RQ3_TAYLOR_VARS)]
   d$policy_action_class <- factor(d$policy_action_class, levels = RQ3_CLASSES, ordered = TRUE)
   w <- class_weights(df$policy_action_class, weighted)
-  f <- reformulate(varying_vars(d, RQ3_TAYLOR_VARS), response = "policy_action_class")
-  MASS::polr(f, data = d, weights = w, method = "probit", Hess = TRUE)
+  vars <- varying_vars(d, RQ3_TAYLOR_VARS)
+  f <- reformulate(vars, response = "policy_action_class")
+  shares <- prop.table(table(d$policy_action_class))
+  fit_with <- function(...) MASS::polr(f, data = d, weights = w, method = "probit", Hess = TRUE, ...)
+  # polr's own starting values fail in some short windows (e.g. a window
+  # of mostly zero-bound holds). Retry from zero slopes and the observed
+  # class shares; if a class is missing altogether, fall back to predicting
+  # the window's most common outcome.
+  tryCatch(fit_with(), error = function(e) tryCatch(
+    fit_with(start = c(rep(0, length(vars)), qnorm(cumsum(shares)[1:2]))),
+    error = function(e2) structure(list(mode = names(which.max(shares))), class = "class_mode")
+  ))
 }
 
 predict_oprobit <- function(fit, newdata) {
+  if (inherits(fit, "class_mode")) return(as_class(rep(fit$mode, nrow(newdata))))
   as_class(as.character(predict(fit, newdata = newdata, type = "class")))
 }
 
@@ -851,22 +862,32 @@ hazard_frame <- function(df) {
     )
 }
 
+# A logit, or just the observed share when a window has no variation to
+# fit (e.g. no moves, or moves in one direction only).
+fit_logit_or_share <- function(d, y, vars, weighted) {
+  if (nrow(d) == 0) return(structure(list(p = 0), class = "share_fit"))
+  if (length(unique(d[[y]])) < 2) return(structure(list(p = mean(d[[y]])), class = "share_fit"))
+  w <- class_weights(factor(d[[y]]), weighted)
+  glm(reformulate(varying_vars(d, vars), response = y), data = d, weights = w, family = binomial)
+}
+
+predict_logit_or_share <- function(fit, d) {
+  if (inherits(fit, "share_fit")) return(rep(fit$p, nrow(d)))
+  predict(fit, newdata = d, type = "response")
+}
+
 fit_hazard <- function(df, weighted) {
   d <- hazard_frame(df)
-  w_move <- class_weights(factor(d$moved), weighted)
-  move_fit <- glm(reformulate(varying_vars(d, HAZARD_MOVE_VARS), response = "moved"),
-                  data = d, weights = w_move, family = binomial)
-  d_moves <- d[d$moved == 1, ]
-  w_dir <- class_weights(factor(d_moves$hiked), weighted)
-  dir_fit <- glm(reformulate(varying_vars(d_moves, HAZARD_DIR_VARS), response = "hiked"),
-                 data = d_moves, weights = w_dir, family = binomial)
-  list(move = move_fit, dir = dir_fit)
+  list(
+    move = fit_logit_or_share(d, "moved", HAZARD_MOVE_VARS, weighted),
+    dir  = fit_logit_or_share(d[d$moved == 1, ], "hiked", HAZARD_DIR_VARS, weighted)
+  )
 }
 
 predict_hazard <- function(fit, newdata) {
   d <- hazard_frame(newdata)
-  p_move <- predict(fit$move, newdata = d, type = "response")
-  p_hike <- predict(fit$dir, newdata = d, type = "response")
+  p_move <- predict_logit_or_share(fit$move, d)
+  p_hike <- predict_logit_or_share(fit$dir, d)
   probs <- cbind(cut = p_move * (1 - p_hike), hold = 1 - p_move, hike = p_move * p_hike)
   as_class(RQ3_CLASSES[max.col(probs, ties.method = "first")])
 }
@@ -1026,7 +1047,7 @@ rq3_inputs_hash <- digest::digest(list(
   RQ3_SEED, RQ3_WEIGHT_OPTIONS, prev_decision, market_signal,
   RQ3_TAYLOR_VARS,
   HAZARD_MOVE_VARS, HAZARD_DIR_VARS,
-  fn_code(hazard_frame, fit_hazard, predict_hazard, tune_hazard, varying_vars, fit_oprobit, predict_oprobit, tune_oprobit, make_scaler, apply_scaler, class_weights, class_freq_weights, tune_multinom, tune_enet, tune_rf, tune_xgb, class_scores,
+  fn_code(fit_logit_or_share, predict_logit_or_share, hazard_frame, fit_hazard, predict_hazard, tune_hazard, varying_vars, fit_oprobit, predict_oprobit, tune_oprobit, make_scaler, apply_scaler, class_weights, class_freq_weights, tune_multinom, tune_enet, tune_rf, tune_xgb, class_scores,
           score_predictions, cohen_kappa, rank_scores, make_inner_split,
           to_xgb_label, fit_and_predict, as_class, rq3_x),
   lapply(rq3_models, function(m) lapply(m, deparse)),
@@ -1293,6 +1314,83 @@ when models do well or badly, not which model is better overall.
 tuning_table
 ```
 
+## Does Old History Help? Rolling vs. Expanding Window
+
+The main comparison trains every model on all meetings since 1986. If the
+Fed's behaviour has changed, old meetings could mislead the models. To
+check, every model is refitted on a **rolling window** of only the most
+recent `r RQ3_ROLLING_WINDOW` meetings (about 15 years, fixed before
+seeing results) and predicts the same test meetings. If rolling wins, old
+history hurts; if expanding wins, it helps.
+
+```{r rq3-rolling-window, cache=TRUE, cache.extra=list(rq3_inputs_hash, RQ3_ROLLING_WINDOW)}
+rolling_window_runs <- parallel::mclapply(seq_along(fold_ends), function(fold) {
+  end_train  <- fold_ends[fold]
+  train_part <- df_final_rq3[max(1, end_train - RQ3_ROLLING_WINDOW + 1):end_train, ]
+  test_part  <- df_final_rq3[(end_train + 1):min(end_train + RQ3_STEP, n_meetings), ]
+  fits <- fit_and_predict(train_part, test_part, seed = RQ3_SEED + fold)
+  imap_dfr(fits, ~ tibble(
+    Fold = fold, Model = .y, date = test_part$date,
+    truth = test_part$policy_action_class, pred = .x$pred
+  ))
+}, mc.cores = RQ3_CORES, mc.preschedule = FALSE)
+
+failed <- map_lgl(rolling_window_runs, ~ inherits(.x, "try-error"))
+if (any(failed)) stop("Rolling-window fold(s) failed: ", paste(which(failed), collapse = ", "),
+                      "\n", rolling_window_runs[[which(failed)[1]]])
+rolling_window_preds <- bind_rows(rolling_window_runs)
+```
+
+```{r}
+# Paired moving-block bootstrap: both windows are scored on the same
+# resampled meetings, so the interval is for the difference itself.
+set.seed(RQ3_SEED)
+boot_dates <- sort(unique(rolling_preds$date))
+n_boot <- length(boot_dates)
+boot_idx <- replicate(RQ3_BOOT_REPS, {
+  starts <- sample.int(n_boot - RQ3_BOOT_BLOCK + 1, ceiling(n_boot / RQ3_BOOT_BLOCK), replace = TRUE)
+  unlist(lapply(starts, function(s) s:(s + RQ3_BOOT_BLOCK - 1)))[1:n_boot]
+}, simplify = FALSE)
+
+window_comparison <- map_dfr(sort(unique(rolling_preds$Model)), function(m) {
+  e <- rolling_preds %>% filter(Model == m) %>% arrange(date)
+  r <- rolling_window_preds %>% filter(Model == m) %>% arrange(date)
+  diffs <- map_dbl(boot_idx, function(i) {
+    macro_f1(r$pred[i], r$truth[i]) - macro_f1(e$pred[i], e$truth[i])
+  })
+  tibble(
+    Model     = m,
+    Expanding = macro_f1(e$pred, e$truth),
+    Rolling   = macro_f1(r$pred, r$truth),
+    Difference = Rolling - Expanding,
+    Diff_low  = quantile(diffs, 0.05),
+    Diff_high = quantile(diffs, 0.95)
+  )
+}) %>%
+  arrange(desc(Expanding))
+
+window_comparison %>%
+  mutate(across(where(is.numeric), ~ round(.x, 3))) %>%
+  as.data.frame()
+
+list_or_none <- function(x) if (length(x) == 0) "none" else paste(x, collapse = ", ")
+rolling_better  <- window_comparison$Model[window_comparison$Diff_low > 0]
+expanding_better <- window_comparison$Model[window_comparison$Diff_high < 0]
+```
+
+Models that clearly do better with only recent history (90% interval of
+the difference above zero): `r list_or_none(rolling_better)`. Models that
+clearly do better with the full history: `r list_or_none(expanding_better)`.
+The rolling window also leaves only `r round(0.2 * RQ3_ROLLING_WINDOW)`
+meetings for each model's tuning block, so part of any loss can come from
+noisier tuning rather than from losing old information. A likely reason
+old history helps: a recent 15-year window is dominated by the
+zero-lower-bound years, so it holds few rate moves (and fewer cuts) to
+learn from, while the full history covers many easing and tightening
+cycles. In some short windows the ordered probit or one step of the
+hazard model has nothing to fit (for example no cuts at all); there it
+predicts the window's most common outcome or observed share instead.
+
 ## What the Comparison Shows
 
 ```{r}
@@ -1316,7 +1414,6 @@ cut_table
 best_ml <- rolling_scores %>%
   filter(endsWith(Model, "_Tuned")) %>%
   slice(1)
-list_or_none <- function(x) if (length(x) == 0) "none" else paste(x, collapse = ", ")
 ```
 
 - The strongest model family is **`r best_model$Model`** (pooled macro-F1

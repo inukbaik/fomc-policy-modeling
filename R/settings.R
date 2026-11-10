@@ -46,6 +46,7 @@ ZLB_MAX_TARGET  <- 0.25                   # target at or below this = zero lower
 RQ3_TAYLOR_VARS <- c("prev_move", "inflation_gap", "UNRATE", "market_2y_spread", "at_zlb")
 RQ3_START_TRAIN <- 200                    # meetings in the first training window
 RQ3_STEP        <- 12                     # meetings per test block
+RQ3_ROLLING_WINDOW <- 120                 # meetings in the rolling-window check (~15 years), fixed in advance
 RQ3_WEIGHT_OPTIONS <- c(FALSE, TRUE)      # tuning tries unweighted and inverse-frequency class weights (RQ3)
 RQ3_SEED        <- 597                    # seed for model fitting and the bootstrap (RQ3)
 RQ3_BOOT_REPS   <- 1000                   # bootstrap resamples for score intervals (RQ3)
