@@ -134,7 +134,9 @@ each one to readers; keep the two in sync.
   net's lambda, is tuned on the last block of its training window. No
   `cv.glmnet` random folds. Each model is fit from seed `RQ3_SEED + fold`.
 - **RQ3 predictors = data published before the meeting starts**, using
-  `RELEASE_DELAY_DAYS` (cautious approximations, until ALFRED in D3).
+  `RELEASE_DELAY_DAYS` (cautious approximations). Real-time vintages
+  (ALFRED, D3) were skipped by the user (2026-11-10); the Prediction page
+  states the revised-data limitation instead.
 - **Class weights are a tuning setting** (user decision 2026-11-08): fixed
   inverse-frequency weights lowered macro-F1 for every model, so each model's
   validation block picks weighted or unweighted.

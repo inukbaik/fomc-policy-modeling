@@ -267,6 +267,25 @@ value for that series was from two months earlier. The previous version gave eve
 meeting the previous month's value of every series, which used PCE
 inflation before it was published at almost every meeting.
 
+::: {.callout-warning}
+## Limitation: current data, not first-release data
+
+The release delays above control *when* each number became public, but
+not *which version* of it was public. All predictors come from FRED as it
+stands today. The agencies that publish these statistics (the Bureau of
+Labor Statistics, the Bureau of Economic Analysis, the Federal Reserve)
+revise many of them after the first release, sometimes years later:
+payrolls, PCE inflation, industrial production and housing starts all
+change this way. So the values used here can differ from the numbers the
+Fed saw at each meeting, and the release delays are cautious
+approximations rather than actual release dates. FRED's archive (ALFRED)
+keeps the originally published versions for most of these series (core
+PCE only from 2000, financial conditions only from 2011), so a real-time
+version of this evaluation is possible but was not built. The inputs that
+matter most here (the previous decision, the target level and market
+yields) are not revised, so the effect on the comparison is likely small.
+:::
+
 ## Complete Predictor Set
 
 ```{r}
