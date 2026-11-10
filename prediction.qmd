@@ -107,6 +107,11 @@ strongest baseline. So the models also see the previous scheduled
 decision, the direction of the most recent target change, and the days
 since that change. All three are public before the meeting.
 
+**Where rates are.** The target level the day before the meeting, and a
+flag for the zero lower bound (target at or below `r ZLB_MAX_TARGET`%).
+Without it, no model knows that a cut is impossible when rates are
+already at zero.
+
 ```{r}
 # Price indexes, production, housing starts and oil prices trend over
 # decades, so their levels mostly say what era it is (and later test folds
@@ -215,6 +220,15 @@ df_meeting_model <- df_meeting_model %>%
   ) %>%
   select(-last_change_idx)
 rq3_predictors <- c(rq3_predictors, "prev_move", "last_change_dir", "days_since_change")
+
+# Where rates are: the target the day before the meeting, and whether it
+# is at the zero lower bound (where a cut is impossible).
+df_meeting_model <- df_meeting_model %>%
+  mutate(
+    target_level = target_asof(start_date - 1),
+    at_zlb       = as.integer(target_level <= ZLB_MAX_TARGET)
+  )
+rq3_predictors <- c(rq3_predictors, "target_level", "at_zlb")
 
 # `date` becomes the decision date.
 df_meeting_model <- df_meeting_model %>%

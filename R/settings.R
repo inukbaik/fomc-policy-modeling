@@ -39,6 +39,7 @@ RELEASE_DELAY_DAYS <- c(
   PCEPILFE = 31,  # personal income and outlays, end of m+1
   PCEPI    = 31
 )
+ZLB_MAX_TARGET  <- 0.25                   # target at or below this = zero lower bound (RQ3 feature)
 RQ3_START_TRAIN <- 200                    # meetings in the first training window
 RQ3_STEP        <- 12                     # meetings per test block
 RQ3_WEIGHT_OPTIONS <- c(FALSE, TRUE)      # tuning tries unweighted and inverse-frequency class weights (RQ3)
