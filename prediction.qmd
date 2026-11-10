@@ -112,6 +112,10 @@ flag for the zero lower bound (target at or below `r ZLB_MAX_TARGET`%).
 Without it, no model knows that a cut is impossible when rates are
 already at zero.
 
+**Market expectations.** The 2-year Treasury yield on the day before the
+meeting minus the current target, the same signal the market baseline
+uses. When markets expect hikes, the 2-year yield sits above the target.
+
 ```{r}
 # Price indexes, production, housing starts and oil prices trend over
 # decades, so their levels mostly say what era it is (and later test folds
@@ -229,6 +233,21 @@ df_meeting_model <- df_meeting_model %>%
     at_zlb       = as.integer(target_level <= ZLB_MAX_TARGET)
   )
 rq3_predictors <- c(rq3_predictors, "target_level", "at_zlb")
+
+# Market expectations: 2-year Treasury yield on the last trading day before
+# the meeting minus the current target. Above zero, markets expect hikes.
+market_daily <- read.csv("data/market_daily.csv") %>%
+  mutate(date = as.Date(date)) %>%
+  filter(!is.na(DGS2)) %>%
+  arrange(date)
+
+dgs2_asof <- function(d) {
+  market_daily$DGS2[findInterval(as.numeric(d), as.numeric(market_daily$date))]
+}
+
+df_meeting_model <- df_meeting_model %>%
+  mutate(market_2y_spread = dgs2_asof(start_date - 1) - target_level)
+rq3_predictors <- c(rq3_predictors, "market_2y_spread")
 
 # `date` becomes the decision date.
 df_meeting_model <- df_meeting_model %>%
@@ -744,18 +763,10 @@ prev_decision <- meetings_rq3 %>%
   arrange(start_date) %>%
   transmute(date = decision_date, prev = lag(as.character(policy_action_class), default = "hold"))
 
-# 2-year yield on the last trading day before the meeting minus the target.
-market_daily <- read.csv("data/market_daily.csv") %>%
-  mutate(date = as.Date(date)) %>%
-  filter(!is.na(DGS2)) %>%
-  arrange(date)
-
-dgs2_asof <- function(d) {
-  market_daily$DGS2[findInterval(as.numeric(d), as.numeric(market_daily$date))]
-}
-
-market_signal <- meetings_rq3 %>%
-  transmute(date = decision_date, signal = dgs2_asof(start_date - 1) - target_before)
+# 2-year yield on the last trading day before the meeting minus the target
+# (computed with the predictors above as `market_2y_spread`).
+market_signal <- df_meeting_model %>%
+  transmute(date, signal = market_2y_spread)
 
 summary(market_signal$signal)
 ```
