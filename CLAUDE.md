@@ -209,6 +209,6 @@ and mark it done with a one-line outcome before moving on.
 |---|---|---|
 | Static vs. reproducible / refreshed report | decided | Reproducible: one command rebuilds everything from raw data; publishing is manual. Scheduled refresh and prediction tracker deferred (optional later) |
 | Output format | decided | Quarto website on GitHub Pages: Home, The rule, The regimes, The prediction, Appendix. Code folded by default; `freeze` enabled for slow chunks |
-| Time-series extension of RQ3 | open | Meeting-level dynamic models (ordered probit with lagged decision, autoregressive conditional hazard) plus a monthly rate-path model (VAR / BVAR / local projections). Data is too small for deep sequence models |
+| Time-series extension of RQ3 | in progress | Done (D1): ordered probit and a two-step hazard model (simplified Hamilton–Jordà ACH), both on fixed Taylor-style inputs (`RQ3_TAYLOR_VARS`), in the RQ3 registry. Open: monthly rate-path model (VAR / BVAR / local projections). Data is too small for deep sequence models |
 | Fixes to teammates' RQ1/RQ2 | on hold | Chapters kept as original work with a short known-limitations note (2026-11-09). Teammates had agreed to MIT release and changes |
 | Narrative structure | decided | Data science portfolio. One question, "How does the Fed set rates, and can we predict its next move?", in three connected chapters: the rule (RQ1), the regimes (RQ2), the prediction (RQ3, headline). RQ1 break dates set RQ3 training windows; RQ2 regime labels are an RQ3 feature, fit per fold on training data only |
