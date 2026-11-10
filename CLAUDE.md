@@ -94,7 +94,8 @@ the old root-level CSVs belong to tag `v1.0-course-submission`.
 - Keep the original submission reproducible. It is tagged `v1.0-course-submission`
   (commit `2b1f27f`). Improvements go on top of it, not in place of its history.
 - Credit teammates for their sections in any published output, as
-  "course-project teammates", without real names.
+  "course-project teammates". Don't add their names to new text; leave
+  existing author lines as they are.
 
 ## Analysis decisions
 
@@ -118,7 +119,8 @@ each one to readers; keep the two in sync.
 - **RQ1 and RQ2 stay as the original course-project chapters** (decided
   2026-11-09). Their methods are not revised; each page opens with a
   "known limitations" note instead. Credit them to course-project
-  teammates without real names. Breaks (RQ1) = 3 and k (RQ2) = 3 remain
+  teammates; don't add teammates' names to new text, but leave existing
+  author lines (the Data page) as they are. Breaks (RQ1) = 3 and k (RQ2) = 3 remain
   fixed settings (BIC hits its cap; silhouette is flat).
 - **Missing values inside a series**: carry the last value forward, one month
   at most (no look-ahead).
@@ -138,6 +140,16 @@ each one to readers; keep the two in sync.
   validation block picks weighted or unweighted.
 - **RQ3 baselines**: always hold, same as last meeting, and a 2-year-yield
   market signal. Models are judged against the best baseline.
+- **RQ3 features** (decided 2026-11-09/10): trending levels enter as YoY
+  changes; timing is meeting-based (days since previous decision,
+  emergency calls since then); persistence (previous decision, direction
+  and age of the last target change), target level + zero-lower-bound
+  flag, and the 2-year-minus-target market signal are model inputs.
+  Momentum (3-month changes, Sahm rule) was tried and dropped by the user
+  after it lowered three of four models; the page discloses that this
+  used the evaluation results. Not used: UNRATE − NROU (CBO estimate is
+  revised with later data, look-ahead) and `has_sep` (blank before 2021).
+  multinom inputs are standardized with training-window statistics.
 
 ## Git conventions
 
