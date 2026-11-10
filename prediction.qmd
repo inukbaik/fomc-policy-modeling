@@ -97,6 +97,11 @@ rather than levels. A level mostly tells a model which era a meeting is
 in, and in later test folds it lies outside anything seen in training,
 which tree models in particular cannot extrapolate.
 
+The monthly FOMC counts and "days since the last meeting" (measured from
+the first of the month) are replaced by two meeting-level features: days
+since the previous scheduled decision, and the number of emergency calls
+or unscheduled meetings held since then.
+
 ```{r}
 # Price indexes, production, housing starts and oil prices trend over
 # decades, so their levels mostly say what era it is (and later test folds
@@ -110,7 +115,9 @@ rq3_predictors <- c(
     c("date", "ff_target",
       "unrate_lag1",          # duplicate of UNRATE one month back
       "term_spread_10y_3m",   # duplicate of T10Y3M
-      trending_levels)
+      trending_levels,
+      # monthly calendar counts, replaced by meeting-based timing below
+      "fomc_meetings", "fomc_scheduled", "fomc_unscheduled", "days_since_last_fomc")
   ),
   "indpro_yoy", "houst_yoy", "oil_yoy"
 )
@@ -161,6 +168,29 @@ release_table <- tibble(
   }))
 
 release_table
+
+# Meeting-based timing, from the full FOMC calendar: days since the
+# previous scheduled decision, and emergency calls or unscheduled meetings
+# held since then (a sign of stress the monthly data cannot show).
+all_scheduled <- fomc_meetings %>%
+  filter(type == "scheduled") %>%
+  transmute(start = as.Date(start_date), decision = as.Date(decision_date)) %>%
+  arrange(start)
+emergency_starts <- fomc_meetings %>%
+  filter(type %in% c("conference_call", "unscheduled_meeting")) %>%
+  pull(date)
+
+prev_decision_date <- all_scheduled$decision[
+  match(df_meeting_model$start_date, all_scheduled$start) - 1
+]
+df_meeting_model <- df_meeting_model %>%
+  mutate(
+    days_since_prev_meeting = as.numeric(start_date - prev_decision_date),
+    calls_since_prev_meeting = map2_int(prev_decision_date, start_date, function(a, b) {
+      sum(emergency_starts > a & emergency_starts < b)
+    })
+  )
+rq3_predictors <- c(rq3_predictors, "days_since_prev_meeting", "calls_since_prev_meeting")
 
 # `date` becomes the decision date.
 df_meeting_model <- df_meeting_model %>%
