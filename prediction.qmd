@@ -366,10 +366,24 @@ random forest.
 ## Tuned Models
 
 ```{r}
+# Standardize numeric inputs with training-window means and SDs only, so
+# multinom's weight decay penalizes every input on the same scale.
+make_scaler <- function(df) {
+  cols <- names(df)[vapply(df, is.numeric, logical(1))]
+  list(cols = cols,
+       center = vapply(df[cols], mean, numeric(1)),
+       scale  = vapply(df[cols], function(x) { s <- sd(x); if (s > 0) s else 1 }, numeric(1)))
+}
+apply_scaler <- function(df, sc) {
+  for (col in sc$cols) df[[col]] <- (df[[col]] - sc$center[[col]]) / sc$scale[[col]]
+  df
+}
+
 tune_multinom <- function(train_part) {
   split_obj <- make_inner_split(train_part)
-  inner_train <- split_obj$inner_train
-  inner_valid <- split_obj$inner_valid
+  inner_scaler <- make_scaler(split_obj$inner_train)
+  inner_train <- apply_scaler(split_obj$inner_train, inner_scaler)
+  inner_valid <- apply_scaler(split_obj$inner_valid, inner_scaler)
 
   decay_grid <- c(0, 1e-4, 1e-3, 1e-2, 1e-1)
   results <- list()
@@ -399,9 +413,10 @@ tune_multinom <- function(train_part) {
   best_decay <- results_df$decay[1]
   best_weighted <- results_df$weighted[1]
 
+  scaler <- make_scaler(train_part)
   final_fit <- multinom(
     policy_action_class ~ . - date,
-    data = train_part,
+    data = apply_scaler(train_part, scaler),
     weights = class_weights(train_part$policy_action_class, best_weighted),
     decay = best_decay,
     trace = FALSE,
@@ -411,7 +426,8 @@ tune_multinom <- function(train_part) {
   list(
     best_params = results_df[1, ],
     tuning_results = results_df,
-    final_fit = final_fit
+    final_fit = final_fit,
+    scaler = scaler
   )
 }
 ```
@@ -753,7 +769,9 @@ rq3_models <- list(
   ),
   Multinomial_Logit_Tuned = list(
     tune    = tune_multinom,
-    predict = function(obj, newdata) as_class(predict(obj$final_fit, newdata = newdata))
+    predict = function(obj, newdata) {
+      as_class(predict(obj$final_fit, newdata = apply_scaler(newdata, obj$scaler)))
+    }
   ),
   Elastic_Net_Tuned = list(
     tune    = tune_enet,
@@ -794,7 +812,7 @@ fn_code <- function(...) lapply(list(...), deparse)
 rq3_inputs_hash <- digest::digest(list(
   df_final_rq3, train_data, test_data, RQ3_START_TRAIN, RQ3_STEP,
   RQ3_SEED, RQ3_WEIGHT_OPTIONS, prev_decision, market_signal,
-  fn_code(class_weights, class_freq_weights, tune_multinom, tune_enet, tune_rf, tune_xgb, class_scores,
+  fn_code(make_scaler, apply_scaler, class_weights, class_freq_weights, tune_multinom, tune_enet, tune_rf, tune_xgb, class_scores,
           score_predictions, cohen_kappa, rank_scores, make_inner_split,
           to_xgb_label, fit_and_predict, as_class, rq3_x),
   lapply(rq3_models, function(m) lapply(m, deparse)),
