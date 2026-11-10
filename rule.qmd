@@ -8,6 +8,35 @@ source("R/settings.R")
 source("R/prepare_data.R")
 ```
 
+::: {.callout-note}
+## Original course-project chapter
+
+This chapter is the course-project team's original analysis, written by
+teammates and kept as submitted. The only changes are shared data fixes
+and small cleanups (computed instead of hardcoded dates, clearer names);
+the methods were not revised for this portfolio. Known limitations:
+
+- **Possibly spurious levels regression.** The target, inflation and
+  unemployment behave like trending series (see the unit-root tests below),
+  and regressing trending series on each other can show strong
+  relationships that are not real. A partial-adjustment model (the lagged
+  target as a regressor, used below only as a robustness check) is the
+  standard way to estimate a policy rule.
+- **Standard errors ignore autocorrelation.** Monthly errors are strongly
+  correlated over time, so the ordinary p-values overstate how certain each
+  estimate is. Newey-West (autocorrelation-robust) errors would be wider.
+- **Zero-lower-bound months are included.** In 2009–2015 and 2020–2022 the
+  target could not fall below zero, so it stayed flat whatever the economy
+  did. Those months pull every estimated response toward zero.
+- **Lasso screening.** It is given `core_pce_yoy` and `inflation_gap`
+  (the same series shifted by 2), uses random cross-validation folds on
+  time-series data, and its result is not used afterwards.
+- **Break tests reject everywhere.** The Chow tests assume independent
+  errors and reject stability at every date tested, and BIC selects the
+  maximum number of breaks allowed, so neither pins down when the rule
+  changed. The number of breaks is therefore a fixed setting.
+:::
+
 
 This section studies how the federal funds target is related to selected macroeconomic and financial variables, and whether those relationships remain stable over time.
 

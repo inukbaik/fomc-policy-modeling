@@ -8,6 +8,28 @@ source("R/settings.R")
 source("R/prepare_data.R")
 ```
 
+::: {.callout-note}
+## Original course-project chapter
+
+This chapter is the course-project team's original analysis, written by
+teammates and kept as submitted. The only changes are shared data fixes
+and small cleanups (computed instead of hardcoded dates, clearer names);
+the methods were not revised for this portfolio. Known limitations:
+
+- **Trending inputs.** Several clustering inputs are levels that trend over
+  decades (the core PCE price index, nominal oil prices, housing starts,
+  the target itself). They can dominate the principal components, so
+  clusters may separate eras rather than economic conditions.
+- **Weak cluster structure.** Average silhouette widths are low and similar
+  for every k tried (see below), so the number of clusters is a fixed
+  setting rather than something the data chooses.
+- **No stability check.** Clusters are not re-checked across random starts,
+  sub-periods or alternative variable sets.
+- **Fitted on the full sample.** Each month's regime label uses data from
+  later years, which is fine for describing history but means the labels
+  cannot be used as a predictor without refitting on past data only.
+:::
+
 
 ## Data Preparation
 

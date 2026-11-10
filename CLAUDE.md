@@ -93,7 +93,8 @@ the old root-level CSVs belong to tag `v1.0-course-submission`.
   `df$date[c(198, 274, 387)]`). Compute them, so the report survives a data refresh.
 - Keep the original submission reproducible. It is tagged `v1.0-course-submission`
   (commit `2b1f27f`). Improvements go on top of it, not in place of its history.
-- Credit teammates for their sections in any published output.
+- Credit teammates for their sections in any published output, as
+  "course-project teammates", without real names.
 
 ## Analysis decisions
 
@@ -114,8 +115,11 @@ each one to readers; keep the two in sync.
   by the Chair (26 of 150 changes since 1986, all 1986–1992) belong to no
   meeting and are not attributed to one. Never label from the monthly-average
   target: it mislabelled about 20% of meetings.
-- **Breaks (RQ1) = 3 and k (RQ2) = 3 are settings**, not data-driven, until C4
-  and C5 fix the methods (BIC hits its cap; silhouette is flat).
+- **RQ1 and RQ2 stay as the original course-project chapters** (decided
+  2026-11-09). Their methods are not revised; each page opens with a
+  "known limitations" note instead. Credit them to course-project
+  teammates without real names. Breaks (RQ1) = 3 and k (RQ2) = 3 remain
+  fixed settings (BIC hits its cap; silhouette is flat).
 - **Missing values inside a series**: carry the last value forward, one month
   at most (no look-ahead).
 - **RQ3 scoring** (decided 2026-11-08): macro-F1 where a class that occurs
@@ -194,5 +198,5 @@ and mark it done with a one-line outcome before moving on.
 | Static vs. reproducible / refreshed report | decided | Reproducible: one command rebuilds everything from raw data; publishing is manual. Scheduled refresh and prediction tracker deferred (optional later) |
 | Output format | decided | Quarto website on GitHub Pages: Home, The rule, The regimes, The prediction, Appendix. Code folded by default; `freeze` enabled for slow chunks |
 | Time-series extension of RQ3 | open | Meeting-level dynamic models (ordered probit with lagged decision, autoregressive conditional hazard) plus a monthly rate-path model (VAR / BVAR / local projections). Data is too small for deep sequence models |
-| Fixes to teammates' RQ1/RQ2 | approved | Teammates agreed to public MIT release and to changes, marked as Inuk's |
+| Fixes to teammates' RQ1/RQ2 | on hold | Chapters kept as original work with a short known-limitations note (2026-11-09). Teammates had agreed to MIT release and changes |
 | Narrative structure | decided | Data science portfolio. One question, "How does the Fed set rates, and can we predict its next move?", in three connected chapters: the rule (RQ1), the regimes (RQ2), the prediction (RQ3, headline). RQ1 break dates set RQ3 training windows; RQ2 regime labels are an RQ3 feature, fit per fold on training data only |
