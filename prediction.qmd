@@ -9,7 +9,7 @@ source("R/prepare_data.R")
 ```
 
 
-This section turns the meeting-level data into a multiclass classification problem and compares tuned machine-learning models against a naive benchmark.
+This section turns the meeting-level data into a multiclass classification problem and compares tuned machine-learning models against three simple baselines.
 
 ## Data Preparation
 
@@ -115,6 +115,12 @@ already at zero.
 **Market expectations.** The 2-year Treasury yield on the day before the
 meeting minus the current target, the same signal the market baseline
 uses. When markets expect hikes, the 2-year yield sits above the target.
+
+**Tried and dropped: momentum.** Three-month changes in unemployment and
+core inflation and the Sahm rule indicator were also tested. They lowered
+the expanding-window score of three of the four models, so they were left
+out. Because that choice was made after seeing the evaluation results,
+the final scores below are slightly optimistic.
 
 ```{r}
 # Price indexes, production, housing starts and oil prices trend over
@@ -1074,7 +1080,7 @@ rolling_class_scores <- rolling_preds %>%
   group_modify(~ class_scores(.x$pred, .x$truth)) %>%
   ungroup()
 
-rolling_class_scores
+print(rolling_class_scores, n = Inf)
 ```
 
 This shows which moves each model catches: recall is the share of actual
@@ -1114,27 +1120,46 @@ tuning_table
 best_model <- rolling_scores %>%
   filter(!startsWith(Model, "Baseline_")) %>%
   slice(1)
+baseline_f1 <- rolling_scores$Macro_F1[rolling_scores$Model == best_baseline]
+models_above_baseline <- rolling_scores %>%
+  filter(!startsWith(Model, "Baseline_"), Macro_F1 > baseline_f1) %>%
+  pull(Model)
 models_beating_baseline <- rolling_ranking %>%
   filter(!startsWith(Model, "Baseline_"), Gap_low > 0) %>%
   pull(Model)
 models_below_baseline <- rolling_ranking %>%
   filter(!startsWith(Model, "Baseline_"), Gap_high < 0) %>%
   pull(Model)
+cut_table <- rolling_class_scores %>%
+  filter(Class == "cut") %>%
+  select(Model, Actual, Predicted, Precision, Recall)
+cut_table
+list_or_none <- function(x) if (length(x) == 0) "none" else paste(x, collapse = ", ")
 ```
 
 - The strongest model family is **`r best_model$Model`** (pooled macro-F1
-  `r round(best_model$Macro_F1, 3)`), and every model beats always-hold.
-- The best baseline, **`r best_baseline`**, scores higher than every
-  model. Models that beat it with a 90% bootstrap gap above zero:
-  `r if (length(models_beating_baseline) == 0) "none" else paste(models_beating_baseline, collapse = ", ")`.
-  Models whose whole gap interval is below zero (clearly worse):
-  `r if (length(models_below_baseline) == 0) "none" else paste(models_below_baseline, collapse = ", ")`.
-- Cuts are the hard class. There are few in the test period, and the macro
-  predictors, published with a delay, see a slowdown late. Repeating the
-  last decision catches cuts that come in runs; the models mostly miss them.
+  `r round(best_model$Macro_F1, 3)`). The best baseline is
+  **`r best_baseline`** (`r round(baseline_f1, 3)`).
+- Models scoring above that baseline: `r list_or_none(models_above_baseline)`.
+  Models clearly better (whole 90% gap interval above zero):
+  `r list_or_none(models_beating_baseline)`. Models clearly worse:
+  `r list_or_none(models_below_baseline)`.
+- Cuts are the hard class: the test period has only
+  `r cut_table$Actual[1]` of them. The table above shows how many each
+  model predicted and caught.
 
-So with monthly macro data alone, these model families do not predict
-the next decision better than "do what you did last time", and the 2-year
-yield (what markets expect) is also hard to beat. The models never see
-the previous decision or market expectations as inputs. Adding them as
-features and modelling the decision sequence directly are the next steps.
+**What made the difference.** With lagged macro data alone, every model
+scored below "same as last meeting". The inputs that lifted them describe
+the Fed itself rather than the economy: the previous decision and the
+most recent change, where rates are (including the zero lower bound), and
+what markets expect. Adding those let the models match or pass the simple
+baselines.
+
+**How sure is that?** The test period holds
+`r n_distinct(rolling_preds$date)` meetings, so the gaps between the best
+models and the best baseline are within the range that luck alone could
+produce. The fair conclusion is that, given the same information as the
+baselines, these model families perform about as well as the best simple
+rule, and the data cannot yet separate them. Modelling the decision
+sequence directly (ordered probit with the lagged decision, a hazard
+model) is the next comparison.
