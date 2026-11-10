@@ -102,6 +102,11 @@ the first of the month) are replaced by two meeting-level features: days
 since the previous scheduled decision, and the number of emergency calls
 or unscheduled meetings held since then.
 
+**Persistence.** The Fed moves in runs, and "same as last meeting" is the
+strongest baseline. So the models also see the previous scheduled
+decision, the direction of the most recent target change, and the days
+since that change. All three are public before the meeting.
+
 ```{r}
 # Price indexes, production, housing starts and oil prices trend over
 # decades, so their levels mostly say what era it is (and later test folds
@@ -191,6 +196,25 @@ df_meeting_model <- df_meeting_model %>%
     })
   )
 rq3_predictors <- c(rq3_predictors, "days_since_prev_meeting", "calls_since_prev_meeting")
+
+# Persistence: what the Fed did last. The previous scheduled decision
+# (cut -1, hold 0, hike +1), and from the daily target the direction of the
+# most recent change and the days since it (this also catches moves made
+# between meetings).
+target_changes <- target_daily %>%
+  mutate(change = ff_target - lag(ff_target)) %>%
+  filter(!is.na(change), change != 0)
+
+df_meeting_model <- df_meeting_model %>%
+  arrange(start_date) %>%
+  mutate(
+    prev_move         = lag(as.integer(policy_action_class) - 2L, default = 0L),
+    last_change_idx   = findInterval(as.numeric(start_date - 1), as.numeric(target_changes$date)),
+    last_change_dir   = sign(target_changes$change[last_change_idx]),
+    days_since_change = as.numeric(start_date - target_changes$date[last_change_idx])
+  ) %>%
+  select(-last_change_idx)
+rq3_predictors <- c(rq3_predictors, "prev_move", "last_change_dir", "days_since_change")
 
 # `date` becomes the decision date.
 df_meeting_model <- df_meeting_model %>%
