@@ -40,6 +40,10 @@ RELEASE_DELAY_DAYS <- c(
   PCEPI    = 31
 )
 ZLB_MAX_TARGET  <- 0.25                   # target at or below this = zero lower bound (RQ3 feature)
+# Inputs of the ordered probit and hazard models (RQ3), fixed in advance,
+# Taylor-rule style: last decision, inflation, unemployment, market
+# expectations, zero lower bound.
+RQ3_TAYLOR_VARS <- c("prev_move", "inflation_gap", "UNRATE", "market_2y_spread", "at_zlb")
 RQ3_START_TRAIN <- 200                    # meetings in the first training window
 RQ3_STEP        <- 12                     # meetings per test block
 RQ3_WEIGHT_OPTIONS <- c(FALSE, TRUE)      # tuning tries unweighted and inverse-frequency class weights (RQ3)

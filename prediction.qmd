@@ -742,6 +742,59 @@ tune_xgb <- function(train_part) {
 
 These tuning functions keep the model-fitting section organized while preserving the full comparison pipeline.
 
+## Dynamic Models: Ordered Probit
+
+The models above treat cut, hold and hike as three unrelated labels. An
+**ordered probit** uses their order. It builds one "policy pressure" score
+from a few inputs and two cut-off points: below the first the Fed cuts,
+above the second it hikes, in between it holds. With the previous decision
+as an input, it is the standard dynamic model of discrete policy moves.
+
+Its inputs are fixed in advance, in the style of a Taylor rule, rather
+than chosen from results: `r paste(RQ3_TAYLOR_VARS, collapse = ", ")`. A
+small fixed set keeps the model stable on a few hundred meetings. There
+are no hyperparameters; like the other models, it chooses on its
+validation block whether to use class weights.
+
+```{r}
+# Inputs that are constant in a training window (e.g. the zero-bound flag
+# before 2008) are left out of that window's fit.
+varying_vars <- function(df, vars) {
+  vars[vapply(df[vars], function(x) isTRUE(sd(x) > 0), logical(1))]
+}
+
+fit_oprobit <- function(df, weighted) {
+  d <- df[, c("policy_action_class", RQ3_TAYLOR_VARS)]
+  d$policy_action_class <- factor(d$policy_action_class, levels = RQ3_CLASSES, ordered = TRUE)
+  w <- class_weights(df$policy_action_class, weighted)
+  f <- reformulate(varying_vars(d, RQ3_TAYLOR_VARS), response = "policy_action_class")
+  MASS::polr(f, data = d, weights = w, method = "probit", Hess = TRUE)
+}
+
+predict_oprobit <- function(fit, newdata) {
+  as_class(as.character(predict(fit, newdata = newdata, type = "class")))
+}
+
+tune_oprobit <- function(train_part) {
+  split_obj <- make_inner_split(train_part)
+  results_df <- map_dfr(RQ3_WEIGHT_OPTIONS, function(w) {
+    fit <- fit_oprobit(split_obj$inner_train, w)
+    bind_cols(
+      tibble(weighted = w),
+      score_predictions(predict_oprobit(fit, split_obj$inner_valid),
+                        split_obj$inner_valid$policy_action_class)
+    )
+  }) %>%
+    rank_scores()
+
+  list(
+    best_params = results_df[1, ],
+    tuning_results = results_df,
+    final_fit = fit_oprobit(train_part, results_df$weighted[1])
+  )
+}
+```
+
 ## Model Registry
 
 Every model, including the baseline, is a pair of functions: `tune()` fits
@@ -843,6 +896,10 @@ rq3_models <- list(
     predict = function(obj, newdata) {
       as_class(RQ3_CLASSES[predict(obj$final_fit, newdata = xgb.DMatrix(data = rq3_x(newdata))) + 1])
     }
+  ),
+  Ordered_Probit = list(
+    tune    = tune_oprobit,
+    predict = function(obj, newdata) predict_oprobit(obj$final_fit, newdata)
   )
 )
 
@@ -867,7 +924,8 @@ fn_code <- function(...) lapply(list(...), deparse)
 rq3_inputs_hash <- digest::digest(list(
   df_final_rq3, train_data, test_data, RQ3_START_TRAIN, RQ3_STEP,
   RQ3_SEED, RQ3_WEIGHT_OPTIONS, prev_decision, market_signal,
-  fn_code(make_scaler, apply_scaler, class_weights, class_freq_weights, tune_multinom, tune_enet, tune_rf, tune_xgb, class_scores,
+  RQ3_TAYLOR_VARS,
+  fn_code(varying_vars, fit_oprobit, predict_oprobit, tune_oprobit, make_scaler, apply_scaler, class_weights, class_freq_weights, tune_multinom, tune_enet, tune_rf, tune_xgb, class_scores,
           score_predictions, cohen_kappa, rank_scores, make_inner_split,
           to_xgb_label, fit_and_predict, as_class, rq3_x),
   lapply(rq3_models, function(m) lapply(m, deparse)),
@@ -900,6 +958,16 @@ map(holdout, ~ table(Predicted = .x$pred, Actual = test_data$policy_action_class
 
 ```{r}
 map(keep(holdout, ~ !is.null(.x$obj$best_params)), ~ .x$obj$best_params)
+```
+
+## Ordered Probit Coefficients
+
+Fitted on the held-out split's training meetings. Positive coefficients
+push toward a hike, negative toward a cut; the two cut-offs (`cut|hold`,
+`hold|hike`) mark where the policy-pressure score switches decision.
+
+```{r}
+summary(holdout$Ordered_Probit$obj$final_fit)
 ```
 
 ## Variable Importance
