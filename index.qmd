@@ -1,6 +1,5 @@
 ---
 title: "How Does the Fed Set Rates, and Can We Predict Its Next Move?"
-subtitle: "Modeling FOMC policy decisions from economic and market data"
 toc: false
 ---
 
@@ -13,80 +12,47 @@ has_results  <- file.exists(summary_file)
 if (has_results) {
   rq3 <- readRDS(summary_file)
   rk  <- rq3$ranking
-  f1  <- function(model) rk$Macro_F1[rk$Model == model]
-  best_ml <- rk[endsWith(rk$Model, "_Tuned"), ][1, ]
   fitted  <- rk[!startsWith(rk$Model, "Baseline_"), ]
   n_clear <- sum(fitted$Gap_low > 0)
-  wc <- rq3$window_comparison
-  wc_fitted <- wc[!startsWith(wc$Model, "Baseline_"), ]
+  hazard_f1 <- rk$Macro_F1[rk$Model == "Hazard_Two_Step"]
+  best_ml_f1 <- rk$Macro_F1[endsWith(rk$Model, "_Tuned")][1]
 }
 ```
 
-Eight times a year the Federal Open Market Committee (FOMC) decides
-whether to cut, hold or raise the federal funds rate. This project asks
-two questions about those decisions: **how does the Fed set rates**, and
-**can its next move be predicted** from information available before each
-meeting?
+Eight times a year the Fed decides to cut, hold or raise interest rates.
+This project predicts that decision using only information available
+before each meeting.
 
 ```{r}
 #| echo: false
 #| results: asis
 if (!has_results) {
-  cat("*Render `prediction.qmd` first to fill in the headline results.*\n")
+  cat("*Render `prediction.qmd` first to fill in the results.*\n")
 } else {
   cat(sprintf(
-'## Headline
+'## Key results
 
-- Across %d scheduled meetings from %s to %s, each predicted by models
-  trained only on earlier meetings, the best model scores a macro-F1 of
-  **%.2f**, against **%.2f** for simply repeating the last decision.
-- A two-step **hazard model** with six inputs fixed in advance ("will they
-  move?", then "which way?") scores **%.2f**, against %.2f for the best
-  tuned machine-learning model, which sees all inputs.
-- The gain comes from information about the Fed itself rather than the
-  economy: its previous decision, where rates are (including the zero
-  lower bound) and what markets expect. With lagged economic data alone,
-  every model lost to "same as last meeting" ([What changed](changes.qmd)).
-- Models that beat the best simple rule with a bootstrap interval clear
-  of zero: **%s**. %s
-- Old history helps: training on all meetings since 1986 beats a rolling
-  15-year window clearly for %d of %d fitted models.
+- The best models score **%.2f** (macro-F1) on %d meetings since %s,
+  against **%.2f** for simply repeating the last decision. %s
+- What helps most is information about the Fed itself: its last
+  decision, where rates are, and what markets expect.
+- A simple six-input model built for policy decisions %s
 ',
-    rq3$n_test, format(rq3$test_from, "%B %Y"), format(rq3$test_to, "%B %Y"),
-    rq3$best_model$Macro_F1, rq3$baseline_f1,
-    f1("Hazard_Two_Step"), best_ml$Macro_F1,
-    if (n_clear == 0) "none" else n_clear,
-    if (n_clear == 0) "The test period is too short to show a reliable edge." else "",
-    sum(wc_fitted$Diff_high < 0), nrow(wc_fitted)
+    rq3$best_model$Macro_F1, rq3$n_test, format(rq3$test_from, "%Y"),
+    rq3$baseline_f1,
+    if (n_clear == 0) "The gap is too small to be sure it is real." else "",
+    if (hazard_f1 >= best_ml_f1 - 0.01) "does as well as the best machine-learning model."
+    else sprintf("scores %.2f, against %.2f for the best machine-learning model.", hazard_f1, best_ml_f1)
   ))
 }
 ```
 
-## The chapters
+## Chapters
 
-| Chapter | Question | Methods | Author |
-|---|---|---|---|
-| [The data](data.qmd) | What goes in? | FRED and FOMC calendar, cleaning, publication delays | Course project |
-| [The rule](rule.qmd) | How does the target relate to inflation, unemployment and financial conditions, and has that changed? | Regression, rolling coefficients, structural breaks | Course-project teammates (original) |
-| [The regimes](regimes.qmd) | Do macro conditions fall into distinct regimes? | PCA and k-means | Course-project teammates (original) |
-| [The prediction](prediction.qmd) | Using only pre-meeting information, how do model families compare at predicting cut, hold or hike? | Multinomial logit, elastic net, random forest, XGBoost, ordered probit, hazard model; expanding-window evaluation | Inuk Baik (extended) |
-
-The rule and the regimes are kept as the team's original course-project
-chapters, each with a short note on known limitations. The prediction
-chapter is the headline and was extended for this portfolio;
-[What changed](changes.qmd) lists every change and its effect.
-
-## How it is built
-
-- **One command rebuilds everything.** `R/acquire_data.R` fetches the
-  data from FRED and the Federal Reserve; `quarto render` rebuilds every
-  page. Package versions are pinned with renv.
-- **No look-ahead.** Each meeting is predicted only from data published
-  before it started, and models are trained only on earlier meetings
-  (expanding windows, time-ordered tuning).
-- **A fair comparison, not a race.** All models share one evaluation
-  path, one score (macro-F1, where a never-predicted class counts as 0),
-  and three baselines: always hold, same as last meeting, and a
-  market signal from the 2-year Treasury yield.
-
-Source code: [github.com/inukbaik/fomc-policy-modeling](https://github.com/inukbaik/fomc-policy-modeling).
+- [The data](data.qmd): where the numbers come from.
+- [The rule](rule.qmd): how rates relate to the economy (original
+  course-project chapter).
+- [The regimes](regimes.qmd): grouping economic conditions (original
+  course-project chapter).
+- [The prediction](prediction.qmd): comparing models on each meeting.
+- [What changed](changes.qmd): how this grew from the course project.
