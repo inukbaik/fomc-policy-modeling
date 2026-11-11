@@ -85,12 +85,3 @@ These chapters are the course-project teammates' original analyses. Their
 methods were not revised; each now opens with a note on known limitations
 (for example, a possibly spurious levels regression in RQ1 and trending
 inputs in RQ2). Only shared data fixes and small cleanups touched them.
-
-## Not done
-
-- **Real-time data.** Predictors use today's FRED data, not the versions
-  published at the time (see the note on The prediction).
-- **A monthly rate-path model** (VAR or local projections) was considered
-  and skipped.
-- **Revising RQ1 and RQ2**, and linking their break dates and regimes into
-  the prediction chapter, is on hold.
