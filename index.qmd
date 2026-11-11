@@ -56,3 +56,18 @@ if (!has_results) {
 | [The regimes](regimes.qmd) | Do macro conditions fall into distinct regimes? | PCA and k-means |
 | [The prediction](prediction.qmd) | Using only pre-meeting information, how do model families compare at predicting cut, hold or hike? | Multinomial logit, elastic net, random forest, XGBoost, ordered probit, hazard model; expanding-window evaluation |
 | [What changed](changes.qmd) | How did this grow from the course project? | Every change and its effect |
+
+## About this project
+
+This began as a group project for a graduate **Statistical Computing**
+course in spring 2026, built with my teammates Asal D. and Zihong X. I
+later came back to it to fix the limitations we had at the time: meeting
+labels that were often wrong, an evaluation that rewarded always
+predicting "hold", and predictors that used data before it was
+published. I then extended the prediction chapter with new features and
+dynamic models. Every change and its effect is documented in
+[What changed](changes.qmd), and the original submission is kept as
+[`v1.0-course-submission`](https://github.com/inukbaik/fomc-policy-modeling/tree/v1.0-course-submission).
+
+*Thanks to Asal and Zihong for the original work, including The rule and
+The regimes chapters.*
