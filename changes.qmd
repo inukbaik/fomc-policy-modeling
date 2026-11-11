@@ -1,0 +1,96 @@
+---
+title: "What Changed from the Course Project"
+---
+
+This project began as a graduate course group project, submitted in April
+2026. The original submission is preserved unchanged in the repository as
+the tag
+[`v1.0-course-submission`](https://github.com/inukbaik/fomc-policy-modeling/tree/v1.0-course-submission).
+This page lists what was changed for the portfolio version, why, and what
+each change did to the results.
+
+Numbers below are the results **at the time of each change**, taken from
+the commit history. Later changes (and refreshed FRED data) move them, so
+the current results are on [The prediction](prediction.qmd).
+
+## Data and reproducibility
+
+- **One data pipeline.** Two hand-run acquisition notebooks were replaced
+  by one script, `R/acquire_data.R`, that scrapes the FOMC calendar from
+  the Federal Reserve and pulls every series from FRED. It fixed three
+  meetings missing from the old calendar (meetings that span two months)
+  and a cancelled March 2020 meeting that had been counted. The ICE BofA
+  high-yield spread was dropped: FRED now serves only about three years
+  of it.
+- **Pinned environment.** Package versions are locked with renv.
+- **No hardcoded values.** The sample end, structural-break dates and
+  gap-filling were hardcoded; they are now computed from the data or set
+  in one settings file, so the site survives a data refresh.
+- **One site instead of one notebook.** The 2,000-line R Markdown file
+  became this Quarto site, with shared code in `R/`. Outputs were checked
+  to match before and after.
+
+## The prediction chapter (RQ3)
+
+**Meeting labels.** The original labels came from the change in the
+*monthly average* target between meeting months. A move late in one month
+raised the next month's average, so later holds were labelled as hikes or
+cuts. The labels were wrong for 65 of 323 meetings (84 cuts labelled
+against 42 real ones). Labels now come from the daily target around each
+scheduled meeting. Much of the original apparent skill disappeared: the
+random forest's kappa fell from 0.34 to 0.10, and XGBoost collapsed to
+always predicting "hold".
+
+**A fair evaluation.**
+
+- The scoring rule dropped classes a model never predicted, so "always
+  hold" was scored on holds alone and ranked first (macro-F1 0.74). Such
+  classes now count as F1 = 0, which puts "always hold" last (0.29).
+- Models are ranked on the pooled predictions of every expanding-window
+  fold, with block-bootstrap intervals, instead of a single 80/20 split.
+- Tuning is time-ordered everywhere; elastic net no longer picks its
+  penalty with random cross-validation folds.
+- Each meeting uses only data published before it (publication delays).
+- Class weighting became a tuning choice after fixed weights lowered every
+  model's score.
+- Two baselines were added. "Same as last meeting" (0.65) beat every model
+  at that point.
+
+**Faster runs, identical results.** Running the evaluation folds in
+parallel and reusing boosted-tree fits cut a full cold render from 277 s
+to 85 s, with every output unchanged.
+
+**Better inputs.** Levels that trend over decades became growth rates,
+calendar counts became meeting-based timing, and the models got the
+information the strongest baselines rely on: the previous decision, the
+direction and age of the last rate change, the target level with a
+zero-lower-bound flag, and the 2-year-yield market signal. Pooled
+macro-F1 rose from 0.38 to 0.72 for elastic net, 0.43 to 0.67 for the
+multinomial logit and 0.55 to 0.66 for XGBoost, putting all three above
+"same as last meeting". Momentum features (3-month changes, Sahm rule)
+were tried and dropped after they lowered three of four models; the
+chapter discloses that this choice used the evaluation results.
+
+**Dynamic models.** An ordered probit with the lagged decision and a
+two-step hazard model (a simplified Hamilton–Jordà autoregressive
+conditional hazard), both on a small set of inputs fixed in advance. The
+hazard model tied the best machine-learning model (0.715).
+
+**Window check.** Refitting every model on only the latest 120 meetings
+lowered five of six fitted models clearly: older history helps.
+
+## The rule and the regimes (RQ1, RQ2)
+
+These chapters are the course-project teammates' original analyses. Their
+methods were not revised; each now opens with a note on known limitations
+(for example, a possibly spurious levels regression in RQ1 and trending
+inputs in RQ2). Only shared data fixes and small cleanups touched them.
+
+## Not done
+
+- **Real-time data.** Predictors use today's FRED data, not the versions
+  published at the time (see the note on The prediction).
+- **A monthly rate-path model** (VAR or local projections) was considered
+  and skipped.
+- **Revising RQ1 and RQ2**, and linking their break dates and regimes into
+  the prediction chapter, is on hold.

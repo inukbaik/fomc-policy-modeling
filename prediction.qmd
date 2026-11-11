@@ -11,6 +11,15 @@ source("R/prepare_data.R")
 
 This section turns the meeting-level data into a multiclass classification problem and compares tuned machine-learning models against three simple baselines.
 
+::: {.callout-note}
+## About this chapter
+
+Written by Inuk Baik for the course project and extended for this
+portfolio: correct meeting labels, a fair evaluation, new features, two
+dynamic models and a window check. [What changed](changes.qmd) lists each
+change with its effect.
+:::
+
 ## Data Preparation
 
 ```{r}
@@ -1452,3 +1461,21 @@ for the gaps to the best baseline
 The fair conclusion is that, given the same information as the
 baselines, the best model families perform at least as well as the best
 simple rule, but this test period is too short to show a reliable edge.
+
+```{r}
+#| include: false
+# Headline numbers for the Home page (index.qmd reads this file).
+dir.create("results", showWarnings = FALSE)
+saveRDS(list(
+  ranking           = rolling_ranking,
+  best_model        = best_model,
+  best_baseline     = best_baseline,
+  baseline_f1       = baseline_f1,
+  n_test            = n_distinct(rolling_preds$date),
+  test_from         = min(rolling_preds$date),
+  test_to           = max(rolling_preds$date),
+  n_meetings        = nrow(df_final_rq3),
+  cut_table         = cut_table,
+  window_comparison = window_comparison
+), "results/rq3_summary.rds")
+```

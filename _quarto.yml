@@ -2,29 +2,53 @@ project:
   type: website
   execute-dir: project
   output-dir: _site
+  # The Prediction page writes results/rq3_summary.rds, which the Home page
+  # reads, so it renders first.
   render:
-    - index.qmd
+    - data.qmd
     - rule.qmd
     - regimes.qmd
     - prediction.qmd
+    - index.qmd
+    - changes.qmd
 
 website:
   title: "FOMC Policy Modeling"
+  site-url: https://inukbaik.github.io/fomc-policy-modeling/
+  repo-url: https://github.com/inukbaik/fomc-policy-modeling
+  repo-actions: [source]
   navbar:
     left:
       - href: index.qmd
-        text: Data
+        text: Home
+      - href: data.qmd
+        text: The data
       - href: rule.qmd
         text: The rule
       - href: regimes.qmd
         text: The regimes
       - href: prediction.qmd
         text: The prediction
+      - href: changes.qmd
+        text: What changed
+    right:
+      - icon: github
+        href: https://github.com/inukbaik/fomc-policy-modeling
+        aria-label: GitHub repository
+  page-footer:
+    left: "Course project by Inuk Baik and course-project teammates; portfolio revision by Inuk Baik."
+    right: "Built with R and Quarto. Data: FRED and the Federal Reserve."
 
 format:
   html:
+    theme:
+      light: cosmo
+      dark: darkly
     code-fold: true
+    code-tools: true
     toc: true
+    fig-width: 8
+    fig-height: 4.5
 
 execute:
   echo: true
