@@ -36,9 +36,11 @@ swapped; tag `v1.0-course-submission` still does.
 | `data/market_daily.csv` | Daily market series kept daily (`DGS2`), for the RQ3 market-signal baseline. |
 | `R/settings.R` | Libraries and every analysis setting (one place). Sourced by every page. |
 | `R/prepare_data.R` | Load, clean and build features (`df_clean`, `df_final`). Sourced by every page; `index.qmd` shows it section by section via `knitr::read_chunk` (`## ---- label ----` markers). |
-| `index.qmd` | Data page: settings, cleaning, feature engineering, EDA. |
+| `index.qmd` | Home page. Its headline numbers are read from `results/rq3_summary.rds` (git-ignored), which `prediction.qmd` writes; `_quarto.yml` renders prediction before index. |
+| `data.qmd` | Data page: settings, cleaning, feature engineering, EDA. |
+| `changes.qmd` | "What changed from the course project": each change with its effect at the time (historical numbers, not recomputed). |
 | `rule.qmd` / `regimes.qmd` / `prediction.qmd` | RQ1 / RQ2 / RQ3. Each runs on its own after sourcing the two `R/` files. |
-| `_quarto.yml` | Website project. `_site/` (output), `*_cache/`, `*_files/` are git-ignored. |
+| `_quarto.yml` | Website project (navbar, themes, footer, `site-url` for GitHub Pages). `_site/` (output), `*_cache/`, `*_files/`, `results/` are git-ignored. |
 | `reports/`, `figures/` | Original PDFs and plots. Git-ignored, local only. |
 
 All `*.csv` files are git-ignored. Data is fetched, not committed. The
@@ -213,7 +215,7 @@ and mark it done with a one-line outcome before moving on.
 | Decision | Status | Current direction |
 |---|---|---|
 | Static vs. reproducible / refreshed report | decided | Reproducible: one command rebuilds everything from raw data; publishing is manual. Scheduled refresh and prediction tracker deferred (optional later) |
-| Output format | decided | Quarto website on GitHub Pages: Home, The rule, The regimes, The prediction, Appendix. Code folded by default; `freeze` enabled for slow chunks |
-| Time-series extension of RQ3 | in progress | Done (D1): ordered probit and a two-step hazard model (simplified Hamilton–Jordà ACH), both on fixed Taylor-style inputs (`RQ3_TAYLOR_VARS`), in the RQ3 registry. Open: monthly rate-path model (VAR / BVAR / local projections). Data is too small for deep sequence models |
+| Output format | decided | Quarto website on GitHub Pages: Home, The data, The rule, The regimes, The prediction, What changed. Code folded by default. `freeze` is off (it ignores R/ and data changes); the knitr cache keeps the slow RQ3 chunks fast |
+| Time-series extension of RQ3 | done | Done (D1): ordered probit and a two-step hazard model (simplified Hamilton–Jordà ACH), both on fixed Taylor-style inputs (`RQ3_TAYLOR_VARS`), in the RQ3 registry. Skipped by the user: monthly rate-path model (D2) and real-time ALFRED data (D3). Data is too small for deep sequence models |
 | Fixes to teammates' RQ1/RQ2 | on hold | Chapters kept as original work with a short known-limitations note (2026-11-09). Teammates had agreed to MIT release and changes |
 | Narrative structure | decided | Data science portfolio. One question, "How does the Fed set rates, and can we predict its next move?", in three connected chapters: the rule (RQ1), the regimes (RQ2), the prediction (RQ3, headline). RQ1 and RQ2 stay original (limitations notes); the planned links into RQ3 (break dates as training windows, regime labels as features) are dropped/on hold. RQ3 instead checks rolling vs. expanding windows itself |
