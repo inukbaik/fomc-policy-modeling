@@ -98,8 +98,8 @@ the old root-level CSVs belong to tag `v1.0-course-submission`.
   (commit `2b1f27f`). Improvements go on top of it, not in place of its history.
 - Credit teammates for their sections in any published output. In new
   text, name them only as "Asal D." and "Zihong X." (first name and last
-  initial, user decision 2026-11-11), never their full names; leave
-  existing author lines as they are.
+  initial, user decision 2026-11-11), never their full names. Site pages
+  have no author lines (removed 2026-11-11).
 
 ## Analysis decisions
 
@@ -123,8 +123,7 @@ each one to readers; keep the two in sync.
 - **RQ1 and RQ2 stay as the original course-project chapters** (decided
   2026-11-09). Their methods are not revised; each page opens with a
   "known limitations" note instead. Credit them to the course-project
-  teammates (as "Asal D." and "Zihong X." in new text, never full names);
-  leave existing author lines (the Data page) as they are. Breaks (RQ1) = 3 and k (RQ2) = 3 remain
+  teammates (as "Asal D." and "Zihong X." in new text, never full names). Breaks (RQ1) = 3 and k (RQ2) = 3 remain
   fixed settings (BIC hits its cap; silhouette is flat).
 - **Missing values inside a series**: carry the last value forward, one month
   at most (no look-ahead).

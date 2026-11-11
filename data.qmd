@@ -1,6 +1,5 @@
 ---
 title: "The Data"
-author: "Inuk Baik, Asal Delkhosh, Zihong Xiong"
 ---
 
 ```{r}
