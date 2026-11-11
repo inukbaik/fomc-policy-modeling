@@ -73,6 +73,12 @@ the old root-level CSVs belong to tag `v1.0-course-submission`.
   package versions); they re-run only when one of those changes. The cache
   lives in `prediction_cache/` (git-ignored). Delete it to force a re-run.
   Folds run in parallel (`RQ3_CORES`).
+- Publish (manual, ask the user first): `quarto publish gh-pages --no-prompt
+  --no-browser` renders the site and pushes `_site/` to the `gh-pages` branch;
+  GitHub Pages serves it at https://inukbaik.github.io/fomc-policy-modeling/.
+  If the push fails with HTTP 400, raise git's buffer for that run only:
+  `GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0=http.postBuffer GIT_CONFIG_VALUE_0=524288000 quarto publish ...`.
+  Delete stray preview files from `_site/` before publishing.
 - Run anything that re-fits the RQ3 models in the background.
 - `xgboost` 3.x is installed locally; its R API changed from 1.x. Check version
   differences before touching XGBoost code.
