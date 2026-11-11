@@ -49,10 +49,10 @@ if (!has_results) {
 
 ## Chapters
 
-| Chapter | Question | Methods | Author |
-|---|---|---|---|
-| [The data](data.qmd) | What goes in? | FRED and FOMC calendar, cleaning, publication delays | Course project |
-| [The rule](rule.qmd) | How does the target relate to inflation, unemployment and financial conditions, and has that changed? | Regression, rolling coefficients, structural breaks | Course-project teammates (original) |
-| [The regimes](regimes.qmd) | Do macro conditions fall into distinct regimes? | PCA and k-means | Course-project teammates (original) |
-| [The prediction](prediction.qmd) | Using only pre-meeting information, how do model families compare at predicting cut, hold or hike? | Multinomial logit, elastic net, random forest, XGBoost, ordered probit, hazard model; expanding-window evaluation | Inuk Baik (extended) |
-| [What changed](changes.qmd) | How did this grow from the course project? | Every change and its effect | Inuk Baik |
+| Chapter | Question | Methods |
+|---|---|---|
+| [The data](data.qmd) | What goes in? | FRED and FOMC calendar, cleaning, publication delays |
+| [The rule](rule.qmd) | How does the target relate to inflation, unemployment and financial conditions, and has that changed? | Regression, rolling coefficients, structural breaks |
+| [The regimes](regimes.qmd) | Do macro conditions fall into distinct regimes? | PCA and k-means |
+| [The prediction](prediction.qmd) | Using only pre-meeting information, how do model families compare at predicting cut, hold or hike? | Multinomial logit, elastic net, random forest, XGBoost, ordered probit, hazard model; expanding-window evaluation |
+| [What changed](changes.qmd) | How did this grow from the course project? | Every change and its effect |
