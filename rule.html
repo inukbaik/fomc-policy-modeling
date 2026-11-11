@@ -1,0 +1,2078 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.11.9">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>The Rule: How the Target Relates to the Economy (RQ1) – FOMC Policy Modeling</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<script src="site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/scrollable-regions/scrollable-regions.js" type="module"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-63b5708e65d6cd79cd7618c58d0c21e7.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-dark-447e42e69aaa9833c0ba1b986f430b20.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-63b5708e65d6cd79cd7618c58d0c21e7.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-d31a0c91b01e363be7b7a36e602e2c70.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-dark-c1afb647e6504aed1ecd096a1ed45b6d.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="site_libs/bootstrap/bootstrap-d31a0c91b01e363be7b7a36e602e2c70.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+
+</head>
+
+<body class="nav-fixed quarto-light"><a id="quarto-skip-link" class="visually-hidden-focusable" href="#quarto-document-content">Skip to main content</a><script id="quarto-html-before-body" type="application/javascript">
+    const toggleBodyColorMode = (bsSheetEl) => {
+      const mode = bsSheetEl.getAttribute("data-mode");
+      const bodyEl = window.document.querySelector("body");
+      if (mode === "dark") {
+        bodyEl.classList.add("quarto-dark");
+        bodyEl.classList.remove("quarto-light");
+      } else {
+        bodyEl.classList.add("quarto-light");
+        bodyEl.classList.remove("quarto-dark");
+      }
+    }
+    const toggleBodyColorPrimary = () => {
+      const bsSheetEl = window.document.querySelector("link#quarto-bootstrap:not([rel=disabled-stylesheet])");
+      if (bsSheetEl) {
+        toggleBodyColorMode(bsSheetEl);
+      }
+    }
+    const setColorSchemeToggle = (alternate) => {
+      const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+      for (let i=0; i < toggles.length; i++) {
+        const toggle = toggles[i];
+        if (toggle) {
+          toggle.setAttribute("aria-checked", alternate ? "true" : "false");
+          if (alternate) {
+            toggle.classList.add("alternate");
+          } else {
+            toggle.classList.remove("alternate");
+          }
+        }
+      }
+    };
+    const toggleColorMode = (alternate) => {
+      // Switch the stylesheets
+      const primaryStylesheets = window.document.querySelectorAll('link.quarto-color-scheme:not(.quarto-color-alternate)');
+      const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+      manageTransitions('#quarto-margin-sidebar .nav-link', false);
+      if (alternate) {
+        // note: dark is layered on light, we don't disable primary!
+        enableStylesheet(alternateStylesheets);
+        for (const sheetNode of alternateStylesheets) {
+          if (sheetNode.id === "quarto-bootstrap") {
+            toggleBodyColorMode(sheetNode);
+          }
+        }
+      } else {
+        disableStylesheet(alternateStylesheets);
+        enableStylesheet(primaryStylesheets)
+        toggleBodyColorPrimary();
+      }
+      manageTransitions('#quarto-margin-sidebar .nav-link', true);
+      // Switch the toggles
+      setColorSchemeToggle(alternate)
+    }
+    // Hack to workaround the fact that safari doesn't
+    // properly recolor the scrollbar when toggling (#1455).
+    // Not run on load: stylesheets are set before first paint there, and
+    // scrolling would undo the scroll to a URL fragment (#14973).
+    // The one pixel nudge keeps the reader where they were.
+    const refreshSafariScrollbar = () => {
+      if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+        manageTransitions("body", false);
+        const scrollY = window.scrollY;
+        window.scrollTo(0, scrollY > 0 ? scrollY - 1 : 1);
+        setTimeout(() => {
+          window.scrollTo(0, scrollY);
+          manageTransitions("body", true);
+        }, 40);
+      }
+    }
+    const disableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        stylesheet.rel = 'disabled-stylesheet';
+      }
+    }
+    const enableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        if(stylesheet.rel !== 'stylesheet') { // for Chrome, which will still FOUC without this check
+          stylesheet.rel = 'stylesheet';
+        }
+      }
+    }
+    const manageTransitions = (selector, allowTransitions) => {
+      const els = window.document.querySelectorAll(selector);
+      for (let i=0; i < els.length; i++) {
+        const el = els[i];
+        if (allowTransitions) {
+          el.classList.remove('notransition');
+        } else {
+          el.classList.add('notransition');
+        }
+      }
+    }
+    const isFileUrl = () => {
+      return window.location.protocol === 'file:';
+    }
+    const hasAlternateSentinel = () => {
+      let styleSentinel = getColorSchemeSentinel();
+      if (styleSentinel !== null) {
+        return styleSentinel === "alternate";
+      } else {
+        return false;
+      }
+    }
+    const setStyleSentinel = (alternate) => {
+      const value = alternate ? "alternate" : "default";
+      if (!isFileUrl()) {
+        window.localStorage.setItem("quarto-color-scheme", value);
+      } else {
+        localAlternateSentinel = value;
+      }
+    }
+    const getColorSchemeSentinel = () => {
+      if (!isFileUrl()) {
+        const storageValue = window.localStorage.getItem("quarto-color-scheme");
+        return storageValue != null ? storageValue : localAlternateSentinel;
+      } else {
+        return localAlternateSentinel;
+      }
+    }
+    const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+      const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+      const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+      let newTheme = '';
+      if(authorPrefersDark) {
+        newTheme = isAlternate ? baseTheme : alternateTheme;
+      } else {
+        newTheme = isAlternate ? alternateTheme : baseTheme;
+      }
+      const changeGiscusTheme = () => {
+        // From: https://github.com/giscus/giscus/issues/336
+        const sendMessage = (message) => {
+          const iframe = document.querySelector('iframe.giscus-frame');
+          if (!iframe) return;
+          iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+        }
+        sendMessage({
+          setConfig: {
+            theme: newTheme
+          }
+        });
+      }
+      const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+      if (isGiscussLoaded) {
+        changeGiscusTheme();
+      }
+    };
+    const authorPrefersDark = false;
+    const darkModeDefault = authorPrefersDark;
+      document.querySelector('link#quarto-text-highlighting-styles.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+      document.querySelector('link#quarto-bootstrap.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+    let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+    // Dark / light mode switch
+    window.quartoToggleColorScheme = () => {
+      // Read the current dark / light value
+      let toAlternate = !hasAlternateSentinel();
+      toggleColorMode(toAlternate);
+      refreshSafariScrollbar();
+      setStyleSentinel(toAlternate);
+      toggleGiscusIfUsed(toAlternate, darkModeDefault);
+      window.dispatchEvent(new Event('resize'));
+    };
+    // Switch to dark mode if need be
+    if (hasAlternateSentinel()) {
+      toggleColorMode(true);
+    } else {
+      toggleColorMode(false);
+    }
+  </script>
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark" aria-label="Site">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="./index.html">
+    <span class="navbar-title">FOMC Policy Modeling</span>
+    </a>
+  </div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="./index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./data.html"> 
+<span class="menu-text">The data</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link active" href="./rule.html" aria-current="page"> 
+<span class="menu-text">The rule</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./regimes.html"> 
+<span class="menu-text">The regimes</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./prediction.html"> 
+<span class="menu-text">The prediction</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./changes.html"> 
+<span class="menu-text">What changed</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/inukbaik/fomc-policy-modeling"> <i class="bi bi-github" role="img" aria-label="GitHub repository">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+  <button type="button" role="switch" aria-checked="false" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode" aria-label="Toggle dark mode"><i class="bi"></i></button>
+</div>
+            <div id="quarto-search" class="" title="Search"></div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" aria-labelledby="toc-title" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#variable-selection" id="toc-variable-selection" class="nav-link active" data-scroll-target="#variable-selection">Variable Selection</a></li>
+  <li><a href="#final-regression-dataset" id="toc-final-regression-dataset" class="nav-link" data-scroll-target="#final-regression-dataset">Final Regression Dataset</a></li>
+  <li><a href="#exploratory-time-series-checks" id="toc-exploratory-time-series-checks" class="nav-link" data-scroll-target="#exploratory-time-series-checks">Exploratory Time-Series Checks</a></li>
+  <li><a href="#adf-tests" id="toc-adf-tests" class="nav-link" data-scroll-target="#adf-tests">ADF Tests</a></li>
+  <li><a href="#baseline-model" id="toc-baseline-model" class="nav-link" data-scroll-target="#baseline-model">Baseline Model</a></li>
+  <li><a href="#robustness-check-1-dynamic-model" id="toc-robustness-check-1-dynamic-model" class="nav-link" data-scroll-target="#robustness-check-1-dynamic-model">Robustness Check 1: Dynamic Model</a></li>
+  <li><a href="#robustness-check-2-differenced-model" id="toc-robustness-check-2-differenced-model" class="nav-link" data-scroll-target="#robustness-check-2-differenced-model">Robustness Check 2: Differenced Model</a></li>
+  <li><a href="#rolling-coefficient-plots" id="toc-rolling-coefficient-plots" class="nav-link" data-scroll-target="#rolling-coefficient-plots">Rolling Coefficient Plots</a></li>
+  <li><a href="#breakpoint-analysis" id="toc-breakpoint-analysis" class="nav-link" data-scroll-target="#breakpoint-analysis">Breakpoint Analysis</a></li>
+  <li><a href="#chow-tests" id="toc-chow-tests" class="nav-link" data-scroll-target="#chow-tests">Chow Tests</a></li>
+  <li><a href="#sub-period-regressions" id="toc-sub-period-regressions" class="nav-link" data-scroll-target="#sub-period-regressions">Sub-Period Regressions</a></li>
+  </ul>
+<div class="toc-actions"><ul><li><a href="https://github.com/inukbaik/fomc-policy-modeling/blob/main/rule.qmd" class="toc-action"><i class="bi bi-github"></i>View source</a></li></ul></div></nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content" tabindex="-1">
+
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<div class="quarto-title-block"><div><h1 class="title">The Rule: How the Target Relates to the Economy (RQ1)</h1><button type="button" class="btn code-tools-button dropdown-toggle" id="quarto-code-tools-menu" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi"></i> Code</button><ul class="dropdown-menu dropdown-menu-end" aria-labelelledby="quarto-code-tools-menu"><li><a id="quarto-show-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Show All Code</a></li><li><a id="quarto-hide-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Hide All Code</a></li><li><hr class="dropdown-divider"></li><li><a id="quarto-view-source" class="dropdown-item" href="javascript:void(0)" role="button">View Source</a></li></ul></div></div>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Original course-project chapter
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>This chapter is the course-project team’s original analysis, written by teammates and kept as submitted. The only changes are shared data fixes and small cleanups (computed instead of hardcoded dates, clearer names); the methods were not revised for this portfolio. Known limitations:</p>
+<ul>
+<li><strong>Possibly spurious levels regression.</strong> The target, inflation and unemployment behave like trending series (see the unit-root tests below), and regressing trending series on each other can show strong relationships that are not real. A partial-adjustment model (the lagged target as a regressor, used below only as a robustness check) is the standard way to estimate a policy rule.</li>
+<li><strong>Standard errors ignore autocorrelation.</strong> Monthly errors are strongly correlated over time, so the ordinary p-values overstate how certain each estimate is. Newey-West (autocorrelation-robust) errors would be wider.</li>
+<li><strong>Zero-lower-bound months are included.</strong> In 2009–2015 and 2020–2022 the target could not fall below zero, so it stayed flat whatever the economy did. Those months pull every estimated response toward zero.</li>
+<li><strong>Lasso screening.</strong> It is given <code>core_pce_yoy</code> and <code>inflation_gap</code> (the same series shifted by 2), uses random cross-validation folds on time-series data, and its result is not used afterwards.</li>
+<li><strong>Break tests reject everywhere.</strong> The Chow tests assume independent errors and reject stability at every date tested, and BIC selects the maximum number of breaks allowed, so neither pins down when the rule changed. The number of breaks is therefore a fixed setting.</li>
+</ul>
+</div>
+</div>
+<p>This section studies how the federal funds target is related to selected macroeconomic and financial variables, and whether those relationships remain stable over time.</p>
+<section id="variable-selection" class="level2">
+<h2 class="anchored" data-anchor-id="variable-selection">Variable Selection</h2>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>data_rq1 <span class="ot">&lt;-</span> df_final <span class="sc">%&gt;%</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(date)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>vars <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  <span class="st">"ff_target"</span>,</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  <span class="st">"core_pce_yoy"</span>, <span class="st">"inflation_gap"</span>,</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  <span class="st">"UNRATE"</span>, <span class="st">"payems_yoy"</span>,</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>  <span class="st">"term_spread_10y_3m"</span>, <span class="st">"BAA10Y"</span>, <span class="st">"ANFCI"</span>,</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>  <span class="st">"fomc_meetings"</span>, <span class="st">"days_since_last_fomc"</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>df_full_rq1 <span class="ot">&lt;-</span> data_rq1[, vars]</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>na_ratio <span class="ot">&lt;-</span> <span class="fu">colMeans</span>(<span class="fu">is.na</span>(df_full_rq1))</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>df_clean_rq1 <span class="ot">&lt;-</span> df_full_rq1[, na_ratio <span class="sc">&lt;</span> <span class="fl">0.2</span>]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">model.matrix</span>(ff_target <span class="sc">~</span> ., df_clean_rq1)[, <span class="sc">-</span><span class="dv">1</span>]</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span> df_clean_rq1<span class="sc">$</span>ff_target</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>lasso <span class="ot">&lt;-</span> <span class="fu">cv.glmnet</span>(x, y, <span class="at">alpha =</span> <span class="dv">1</span>)</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="fu">coef</span>(lasso, <span class="at">s =</span> <span class="st">"lambda.min"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>10 x 1 sparse Matrix of class "dgCMatrix"
+                        lambda.min
+(Intercept)           8.690785e+00
+core_pce_yoy          3.120150e-01
+inflation_gap         3.304723e-16
+UNRATE                1.508668e-01
+payems_yoy            8.033178e-02
+term_spread_10y_3m   -4.534030e-01
+BAA10Y               -2.607824e+00
+ANFCI                 2.174528e+00
+fomc_meetings         2.499294e-01
+days_since_last_fomc -5.735544e-03</code></pre>
+</div>
+</div>
+<p>Variable selection narrows the model to a smaller set of predictors that appear most relevant to the policy rate.</p>
+</section>
+<section id="final-regression-dataset" class="level2">
+<h2 class="anchored" data-anchor-id="final-regression-dataset">Final Regression Dataset</h2>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>df_reg_rq1 <span class="ot">&lt;-</span> data_rq1[, <span class="fu">c</span>(</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="st">"date"</span>, <span class="st">"ff_target"</span>, <span class="st">"core_pce_yoy"</span>, <span class="st">"UNRATE"</span>,</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="st">"term_spread_10y_3m"</span>, <span class="st">"BAA10Y"</span>, <span class="st">"ANFCI"</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>)]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<p>The regression section uses a focused set of explanatory variables rather than the full macro dataset.</p>
+</section>
+<section id="exploratory-time-series-checks" class="level2">
+<h2 class="anchored" data-anchor-id="exploratory-time-series-checks">Exploratory Time-Series Checks</h2>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(df_reg_rq1<span class="sc">$</span>date, df_reg_rq1<span class="sc">$</span>ff_target, <span class="at">type =</span> <span class="st">"l"</span>, <span class="at">main =</span> <span class="st">"Federal Funds Target Rate"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="rule_files/figure-html/unnamed-chunk-5-1.png" class="img-fluid figure-img" width="768"></p>
+</figure>
+</div>
+</div>
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(df_reg_rq1<span class="sc">$</span>date, df_reg_rq1<span class="sc">$</span>core_pce_yoy, <span class="at">type =</span> <span class="st">"l"</span>, <span class="at">main =</span> <span class="st">"Core PCE Inflation (YoY %)"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="rule_files/figure-html/unnamed-chunk-5-2.png" class="img-fluid figure-img" width="768"></p>
+</figure>
+</div>
+</div>
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(df_reg_rq1<span class="sc">$</span>date, df_reg_rq1<span class="sc">$</span>UNRATE, <span class="at">type =</span> <span class="st">"l"</span>, <span class="at">main =</span> <span class="st">"Unemployment Rate"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="rule_files/figure-html/unnamed-chunk-5-3.png" class="img-fluid figure-img" width="768"></p>
+</figure>
+</div>
+</div>
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(df_reg_rq1<span class="sc">$</span>date, df_reg_rq1<span class="sc">$</span>term_spread_10y_3m, <span class="at">type =</span> <span class="st">"l"</span>, <span class="at">main =</span> <span class="st">"Term Spread"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="rule_files/figure-html/unnamed-chunk-5-4.png" class="img-fluid figure-img" width="768"></p>
+</figure>
+</div>
+</div>
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cor</span>(df_reg_rq1[, <span class="sc">-</span><span class="dv">1</span>], <span class="at">use =</span> <span class="st">"complete.obs"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>                    ff_target core_pce_yoy     UNRATE term_spread_10y_3m
+ff_target           1.0000000   0.51326807 -0.3579216        -0.44859907
+core_pce_yoy        0.5132681   1.00000000 -0.2595512        -0.25447222
+UNRATE             -0.3579216  -0.25955124  1.0000000         0.62195160
+term_spread_10y_3m -0.4485991  -0.25447222  0.6219516         1.00000000
+BAA10Y             -0.5210686  -0.40302148  0.4648967         0.38915300
+ANFCI               0.1914190   0.08735637  0.1131775         0.02414463
+                       BAA10Y      ANFCI
+ff_target          -0.5210686 0.19141897
+core_pce_yoy       -0.4030215 0.08735637
+UNRATE              0.4648967 0.11317750
+term_spread_10y_3m  0.3891530 0.02414463
+BAA10Y              1.0000000 0.53079210
+ANFCI               0.5307921 1.00000000</code></pre>
+</div>
+</div>
+<p>These plots and the correlation matrix give a first look at the time-series behavior and cross-variable relationships before formal estimation.</p>
+</section>
+<section id="adf-tests" class="level2">
+<h2 class="anchored" data-anchor-id="adf-tests">ADF Tests</h2>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">adf.test</span>(df_reg_rq1<span class="sc">$</span>ff_target)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+    Augmented Dickey-Fuller Test
+
+data:  df_reg_rq1$ff_target
+Dickey-Fuller = -2.9744, Lag order = 7, p-value = 0.1658
+alternative hypothesis: stationary</code></pre>
+</div>
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">adf.test</span>(df_reg_rq1<span class="sc">$</span>core_pce_yoy)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+    Augmented Dickey-Fuller Test
+
+data:  df_reg_rq1$core_pce_yoy
+Dickey-Fuller = -2.6696, Lag order = 7, p-value = 0.2948
+alternative hypothesis: stationary</code></pre>
+</div>
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">adf.test</span>(df_reg_rq1<span class="sc">$</span>UNRATE)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+    Augmented Dickey-Fuller Test
+
+data:  df_reg_rq1$UNRATE
+Dickey-Fuller = -2.7347, Lag order = 7, p-value = 0.2673
+alternative hypothesis: stationary</code></pre>
+</div>
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">adf.test</span>(df_reg_rq1<span class="sc">$</span>term_spread_10y_3m)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+    Augmented Dickey-Fuller Test
+
+data:  df_reg_rq1$term_spread_10y_3m
+Dickey-Fuller = -3.8293, Lag order = 7, p-value = 0.01756
+alternative hypothesis: stationary</code></pre>
+</div>
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">adf.test</span>(df_reg_rq1<span class="sc">$</span>BAA10Y)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+    Augmented Dickey-Fuller Test
+
+data:  df_reg_rq1$BAA10Y
+Dickey-Fuller = -3.6583, Lag order = 7, p-value = 0.02714
+alternative hypothesis: stationary</code></pre>
+</div>
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">adf.test</span>(df_reg_rq1<span class="sc">$</span>ANFCI)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+    Augmented Dickey-Fuller Test
+
+data:  df_reg_rq1$ANFCI
+Dickey-Fuller = -3.702, Lag order = 7, p-value = 0.02393
+alternative hypothesis: stationary</code></pre>
+</div>
+</div>
+<p>The ADF tests motivate the later robustness checks in differences and the stability analysis.</p>
+</section>
+<section id="baseline-model" class="level2">
+<h2 class="anchored" data-anchor-id="baseline-model">Baseline Model</h2>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>model_baseline <span class="ot">&lt;-</span> <span class="fu">lm</span>(</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>  ff_target <span class="sc">~</span> core_pce_yoy <span class="sc">+</span> UNRATE <span class="sc">+</span> term_spread_10y_3m <span class="sc">+</span> BAA10Y <span class="sc">+</span> ANFCI,</span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> df_reg_rq1</span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(model_baseline)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = ff_target ~ core_pce_yoy + UNRATE + term_spread_10y_3m + 
+    BAA10Y + ANFCI, data = df_reg_rq1)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-4.6785 -1.1132 -0.1482  1.2160  4.2868 
+
+Coefficients:
+                   Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept)         9.19569    0.53606  17.154  &lt; 2e-16 ***
+core_pce_yoy        0.36141    0.08283   4.363 1.57e-05 ***
+UNRATE              0.10392    0.05967   1.742   0.0822 .  
+term_spread_10y_3m -0.39442    0.07761  -5.082 5.35e-07 ***
+BAA10Y             -2.70730    0.16658 -16.252  &lt; 2e-16 ***
+ANFCI               2.24159    0.14969  14.975  &lt; 2e-16 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 1.631 on 483 degrees of freedom
+Multiple R-squared:  0.6141,    Adjusted R-squared:  0.6101 
+F-statistic: 153.7 on 5 and 483 DF,  p-value: &lt; 2.2e-16</code></pre>
+</div>
+</div>
+<p>The baseline model estimates the full-sample association between the policy rate and the selected explanatory variables.</p>
+</section>
+<section id="robustness-check-1-dynamic-model" class="level2">
+<h2 class="anchored" data-anchor-id="robustness-check-1-dynamic-model">Robustness Check 1: Dynamic Model</h2>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>df_reg_rq1<span class="sc">$</span>ff_target_lag1 <span class="ot">&lt;-</span> dplyr<span class="sc">::</span><span class="fu">lag</span>(df_reg_rq1<span class="sc">$</span>ff_target, <span class="dv">1</span>)</span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>model_dyn <span class="ot">&lt;-</span> <span class="fu">lm</span>(</span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>  ff_target <span class="sc">~</span> ff_target_lag1 <span class="sc">+</span> core_pce_yoy <span class="sc">+</span> UNRATE <span class="sc">+</span></span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>    term_spread_10y_3m <span class="sc">+</span> BAA10Y <span class="sc">+</span> ANFCI,</span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> df_reg_rq1</span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(model_dyn)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = ff_target ~ ff_target_lag1 + core_pce_yoy + UNRATE + 
+    term_spread_10y_3m + BAA10Y + ANFCI, data = df_reg_rq1)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-0.89727 -0.06049  0.00202  0.07603  0.60416 
+
+Coefficients:
+                    Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept)         0.489653   0.067728   7.230 1.92e-12 ***
+ff_target_lag1      0.963201   0.004469 215.516  &lt; 2e-16 ***
+core_pce_yoy        0.022624   0.008529   2.653 0.008253 ** 
+UNRATE             -0.003513   0.006054  -0.580 0.562056    
+term_spread_10y_3m  0.000948   0.008059   0.118 0.906410    
+BAA10Y             -0.172521   0.020540  -8.399 5.09e-16 ***
+ANFCI               0.070975   0.018171   3.906 0.000107 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 0.1649 on 481 degrees of freedom
+  (1 observation deleted due to missingness)
+Multiple R-squared:  0.996, Adjusted R-squared:  0.996 
+F-statistic: 2.021e+04 on 6 and 481 DF,  p-value: &lt; 2.2e-16</code></pre>
+</div>
+</div>
+<p>The dynamic specification captures persistence in the policy rate through a lagged dependent variable.</p>
+</section>
+<section id="robustness-check-2-differenced-model" class="level2">
+<h2 class="anchored" data-anchor-id="robustness-check-2-differenced-model">Robustness Check 2: Differenced Model</h2>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>df_diff <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">date =</span> df_reg_rq1<span class="sc">$</span>date[<span class="sc">-</span><span class="dv">1</span>],</span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">d_ff =</span> <span class="fu">diff</span>(df_reg_rq1<span class="sc">$</span>ff_target),</span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">d_core_pce =</span> <span class="fu">diff</span>(df_reg_rq1<span class="sc">$</span>core_pce_yoy),</span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">d_unrate =</span> <span class="fu">diff</span>(df_reg_rq1<span class="sc">$</span>UNRATE),</span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">term_spread_10y_3m =</span> df_reg_rq1<span class="sc">$</span>term_spread_10y_3m[<span class="sc">-</span><span class="dv">1</span>]</span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a>model_diff <span class="ot">&lt;-</span> <span class="fu">lm</span>(</span>
+<span id="cb27-10"><a href="#cb27-10" aria-hidden="true" tabindex="-1"></a>  d_ff <span class="sc">~</span> d_core_pce <span class="sc">+</span> d_unrate <span class="sc">+</span> term_spread_10y_3m,</span>
+<span id="cb27-11"><a href="#cb27-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> df_diff</span>
+<span id="cb27-12"><a href="#cb27-12" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb27-13"><a href="#cb27-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-14"><a href="#cb27-14" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(model_diff)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = d_ff ~ d_core_pce + d_unrate + term_spread_10y_3m, 
+    data = df_diff)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-0.96241 -0.01936  0.00814  0.03256  0.70829 
+
+Coefficients:
+                    Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept)         0.006402   0.012668   0.505    0.614    
+d_core_pce          0.085132   0.056288   1.512    0.131    
+d_unrate           -0.064449   0.016095  -4.004  7.2e-05 ***
+term_spread_10y_3m -0.010214   0.006638  -1.539    0.125    
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 0.1818 on 484 degrees of freedom
+Multiple R-squared:  0.04586,   Adjusted R-squared:  0.03994 
+F-statistic: 7.754 on 3 and 484 DF,  p-value: 4.566e-05</code></pre>
+</div>
+</div>
+<p>The first-difference model checks whether the main relationships remain visible when the focus shifts from levels to short-run changes.</p>
+</section>
+<section id="rolling-coefficient-plots" class="level2">
+<h2 class="anchored" data-anchor-id="rolling-coefficient-plots">Rolling Coefficient Plots</h2>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>get_coef <span class="ot">&lt;-</span> <span class="cf">function</span>(idx) {</span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>  window_data <span class="ot">&lt;-</span> df_reg_rq1[idx, ]</span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coef</span>(<span class="fu">lm</span>(</span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>    ff_target <span class="sc">~</span> core_pce_yoy <span class="sc">+</span> UNRATE <span class="sc">+</span></span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>      term_spread_10y_3m <span class="sc">+</span> BAA10Y <span class="sc">+</span> ANFCI,</span>
+<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">data =</span> window_data</span>
+<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a>  ))</span>
+<span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb29-9"><a href="#cb29-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-10"><a href="#cb29-10" aria-hidden="true" tabindex="-1"></a>roll <span class="ot">&lt;-</span> <span class="fu">rollapply</span>(</span>
+<span id="cb29-11"><a href="#cb29-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">nrow</span>(df_reg_rq1),</span>
+<span id="cb29-12"><a href="#cb29-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">width =</span> <span class="dv">60</span>,</span>
+<span id="cb29-13"><a href="#cb29-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">FUN =</span> get_coef,</span>
+<span id="cb29-14"><a href="#cb29-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">by =</span> <span class="dv">1</span>,</span>
+<span id="cb29-15"><a href="#cb29-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">align =</span> <span class="st">"right"</span></span>
+<span id="cb29-16"><a href="#cb29-16" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb29-17"><a href="#cb29-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-18"><a href="#cb29-18" aria-hidden="true" tabindex="-1"></a>roll <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(roll)</span>
+<span id="cb29-19"><a href="#cb29-19" aria-hidden="true" tabindex="-1"></a>roll_dates <span class="ot">&lt;-</span> df_reg_rq1<span class="sc">$</span>date[<span class="dv">60</span><span class="sc">:</span><span class="fu">nrow</span>(df_reg_rq1)]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(roll_dates, roll<span class="sc">$</span>core_pce_yoy, <span class="at">type =</span> <span class="st">"l"</span>,</span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>     <span class="at">main =</span> <span class="st">"Rolling Coefficient: core_pce_yoy"</span>,</span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>     <span class="at">xlab =</span> <span class="st">"Date"</span>, <span class="at">ylab =</span> <span class="st">"Coefficient"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="rule_files/figure-html/unnamed-chunk-11-1.png" class="img-fluid figure-img" width="768"></p>
+</figure>
+</div>
+</div>
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(roll_dates, roll<span class="sc">$</span>UNRATE, <span class="at">type =</span> <span class="st">"l"</span>,</span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>     <span class="at">main =</span> <span class="st">"Rolling Coefficient: UNRATE"</span>,</span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>     <span class="at">xlab =</span> <span class="st">"Date"</span>, <span class="at">ylab =</span> <span class="st">"Coefficient"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="rule_files/figure-html/unnamed-chunk-11-2.png" class="img-fluid figure-img" width="768"></p>
+</figure>
+</div>
+</div>
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(roll_dates, roll<span class="sc">$</span>term_spread_10y_3m, <span class="at">type =</span> <span class="st">"l"</span>,</span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>     <span class="at">main =</span> <span class="st">"Rolling Coefficient: Term Spread"</span>,</span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>     <span class="at">xlab =</span> <span class="st">"Date"</span>, <span class="at">ylab =</span> <span class="st">"Coefficient"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="rule_files/figure-html/unnamed-chunk-11-3.png" class="img-fluid figure-img" width="768"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Rolling coefficients provide a visual way to assess whether the reaction function changes across different periods.</p>
+</section>
+<section id="breakpoint-analysis" class="level2">
+<h2 class="anchored" data-anchor-id="breakpoint-analysis">Breakpoint Analysis</h2>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>rq1_formula <span class="ot">&lt;-</span> ff_target <span class="sc">~</span> core_pce_yoy <span class="sc">+</span> UNRATE <span class="sc">+</span></span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>  term_spread_10y_3m <span class="sc">+</span> BAA10Y <span class="sc">+</span> ANFCI</span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a>bp <span class="ot">&lt;-</span> <span class="fu">breakpoints</span>(rq1_formula, <span class="at">data =</span> df_reg_rq1, <span class="at">breaks =</span> BP_MAX_BREAKS)</span>
+<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-6"><a href="#cb33-6" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(bp)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+     Optimal (m+1)-segment partition: 
+
+Call:
+breakpoints.formula(formula = rq1_formula, breaks = BP_MAX_BREAKS, 
+    data = df_reg_rq1)
+
+Breakpoints at observation number:
+                          
+m = 1          224        
+m = 2          216     365
+m = 3      200     307 416
+m = 4   81     205 307 416
+m = 5   81 164 237 310 416
+
+Corresponding to breakdates:
+                                                                               
+m = 1                                       0.458077709611452                  
+m = 2                                       0.441717791411043                  
+m = 3                     0.408997955010225                   0.627811860940695
+m = 4   0.165644171779141                   0.419222903885481 0.627811860940695
+m = 5   0.165644171779141 0.335378323108384 0.484662576687117 0.633946830265849
+                         
+m = 1                    
+m = 2   0.74642126789366 
+m = 3   0.850715746421268
+m = 4   0.850715746421268
+m = 5   0.850715746421268
+
+Fit:
+                                                   
+m   0       1       2       3       4       5      
+RSS 1285.51  210.65   97.03   57.53   48.86   43.11
+BIC 1903.71 1062.59  726.90  514.60  478.08  460.18</code></pre>
+</div>
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(bp)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="rule_files/figure-html/unnamed-chunk-12-1.png" class="img-fluid figure-img" width="768"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Number of breaks is a setting (BP_N_BREAKS); the dates come from the fitted</span></span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a><span class="co"># model. BIC's own choice is printed for comparison.</span></span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>bic_breaks <span class="ot">&lt;-</span> <span class="fu">length</span>(<span class="fu">breakpoints</span>(bp)<span class="sc">$</span>breakpoints)</span>
+<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a>bic_breaks</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 5</code></pre>
+</div>
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>bp_rows  <span class="ot">&lt;-</span> <span class="fu">breakpoints</span>(bp, <span class="at">breaks =</span> BP_N_BREAKS)<span class="sc">$</span>breakpoints</span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>n_breaks <span class="ot">&lt;-</span> <span class="fu">length</span>(bp_rows)</span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>bp_dates <span class="ot">&lt;-</span> df_reg_rq1<span class="sc">$</span>date[bp_rows]</span>
+<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a>n_breaks</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 3</code></pre>
+</div>
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>bp_dates</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "2002-08-01" "2011-07-01" "2020-08-01"</code></pre>
+</div>
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="fu">confint</span>(bp, <span class="at">breaks =</span> n_breaks)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+     Confidence intervals for breakpoints
+     of optimal 4-segment partition: 
+
+Call:
+confint.breakpointsfull(object = bp, breaks = n_breaks)
+
+Breakpoints at observation number:
+  2.5 % breakpoints 97.5 %
+1   199         200    201
+2   306         307    308
+3   415         416    417
+
+Corresponding to breakdates:
+      2.5 % breakpoints    97.5 %
+1 0.4069530   0.4089980 0.4110429
+2 0.6257669   0.6278119 0.6298569
+3 0.8486708   0.8507157 0.8527607</code></pre>
+</div>
+</div>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb44"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(df_reg_rq1<span class="sc">$</span>date, df_reg_rq1<span class="sc">$</span>ff_target, <span class="at">type =</span> <span class="st">"l"</span>)</span>
+<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a><span class="fu">abline</span>(<span class="at">v =</span> bp_dates, <span class="at">col =</span> <span class="st">"red"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="rule_files/figure-html/unnamed-chunk-14-1.png" class="img-fluid figure-img" width="768"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>The analysis uses 3 breaks, estimated at Aug 2002, Jul 2011, Aug 2020. BIC alone would pick 5, the most the test allows; with trending variables and serially correlated errors BIC tends to over-select breaks, so the number of breaks is kept as an explicit choice.</p>
+</section>
+<section id="chow-tests" class="level2">
+<h2 class="anchored" data-anchor-id="chow-tests">Chow Tests</h2>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb45"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a>chow_dates <span class="ot">&lt;-</span> <span class="fu">sort</span>(<span class="fu">unique</span>(<span class="fu">c</span>(CHOW_EVENT_DATES, bp_dates)))</span>
+<span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-3"><a href="#cb45-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (d <span class="cf">in</span> <span class="fu">as.list</span>(chow_dates)) {</span>
+<span id="cb45-4"><a href="#cb45-4" aria-hidden="true" tabindex="-1"></a>  idx <span class="ot">&lt;-</span> <span class="fu">which</span>(df_reg_rq1<span class="sc">$</span>date <span class="sc">==</span> d)</span>
+<span id="cb45-5"><a href="#cb45-5" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="fu">length</span>(idx) <span class="sc">&gt;</span> <span class="dv">0</span>) {</span>
+<span id="cb45-6"><a href="#cb45-6" aria-hidden="true" tabindex="-1"></a>    test <span class="ot">&lt;-</span> <span class="fu">sctest</span>(rq1_formula, <span class="at">type =</span> <span class="st">"Chow"</span>, <span class="at">point =</span> idx, <span class="at">data =</span> df_reg_rq1)</span>
+<span id="cb45-7"><a href="#cb45-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">cat</span>(<span class="st">"Date:"</span>, <span class="fu">format</span>(d),</span>
+<span id="cb45-8"><a href="#cb45-8" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> (d <span class="sc">%in%</span> bp_dates) <span class="st">"(estimated break)"</span> <span class="cf">else</span> <span class="st">"(event)"</span>,</span>
+<span id="cb45-9"><a href="#cb45-9" aria-hidden="true" tabindex="-1"></a>        <span class="st">"| F ="</span>, <span class="fu">round</span>(test<span class="sc">$</span>statistic, <span class="dv">2</span>),</span>
+<span id="cb45-10"><a href="#cb45-10" aria-hidden="true" tabindex="-1"></a>        <span class="st">"| p-value ="</span>, <span class="fu">format</span>(test<span class="sc">$</span>p.value, <span class="at">scientific =</span> <span class="cn">TRUE</span>), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb45-11"><a href="#cb45-11" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb45-12"><a href="#cb45-12" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>Date: 2001-09-01 (event) | F = 227.53 | p-value = 0e+00 
+Date: 2002-08-01 (estimated break) | F = 289.69 | p-value = 0e+00 
+Date: 2008-01-01 (event) | F = 274.65 | p-value = 0e+00 
+Date: 2008-11-01 (event) | F = 214.61 | p-value = 0e+00 
+Date: 2011-07-01 (estimated break) | F = 214.46 | p-value = 0e+00 
+Date: 2020-03-01 (event) | F = 84.59 | p-value = 0e+00 
+Date: 2020-08-01 (estimated break) | F = 84.18 | p-value = 0e+00 </code></pre>
+</div>
+</div>
+<p>The Chow tests evaluate whether the regression relationship shifts at both estimated and theory-motivated break dates.</p>
+</section>
+<section id="sub-period-regressions" class="level2">
+<h2 class="anchored" data-anchor-id="sub-period-regressions">Sub-Period Regressions</h2>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb47"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Sub-periods run between the estimated break dates.</span></span>
+<span id="cb47-2"><a href="#cb47-2" aria-hidden="true" tabindex="-1"></a>period_starts <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fu">min</span>(df_reg_rq1<span class="sc">$</span>date), bp_dates)</span>
+<span id="cb47-3"><a href="#cb47-3" aria-hidden="true" tabindex="-1"></a>period_ends   <span class="ot">&lt;-</span> <span class="fu">c</span>(bp_dates, <span class="fu">max</span>(df_reg_rq1<span class="sc">$</span>date) <span class="sc">+</span> <span class="dv">1</span>)</span>
+<span id="cb47-4"><a href="#cb47-4" aria-hidden="true" tabindex="-1"></a>period_labels <span class="ot">&lt;-</span> <span class="fu">paste0</span>(<span class="fu">format</span>(period_starts, <span class="st">"%Y"</span>), <span class="st">"-"</span>, <span class="fu">format</span>(period_ends <span class="sc">-</span> <span class="dv">1</span>, <span class="st">"%Y"</span>))</span>
+<span id="cb47-5"><a href="#cb47-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb47-6"><a href="#cb47-6" aria-hidden="true" tabindex="-1"></a>df_reg_rq1<span class="sc">$</span>period <span class="ot">&lt;-</span> <span class="fu">cut</span>(</span>
+<span id="cb47-7"><a href="#cb47-7" aria-hidden="true" tabindex="-1"></a>  df_reg_rq1<span class="sc">$</span>date,</span>
+<span id="cb47-8"><a href="#cb47-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">breaks =</span> <span class="fu">c</span>(period_starts, <span class="fu">max</span>(df_reg_rq1<span class="sc">$</span>date) <span class="sc">+</span> <span class="dv">1</span>),</span>
+<span id="cb47-9"><a href="#cb47-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">labels =</span> period_labels,</span>
+<span id="cb47-10"><a href="#cb47-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">right =</span> <span class="cn">FALSE</span></span>
+<span id="cb47-11"><a href="#cb47-11" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb47-12"><a href="#cb47-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb47-13"><a href="#cb47-13" aria-hidden="true" tabindex="-1"></a>models <span class="ot">&lt;-</span> <span class="fu">lapply</span>(period_labels, <span class="cf">function</span>(p) {</span>
+<span id="cb47-14"><a href="#cb47-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">lm</span>(rq1_formula, <span class="at">data =</span> <span class="fu">subset</span>(df_reg_rq1, period <span class="sc">==</span> p))</span>
+<span id="cb47-15"><a href="#cb47-15" aria-hidden="true" tabindex="-1"></a>})</span>
+<span id="cb47-16"><a href="#cb47-16" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(models) <span class="ot">&lt;-</span> period_labels</span>
+<span id="cb47-17"><a href="#cb47-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb47-18"><a href="#cb47-18" aria-hidden="true" tabindex="-1"></a><span class="fu">lapply</span>(models, summary)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>$`1986-2002`
+
+Call:
+lm(formula = rq1_formula, data = subset(df_reg_rq1, period == 
+    p))
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-1.00129 -0.20372 -0.00216  0.20996  1.18665 
+
+Coefficients:
+                   Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept)         6.45910    0.21589   29.92  &lt; 2e-16 ***
+core_pce_yoy        0.73670    0.04892   15.06  &lt; 2e-16 ***
+UNRATE              0.18324    0.05621    3.26  0.00132 ** 
+term_spread_10y_3m -0.95455    0.03616  -26.40  &lt; 2e-16 ***
+BAA10Y             -1.00827    0.06113  -16.49  &lt; 2e-16 ***
+ANFCI               1.38189    0.07798   17.72  &lt; 2e-16 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 0.3645 on 193 degrees of freedom
+Multiple R-squared:  0.9609,    Adjusted R-squared:  0.9599 
+F-statistic: 949.3 on 5 and 193 DF,  p-value: &lt; 2.2e-16
+
+
+$`2002-2011`
+
+Call:
+lm(formula = rq1_formula, data = subset(df_reg_rq1, period == 
+    p))
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-0.74683 -0.24953  0.06082  0.25637  0.73944 
+
+Coefficients:
+                   Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept)         6.60807    0.54036  12.229  &lt; 2e-16 ***
+core_pce_yoy        0.14240    0.14601   0.975    0.332    
+UNRATE             -0.23406    0.03274  -7.148 1.41e-10 ***
+term_spread_10y_3m -0.91531    0.04199 -21.798  &lt; 2e-16 ***
+BAA10Y             -0.52851    0.08638  -6.118 1.81e-08 ***
+ANFCI               0.37089    0.06540   5.671 1.36e-07 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 0.3451 on 101 degrees of freedom
+Multiple R-squared:  0.9676,    Adjusted R-squared:  0.966 
+F-statistic: 603.2 on 5 and 101 DF,  p-value: &lt; 2.2e-16
+
+
+$`2011-2020`
+
+Call:
+lm(formula = rq1_formula, data = subset(df_reg_rq1, period == 
+    p))
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-0.57357 -0.15713 -0.06291  0.17872  0.57399 
+
+Coefficients:
+                   Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept)         1.79527    0.34321   5.231 8.91e-07 ***
+core_pce_yoy        0.60151    0.11032   5.452 3.42e-07 ***
+UNRATE             -0.08319    0.01574  -5.287 7.02e-07 ***
+term_spread_10y_3m -0.62396    0.03745 -16.662  &lt; 2e-16 ***
+BAA10Y             -0.31456    0.08606  -3.655 0.000407 ***
+ANFCI              -0.36419    0.15473  -2.354 0.020482 *  
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 0.2553 on 103 degrees of freedom
+Multiple R-squared:  0.8964,    Adjusted R-squared:  0.8913 
+F-statistic: 178.2 on 5 and 103 DF,  p-value: &lt; 2.2e-16
+
+
+$`2020-2026`
+
+Call:
+lm(formula = rq1_formula, data = subset(df_reg_rq1, period == 
+    p))
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-1.02761 -0.29701  0.01561  0.38246  0.78241 
+
+Coefficients:
+                   Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept)         13.8866     0.7067  19.650  &lt; 2e-16 ***
+core_pce_yoy        -0.7506     0.1028  -7.304 4.01e-10 ***
+UNRATE              -0.8473     0.1834  -4.619 1.77e-05 ***
+term_spread_10y_3m  -1.0214     0.0699 -14.613  &lt; 2e-16 ***
+BAA10Y              -1.6947     0.4657  -3.639 0.000528 ***
+ANFCI                2.5461     0.7403   3.439 0.001000 ** 
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 0.4495 on 68 degrees of freedom
+Multiple R-squared:  0.9567,    Adjusted R-squared:  0.9535 
+F-statistic: 300.2 on 5 and 68 DF,  p-value: &lt; 2.2e-16</code></pre>
+</div>
+</div>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb49"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a>coef_table <span class="ot">&lt;-</span> <span class="fu">do.call</span>(rbind, <span class="fu">lapply</span>(models, coef))</span>
+<span id="cb49-2"><a href="#cb49-2" aria-hidden="true" tabindex="-1"></a>coef_table</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>          (Intercept) core_pce_yoy      UNRATE term_spread_10y_3m     BAA10Y
+1986-2002    6.459100    0.7367021  0.18323509         -0.9545467 -1.0082690
+2002-2011    6.608068    0.1424046 -0.23405917         -0.9153148 -0.5285074
+2011-2020    1.795273    0.6015128 -0.08318559         -0.6239555 -0.3145576
+2020-2026   13.886596   -0.7505605 -0.84729859         -1.0214545 -1.6947366
+               ANFCI
+1986-2002  1.3818891
+2002-2011  0.3708908
+2011-2020 -0.3641897
+2020-2026  2.5461460</code></pre>
+</div>
+</div>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb51"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a>coef_table <span class="ot">&lt;-</span> <span class="fu">do.call</span>(rbind, <span class="fu">lapply</span>(<span class="fu">names</span>(models), <span class="cf">function</span>(p) {</span>
+<span id="cb51-2"><a href="#cb51-2" aria-hidden="true" tabindex="-1"></a>  df <span class="ot">&lt;-</span> <span class="fu">tidy</span>(models[[p]])</span>
+<span id="cb51-3"><a href="#cb51-3" aria-hidden="true" tabindex="-1"></a>  df<span class="sc">$</span>period <span class="ot">&lt;-</span> p</span>
+<span id="cb51-4"><a href="#cb51-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(df)</span>
+<span id="cb51-5"><a href="#cb51-5" aria-hidden="true" tabindex="-1"></a>}))</span>
+<span id="cb51-6"><a href="#cb51-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb51-7"><a href="#cb51-7" aria-hidden="true" tabindex="-1"></a>coef_table</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 24 × 6
+   term               estimate std.error statistic  p.value period   
+   &lt;chr&gt;                 &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt; &lt;chr&gt;    
+ 1 (Intercept)           6.46     0.216     29.9   2.08e-74 1986-2002
+ 2 core_pce_yoy          0.737    0.0489    15.1   2.10e-34 1986-2002
+ 3 UNRATE                0.183    0.0562     3.26  1.32e- 3 1986-2002
+ 4 term_spread_10y_3m   -0.955    0.0362   -26.4   5.80e-66 1986-2002
+ 5 BAA10Y               -1.01     0.0611   -16.5   1.04e-38 1986-2002
+ 6 ANFCI                 1.38     0.0780    17.7   2.41e-42 1986-2002
+ 7 (Intercept)           6.61     0.540     12.2   1.21e-21 2002-2011
+ 8 core_pce_yoy          0.142    0.146      0.975 3.32e- 1 2002-2011
+ 9 UNRATE               -0.234    0.0327    -7.15  1.41e-10 2002-2011
+10 term_spread_10y_3m   -0.915    0.0420   -21.8   5.63e-40 2002-2011
+# ℹ 14 more rows</code></pre>
+</div>
+</div>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb53"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(coef_table[coef_table<span class="sc">$</span>term <span class="sc">!=</span> <span class="st">"(Intercept)"</span>, ],</span>
+<span id="cb53-2"><a href="#cb53-2" aria-hidden="true" tabindex="-1"></a>       <span class="fu">aes</span>(<span class="at">x =</span> period, <span class="at">y =</span> estimate, <span class="at">color =</span> term, <span class="at">group =</span> term)) <span class="sc">+</span></span>
+<span id="cb53-3"><a href="#cb53-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>() <span class="sc">+</span></span>
+<span id="cb53-4"><a href="#cb53-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="rule_files/figure-html/unnamed-chunk-19-1.png" class="img-fluid figure-img" width="768"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Sub-period regressions make it easier to interpret how the policy rule differs across historical regimes.</p>
+
+
+<!-- -->
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    // Ensure there is a toggle, if there isn't float one in the top right
+    if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+      const toggle = window.document.createElement('button');
+      toggle.type = "button";
+      toggle.setAttribute("role", "switch");
+      toggle.setAttribute("aria-checked", "false");
+      toggle.classList.add('top-right');
+      toggle.classList.add('quarto-color-scheme-toggle');
+      toggle.setAttribute("aria-label", "Toggle dark mode");
+      toggle.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+      const i = window.document.createElement("i");
+      i.classList.add('bi');
+      toggle.appendChild(i);
+      // Put the toggle in a landmark of its own, so that landmark navigation
+      // can reach it.
+      //
+      // The container is always a fresh direct child of body, and the toggle is
+      // never moved into page furniture that the theme or the author controls.
+      // The toggle is positioned against the page, so any ancestor that
+      // establishes a containing block captures it: a positioned element or a
+      // grid for position: absolute, and transform, filter, will-change or
+      // contain for position: fixed. A direct child of body has none of these
+      // to inherit, and the shift when one appears is silent and visual.
+      //
+      // ARIA says a document should have at most one banner, and axe reports a
+      // duplicate whether or not the banners carry distinct labels. So use a
+      // header when the page has no banner yet, and a named region otherwise.
+      //
+      // A header is a banner wherever it sits, unless it is inside sectioning
+      // content, so this cannot just look at the children of body: a custom
+      // page layout wraps the title block header in a plain div. An explicit
+      // role="banner" always counts.
+      const sectioning = 'article, aside, main, nav, section, [role="article"], [role="complementary"], [role="main"], [role="navigation"], [role="region"]';
+      const hasBanner = Array.from(
+        window.document.querySelectorAll('header:not([role]), [role="banner"]')
+      ).some(function(el) {
+        return el.hasAttribute("role") || el.closest(sectioning) === null;
+      });
+      const container = window.document.createElement(hasBanner ? "div" : "header");
+      if (hasBanner) {
+        container.setAttribute("role", "region");
+        container.setAttribute("aria-label", "Toggle dark mode");
+      }
+      container.classList.add('quarto-color-scheme-toggle-container');
+      container.appendChild(toggle);
+      window.document.body.appendChild(container);
+    }
+    setColorSchemeToggle(hasAlternateSentinel())
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+    const viewSource = window.document.getElementById('quarto-view-source') ||
+                       window.document.getElementById('quarto-code-tools-source');
+    if (viewSource) {
+      const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+      viewSource.addEventListener("click", function(e) {
+        if (sourceUrl) {
+          // rstudio viewer pane
+          if (/\bcapabilities=\b/.test(window.location)) {
+            window.open(sourceUrl);
+          } else {
+            window.location.href = sourceUrl;
+          }
+        } else {
+          const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+          modal.show();
+        }
+        return false;
+      });
+    }
+    function toggleCodeHandler(show) {
+      return function(e) {
+        const cellDetails = window.document.querySelectorAll(".cell details.code-fold");
+        for (let i=0; i<cellDetails.length; i++) {
+          const details = cellDetails[i];
+          if (show) {
+            details.open = true;
+          } else {
+            details.removeAttribute("open");
+          }
+        }
+        const cellCodeDivs = window.document.querySelectorAll(".cell div.sourceCode.cell-code");
+        const fromCls = show ? "hidden" : "unhidden";
+        const toCls = show ? "unhidden" : "hidden";
+        for (let i=0; i<cellCodeDivs.length; i++) {
+          const codeDiv = cellCodeDivs[i];
+          if (codeDiv.classList.contains(fromCls)) {
+            codeDiv.classList.remove(fromCls);
+            codeDiv.classList.add(toCls);
+          } 
+        }
+        return false;
+      }
+    }
+    const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+    if (hideAllCode) {
+      hideAllCode.addEventListener("click", toggleCodeHandler(false));
+    }
+    const showAllCode = window.document.getElementById("quarto-show-all-code");
+    if (showAllCode) {
+      showAllCode.addEventListener("click", toggleCodeHandler(true));
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/inukbaik\.github\.io\/fomc-policy-modeling\/");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+      window.quartoDecorateExternalLinks = function (root) {
+     var links = (root || window.document).querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+          if (!link.classList.contains('no-external-icon')) {
+          }
+        }
+      }
+      };
+      window.quartoDecorateExternalLinks(window.document);
+    // Esc closes the popup (WCAG 1.4.13) and focus leaving both trigger and
+    // popup closes it (WCAG 2.4.11); tippy handles neither for interactive popups.
+    const hideOnEscAndFocusOut = {
+      name: 'hideOnEscAndFocusOut',
+      defaultValue: true,
+      fn(instance) {
+        const dismiss = () => {
+          // A show scheduled by the trigger delay would otherwise reopen it
+          instance.clearDelayTimeouts();
+          instance.hide();
+        };
+        const onKeyDown = (event) => {
+          if (event.key !== 'Escape') {
+            return;
+          }
+          // Keep Esc from also reaching page handlers (e.g. reveal.js overview),
+          // except an open reveal.js slide menu, which Esc should close too.
+          // The menu handles keys only when its keyboard option is on.
+          const menuHandlesEsc = window.Reveal?.getPlugin?.('menu')?.isOpen() &&
+            window.Reveal.getConfig().menu?.keyboard !== false;
+          if (!menuHandlesEsc) {
+            event.stopPropagation();
+          }
+          if (instance.popper.contains(window.document.activeElement)) {
+            // Disabled while refocusing so the focus trigger does not reopen it
+            instance.disable();
+            instance.reference.focus();
+            instance.enable();
+          }
+          dismiss();
+        };
+        const onFocusOut = (event) => {
+          const target = event.relatedTarget;
+          if (target && !instance.reference.contains(target) &&
+              !instance.popper.contains(target)) {
+            dismiss();
+          }
+        };
+        // On the trigger too: a click trigger (code-annotations: select) has no
+        // blur handling. Attached for the instance's lifetime so leaving the
+        // trigger also cancels a show still pending on the trigger delay.
+        instance.reference.addEventListener('focusout', onFocusOut);
+        return {
+          onShow() {
+            window.document.addEventListener('keydown', onKeyDown, true);
+            instance.popper.addEventListener('focusout', onFocusOut);
+          },
+          onHide() {
+            window.document.removeEventListener('keydown', onKeyDown, true);
+            instance.popper.removeEventListener('focusout', onFocusOut);
+          },
+          onDestroy() {
+            instance.reference.removeEventListener('focusout', onFocusOut);
+          },
+        };
+      },
+    };
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+        plugins: [hideOnEscAndFocusOut],
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          // Each band is positioned against its own containing block, which is
+          // not the offsetParent of the lines, so place it from client rects.
+          const placeBand = (band, firstEl, lastEl, codeBlock) => {
+            const container = band.offsetParent;
+            if (container === null) {
+              return;
+            }
+            const containerRect = container.getBoundingClientRect();
+            // Reveal.js scales slides with a transform, so convert client
+            // pixels back to the CSS pixels of the container.
+            const scale = containerRect.height / container.offsetHeight || 1;
+            const firstRect = firstEl.getBoundingClientRect();
+            const lastRect = lastEl.getBoundingClientRect();
+            const top = (firstRect.top - containerRect.top) / scale - container.clientTop + container.scrollTop;
+            const height = (lastRect.bottom - firstRect.top) / scale;
+            band.style.top = top - 2 + "px";
+            band.style.height = height + 4 + "px";
+            if (codeBlock) {
+              // Without the copy button wrapper, the containing block is wider
+              // than the code block, so span the code block explicitly.
+              const blockRect = codeBlock.getBoundingClientRect();
+              band.style.left = (blockRect.left - containerRect.left) / scale - container.clientLeft + container.scrollLeft + "px";
+              band.style.width = blockRect.width / scale + "px";
+            }
+          };
+          if (lineIds.length > 0) {
+            const el = window.document.getElementById(lineIds[0]);
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const parent = el.parentElement.parentElement;
+            // cook up a div (if necessary) and position it
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            placeBand(div, el, lastEl, parent.closest("div.sourceCode") || parent);
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            placeBand(gutterDiv, el, lastEl);
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+  <script type="application/javascript">
+  window.quartoScrollableRegionsLabels = {"code":"Scrollable code","output":"Scrollable output"};
+  </script><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb54" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb54-2"><a href="#cb54-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> "The Rule: How the Target Relates to the Economy (RQ1)"</span></span>
+<span id="cb54-3"><a href="#cb54-3" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb54-4"><a href="#cb54-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-7"><a href="#cb54-7" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb54-8"><a href="#cb54-8" aria-hidden="true" tabindex="-1"></a><span class="co">#| include: false</span></span>
+<span id="cb54-9"><a href="#cb54-9" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">"R/settings.R"</span>)</span>
+<span id="cb54-10"><a href="#cb54-10" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">"R/prepare_data.R"</span>)</span>
+<span id="cb54-11"><a href="#cb54-11" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb54-12"><a href="#cb54-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-13"><a href="#cb54-13" aria-hidden="true" tabindex="-1"></a>::: {.callout-note}</span>
+<span id="cb54-14"><a href="#cb54-14" aria-hidden="true" tabindex="-1"></a><span class="fu">## Original course-project chapter</span></span>
+<span id="cb54-15"><a href="#cb54-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-16"><a href="#cb54-16" aria-hidden="true" tabindex="-1"></a>This chapter is the course-project team's original analysis, written by</span>
+<span id="cb54-17"><a href="#cb54-17" aria-hidden="true" tabindex="-1"></a>teammates and kept as submitted. The only changes are shared data fixes</span>
+<span id="cb54-18"><a href="#cb54-18" aria-hidden="true" tabindex="-1"></a>and small cleanups (computed instead of hardcoded dates, clearer names);</span>
+<span id="cb54-19"><a href="#cb54-19" aria-hidden="true" tabindex="-1"></a>the methods were not revised for this portfolio. Known limitations:</span>
+<span id="cb54-20"><a href="#cb54-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-21"><a href="#cb54-21" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Possibly spurious levels regression.** The target, inflation and</span>
+<span id="cb54-22"><a href="#cb54-22" aria-hidden="true" tabindex="-1"></a>  unemployment behave like trending series (see the unit-root tests below),</span>
+<span id="cb54-23"><a href="#cb54-23" aria-hidden="true" tabindex="-1"></a>  and regressing trending series on each other can show strong</span>
+<span id="cb54-24"><a href="#cb54-24" aria-hidden="true" tabindex="-1"></a>  relationships that are not real. A partial-adjustment model (the lagged</span>
+<span id="cb54-25"><a href="#cb54-25" aria-hidden="true" tabindex="-1"></a>  target as a regressor, used below only as a robustness check) is the</span>
+<span id="cb54-26"><a href="#cb54-26" aria-hidden="true" tabindex="-1"></a>  standard way to estimate a policy rule.</span>
+<span id="cb54-27"><a href="#cb54-27" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Standard errors ignore autocorrelation.** Monthly errors are strongly</span>
+<span id="cb54-28"><a href="#cb54-28" aria-hidden="true" tabindex="-1"></a>  correlated over time, so the ordinary p-values overstate how certain each</span>
+<span id="cb54-29"><a href="#cb54-29" aria-hidden="true" tabindex="-1"></a>  estimate is. Newey-West (autocorrelation-robust) errors would be wider.</span>
+<span id="cb54-30"><a href="#cb54-30" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Zero-lower-bound months are included.** In 2009–2015 and 2020–2022 the</span>
+<span id="cb54-31"><a href="#cb54-31" aria-hidden="true" tabindex="-1"></a>  target could not fall below zero, so it stayed flat whatever the economy</span>
+<span id="cb54-32"><a href="#cb54-32" aria-hidden="true" tabindex="-1"></a>  did. Those months pull every estimated response toward zero.</span>
+<span id="cb54-33"><a href="#cb54-33" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Lasso screening.** It is given <span class="in">`core_pce_yoy`</span> and <span class="in">`inflation_gap`</span></span>
+<span id="cb54-34"><a href="#cb54-34" aria-hidden="true" tabindex="-1"></a>  (the same series shifted by 2), uses random cross-validation folds on</span>
+<span id="cb54-35"><a href="#cb54-35" aria-hidden="true" tabindex="-1"></a>  time-series data, and its result is not used afterwards.</span>
+<span id="cb54-36"><a href="#cb54-36" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Break tests reject everywhere.** The Chow tests assume independent</span>
+<span id="cb54-37"><a href="#cb54-37" aria-hidden="true" tabindex="-1"></a>  errors and reject stability at every date tested, and BIC selects the</span>
+<span id="cb54-38"><a href="#cb54-38" aria-hidden="true" tabindex="-1"></a>  maximum number of breaks allowed, so neither pins down when the rule</span>
+<span id="cb54-39"><a href="#cb54-39" aria-hidden="true" tabindex="-1"></a>  changed. The number of breaks is therefore a fixed setting.</span>
+<span id="cb54-40"><a href="#cb54-40" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb54-41"><a href="#cb54-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-42"><a href="#cb54-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-43"><a href="#cb54-43" aria-hidden="true" tabindex="-1"></a>This section studies how the federal funds target is related to selected macroeconomic and financial variables, and whether those relationships remain stable over time.</span>
+<span id="cb54-44"><a href="#cb54-44" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-45"><a href="#cb54-45" aria-hidden="true" tabindex="-1"></a><span class="fu">## Variable Selection</span></span>
+<span id="cb54-46"><a href="#cb54-46" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-49"><a href="#cb54-49" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb54-50"><a href="#cb54-50" aria-hidden="true" tabindex="-1"></a>data_rq1 <span class="ot">&lt;-</span> df_final <span class="sc">%&gt;%</span></span>
+<span id="cb54-51"><a href="#cb54-51" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(date)</span>
+<span id="cb54-52"><a href="#cb54-52" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-53"><a href="#cb54-53" aria-hidden="true" tabindex="-1"></a>vars <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
+<span id="cb54-54"><a href="#cb54-54" aria-hidden="true" tabindex="-1"></a>  <span class="st">"ff_target"</span>,</span>
+<span id="cb54-55"><a href="#cb54-55" aria-hidden="true" tabindex="-1"></a>  <span class="st">"core_pce_yoy"</span>, <span class="st">"inflation_gap"</span>,</span>
+<span id="cb54-56"><a href="#cb54-56" aria-hidden="true" tabindex="-1"></a>  <span class="st">"UNRATE"</span>, <span class="st">"payems_yoy"</span>,</span>
+<span id="cb54-57"><a href="#cb54-57" aria-hidden="true" tabindex="-1"></a>  <span class="st">"term_spread_10y_3m"</span>, <span class="st">"BAA10Y"</span>, <span class="st">"ANFCI"</span>,</span>
+<span id="cb54-58"><a href="#cb54-58" aria-hidden="true" tabindex="-1"></a>  <span class="st">"fomc_meetings"</span>, <span class="st">"days_since_last_fomc"</span></span>
+<span id="cb54-59"><a href="#cb54-59" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb54-60"><a href="#cb54-60" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-61"><a href="#cb54-61" aria-hidden="true" tabindex="-1"></a>df_full_rq1 <span class="ot">&lt;-</span> data_rq1[, vars]</span>
+<span id="cb54-62"><a href="#cb54-62" aria-hidden="true" tabindex="-1"></a>na_ratio <span class="ot">&lt;-</span> <span class="fu">colMeans</span>(<span class="fu">is.na</span>(df_full_rq1))</span>
+<span id="cb54-63"><a href="#cb54-63" aria-hidden="true" tabindex="-1"></a>df_clean_rq1 <span class="ot">&lt;-</span> df_full_rq1[, na_ratio <span class="sc">&lt;</span> <span class="fl">0.2</span>]</span>
+<span id="cb54-64"><a href="#cb54-64" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb54-65"><a href="#cb54-65" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-68"><a href="#cb54-68" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb54-69"><a href="#cb54-69" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">model.matrix</span>(ff_target <span class="sc">~</span> ., df_clean_rq1)[, <span class="sc">-</span><span class="dv">1</span>]</span>
+<span id="cb54-70"><a href="#cb54-70" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span> df_clean_rq1<span class="sc">$</span>ff_target</span>
+<span id="cb54-71"><a href="#cb54-71" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-72"><a href="#cb54-72" aria-hidden="true" tabindex="-1"></a>lasso <span class="ot">&lt;-</span> <span class="fu">cv.glmnet</span>(x, y, <span class="at">alpha =</span> <span class="dv">1</span>)</span>
+<span id="cb54-73"><a href="#cb54-73" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-74"><a href="#cb54-74" aria-hidden="true" tabindex="-1"></a><span class="fu">coef</span>(lasso, <span class="at">s =</span> <span class="st">"lambda.min"</span>)</span>
+<span id="cb54-75"><a href="#cb54-75" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb54-76"><a href="#cb54-76" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-77"><a href="#cb54-77" aria-hidden="true" tabindex="-1"></a>Variable selection narrows the model to a smaller set of predictors that appear most relevant to the policy rate.</span>
+<span id="cb54-78"><a href="#cb54-78" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-79"><a href="#cb54-79" aria-hidden="true" tabindex="-1"></a><span class="fu">## Final Regression Dataset</span></span>
+<span id="cb54-80"><a href="#cb54-80" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-83"><a href="#cb54-83" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb54-84"><a href="#cb54-84" aria-hidden="true" tabindex="-1"></a>df_reg_rq1 <span class="ot">&lt;-</span> data_rq1[, <span class="fu">c</span>(</span>
+<span id="cb54-85"><a href="#cb54-85" aria-hidden="true" tabindex="-1"></a>  <span class="st">"date"</span>, <span class="st">"ff_target"</span>, <span class="st">"core_pce_yoy"</span>, <span class="st">"UNRATE"</span>,</span>
+<span id="cb54-86"><a href="#cb54-86" aria-hidden="true" tabindex="-1"></a>  <span class="st">"term_spread_10y_3m"</span>, <span class="st">"BAA10Y"</span>, <span class="st">"ANFCI"</span></span>
+<span id="cb54-87"><a href="#cb54-87" aria-hidden="true" tabindex="-1"></a>)]</span>
+<span id="cb54-88"><a href="#cb54-88" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb54-89"><a href="#cb54-89" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-90"><a href="#cb54-90" aria-hidden="true" tabindex="-1"></a>The regression section uses a focused set of explanatory variables rather than the full macro dataset.</span>
+<span id="cb54-91"><a href="#cb54-91" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-92"><a href="#cb54-92" aria-hidden="true" tabindex="-1"></a><span class="fu">## Exploratory Time-Series Checks</span></span>
+<span id="cb54-93"><a href="#cb54-93" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-96"><a href="#cb54-96" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb54-97"><a href="#cb54-97" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(df_reg_rq1<span class="sc">$</span>date, df_reg_rq1<span class="sc">$</span>ff_target, <span class="at">type =</span> <span class="st">"l"</span>, <span class="at">main =</span> <span class="st">"Federal Funds Target Rate"</span>)</span>
+<span id="cb54-98"><a href="#cb54-98" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-99"><a href="#cb54-99" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(df_reg_rq1<span class="sc">$</span>date, df_reg_rq1<span class="sc">$</span>core_pce_yoy, <span class="at">type =</span> <span class="st">"l"</span>, <span class="at">main =</span> <span class="st">"Core PCE Inflation (YoY %)"</span>)</span>
+<span id="cb54-100"><a href="#cb54-100" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-101"><a href="#cb54-101" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(df_reg_rq1<span class="sc">$</span>date, df_reg_rq1<span class="sc">$</span>UNRATE, <span class="at">type =</span> <span class="st">"l"</span>, <span class="at">main =</span> <span class="st">"Unemployment Rate"</span>)</span>
+<span id="cb54-102"><a href="#cb54-102" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-103"><a href="#cb54-103" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(df_reg_rq1<span class="sc">$</span>date, df_reg_rq1<span class="sc">$</span>term_spread_10y_3m, <span class="at">type =</span> <span class="st">"l"</span>, <span class="at">main =</span> <span class="st">"Term Spread"</span>)</span>
+<span id="cb54-104"><a href="#cb54-104" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-105"><a href="#cb54-105" aria-hidden="true" tabindex="-1"></a><span class="fu">cor</span>(df_reg_rq1[, <span class="sc">-</span><span class="dv">1</span>], <span class="at">use =</span> <span class="st">"complete.obs"</span>)</span>
+<span id="cb54-106"><a href="#cb54-106" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb54-107"><a href="#cb54-107" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-108"><a href="#cb54-108" aria-hidden="true" tabindex="-1"></a>These plots and the correlation matrix give a first look at the time-series behavior and cross-variable relationships before formal estimation.</span>
+<span id="cb54-109"><a href="#cb54-109" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-110"><a href="#cb54-110" aria-hidden="true" tabindex="-1"></a><span class="fu">## ADF Tests</span></span>
+<span id="cb54-111"><a href="#cb54-111" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-114"><a href="#cb54-114" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb54-115"><a href="#cb54-115" aria-hidden="true" tabindex="-1"></a><span class="fu">adf.test</span>(df_reg_rq1<span class="sc">$</span>ff_target)</span>
+<span id="cb54-116"><a href="#cb54-116" aria-hidden="true" tabindex="-1"></a><span class="fu">adf.test</span>(df_reg_rq1<span class="sc">$</span>core_pce_yoy)</span>
+<span id="cb54-117"><a href="#cb54-117" aria-hidden="true" tabindex="-1"></a><span class="fu">adf.test</span>(df_reg_rq1<span class="sc">$</span>UNRATE)</span>
+<span id="cb54-118"><a href="#cb54-118" aria-hidden="true" tabindex="-1"></a><span class="fu">adf.test</span>(df_reg_rq1<span class="sc">$</span>term_spread_10y_3m)</span>
+<span id="cb54-119"><a href="#cb54-119" aria-hidden="true" tabindex="-1"></a><span class="fu">adf.test</span>(df_reg_rq1<span class="sc">$</span>BAA10Y)</span>
+<span id="cb54-120"><a href="#cb54-120" aria-hidden="true" tabindex="-1"></a><span class="fu">adf.test</span>(df_reg_rq1<span class="sc">$</span>ANFCI)</span>
+<span id="cb54-121"><a href="#cb54-121" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb54-122"><a href="#cb54-122" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-123"><a href="#cb54-123" aria-hidden="true" tabindex="-1"></a>The ADF tests motivate the later robustness checks in differences and the stability analysis.</span>
+<span id="cb54-124"><a href="#cb54-124" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-125"><a href="#cb54-125" aria-hidden="true" tabindex="-1"></a><span class="fu">## Baseline Model</span></span>
+<span id="cb54-126"><a href="#cb54-126" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-129"><a href="#cb54-129" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb54-130"><a href="#cb54-130" aria-hidden="true" tabindex="-1"></a>model_baseline <span class="ot">&lt;-</span> <span class="fu">lm</span>(</span>
+<span id="cb54-131"><a href="#cb54-131" aria-hidden="true" tabindex="-1"></a>  ff_target <span class="sc">~</span> core_pce_yoy <span class="sc">+</span> UNRATE <span class="sc">+</span> term_spread_10y_3m <span class="sc">+</span> BAA10Y <span class="sc">+</span> ANFCI,</span>
+<span id="cb54-132"><a href="#cb54-132" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> df_reg_rq1</span>
+<span id="cb54-133"><a href="#cb54-133" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb54-134"><a href="#cb54-134" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-135"><a href="#cb54-135" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(model_baseline)</span>
+<span id="cb54-136"><a href="#cb54-136" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb54-137"><a href="#cb54-137" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-138"><a href="#cb54-138" aria-hidden="true" tabindex="-1"></a>The baseline model estimates the full-sample association between the policy rate and the selected explanatory variables.</span>
+<span id="cb54-139"><a href="#cb54-139" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-140"><a href="#cb54-140" aria-hidden="true" tabindex="-1"></a><span class="fu">## Robustness Check 1: Dynamic Model</span></span>
+<span id="cb54-141"><a href="#cb54-141" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-144"><a href="#cb54-144" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb54-145"><a href="#cb54-145" aria-hidden="true" tabindex="-1"></a>df_reg_rq1<span class="sc">$</span>ff_target_lag1 <span class="ot">&lt;-</span> dplyr<span class="sc">::</span><span class="fu">lag</span>(df_reg_rq1<span class="sc">$</span>ff_target, <span class="dv">1</span>)</span>
+<span id="cb54-146"><a href="#cb54-146" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-147"><a href="#cb54-147" aria-hidden="true" tabindex="-1"></a>model_dyn <span class="ot">&lt;-</span> <span class="fu">lm</span>(</span>
+<span id="cb54-148"><a href="#cb54-148" aria-hidden="true" tabindex="-1"></a>  ff_target <span class="sc">~</span> ff_target_lag1 <span class="sc">+</span> core_pce_yoy <span class="sc">+</span> UNRATE <span class="sc">+</span></span>
+<span id="cb54-149"><a href="#cb54-149" aria-hidden="true" tabindex="-1"></a>    term_spread_10y_3m <span class="sc">+</span> BAA10Y <span class="sc">+</span> ANFCI,</span>
+<span id="cb54-150"><a href="#cb54-150" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> df_reg_rq1</span>
+<span id="cb54-151"><a href="#cb54-151" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb54-152"><a href="#cb54-152" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-153"><a href="#cb54-153" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(model_dyn)</span>
+<span id="cb54-154"><a href="#cb54-154" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb54-155"><a href="#cb54-155" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-156"><a href="#cb54-156" aria-hidden="true" tabindex="-1"></a>The dynamic specification captures persistence in the policy rate through a lagged dependent variable.</span>
+<span id="cb54-157"><a href="#cb54-157" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-158"><a href="#cb54-158" aria-hidden="true" tabindex="-1"></a><span class="fu">## Robustness Check 2: Differenced Model</span></span>
+<span id="cb54-159"><a href="#cb54-159" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-162"><a href="#cb54-162" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb54-163"><a href="#cb54-163" aria-hidden="true" tabindex="-1"></a>df_diff <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb54-164"><a href="#cb54-164" aria-hidden="true" tabindex="-1"></a>  <span class="at">date =</span> df_reg_rq1<span class="sc">$</span>date[<span class="sc">-</span><span class="dv">1</span>],</span>
+<span id="cb54-165"><a href="#cb54-165" aria-hidden="true" tabindex="-1"></a>  <span class="at">d_ff =</span> <span class="fu">diff</span>(df_reg_rq1<span class="sc">$</span>ff_target),</span>
+<span id="cb54-166"><a href="#cb54-166" aria-hidden="true" tabindex="-1"></a>  <span class="at">d_core_pce =</span> <span class="fu">diff</span>(df_reg_rq1<span class="sc">$</span>core_pce_yoy),</span>
+<span id="cb54-167"><a href="#cb54-167" aria-hidden="true" tabindex="-1"></a>  <span class="at">d_unrate =</span> <span class="fu">diff</span>(df_reg_rq1<span class="sc">$</span>UNRATE),</span>
+<span id="cb54-168"><a href="#cb54-168" aria-hidden="true" tabindex="-1"></a>  <span class="at">term_spread_10y_3m =</span> df_reg_rq1<span class="sc">$</span>term_spread_10y_3m[<span class="sc">-</span><span class="dv">1</span>]</span>
+<span id="cb54-169"><a href="#cb54-169" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb54-170"><a href="#cb54-170" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-171"><a href="#cb54-171" aria-hidden="true" tabindex="-1"></a>model_diff <span class="ot">&lt;-</span> <span class="fu">lm</span>(</span>
+<span id="cb54-172"><a href="#cb54-172" aria-hidden="true" tabindex="-1"></a>  d_ff <span class="sc">~</span> d_core_pce <span class="sc">+</span> d_unrate <span class="sc">+</span> term_spread_10y_3m,</span>
+<span id="cb54-173"><a href="#cb54-173" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> df_diff</span>
+<span id="cb54-174"><a href="#cb54-174" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb54-175"><a href="#cb54-175" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-176"><a href="#cb54-176" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(model_diff)</span>
+<span id="cb54-177"><a href="#cb54-177" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb54-178"><a href="#cb54-178" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-179"><a href="#cb54-179" aria-hidden="true" tabindex="-1"></a>The first-difference model checks whether the main relationships remain visible when the focus shifts from levels to short-run changes.</span>
+<span id="cb54-180"><a href="#cb54-180" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-181"><a href="#cb54-181" aria-hidden="true" tabindex="-1"></a><span class="fu">## Rolling Coefficient Plots</span></span>
+<span id="cb54-182"><a href="#cb54-182" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-185"><a href="#cb54-185" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb54-186"><a href="#cb54-186" aria-hidden="true" tabindex="-1"></a>get_coef <span class="ot">&lt;-</span> <span class="cf">function</span>(idx) {</span>
+<span id="cb54-187"><a href="#cb54-187" aria-hidden="true" tabindex="-1"></a>  window_data <span class="ot">&lt;-</span> df_reg_rq1[idx, ]</span>
+<span id="cb54-188"><a href="#cb54-188" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coef</span>(<span class="fu">lm</span>(</span>
+<span id="cb54-189"><a href="#cb54-189" aria-hidden="true" tabindex="-1"></a>    ff_target <span class="sc">~</span> core_pce_yoy <span class="sc">+</span> UNRATE <span class="sc">+</span></span>
+<span id="cb54-190"><a href="#cb54-190" aria-hidden="true" tabindex="-1"></a>      term_spread_10y_3m <span class="sc">+</span> BAA10Y <span class="sc">+</span> ANFCI,</span>
+<span id="cb54-191"><a href="#cb54-191" aria-hidden="true" tabindex="-1"></a>    <span class="at">data =</span> window_data</span>
+<span id="cb54-192"><a href="#cb54-192" aria-hidden="true" tabindex="-1"></a>  ))</span>
+<span id="cb54-193"><a href="#cb54-193" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb54-194"><a href="#cb54-194" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-195"><a href="#cb54-195" aria-hidden="true" tabindex="-1"></a>roll <span class="ot">&lt;-</span> <span class="fu">rollapply</span>(</span>
+<span id="cb54-196"><a href="#cb54-196" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">nrow</span>(df_reg_rq1),</span>
+<span id="cb54-197"><a href="#cb54-197" aria-hidden="true" tabindex="-1"></a>  <span class="at">width =</span> <span class="dv">60</span>,</span>
+<span id="cb54-198"><a href="#cb54-198" aria-hidden="true" tabindex="-1"></a>  <span class="at">FUN =</span> get_coef,</span>
+<span id="cb54-199"><a href="#cb54-199" aria-hidden="true" tabindex="-1"></a>  <span class="at">by =</span> <span class="dv">1</span>,</span>
+<span id="cb54-200"><a href="#cb54-200" aria-hidden="true" tabindex="-1"></a>  <span class="at">align =</span> <span class="st">"right"</span></span>
+<span id="cb54-201"><a href="#cb54-201" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb54-202"><a href="#cb54-202" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-203"><a href="#cb54-203" aria-hidden="true" tabindex="-1"></a>roll <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(roll)</span>
+<span id="cb54-204"><a href="#cb54-204" aria-hidden="true" tabindex="-1"></a>roll_dates <span class="ot">&lt;-</span> df_reg_rq1<span class="sc">$</span>date[<span class="dv">60</span><span class="sc">:</span><span class="fu">nrow</span>(df_reg_rq1)]</span>
+<span id="cb54-205"><a href="#cb54-205" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb54-206"><a href="#cb54-206" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-209"><a href="#cb54-209" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb54-210"><a href="#cb54-210" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(roll_dates, roll<span class="sc">$</span>core_pce_yoy, <span class="at">type =</span> <span class="st">"l"</span>,</span>
+<span id="cb54-211"><a href="#cb54-211" aria-hidden="true" tabindex="-1"></a>     <span class="at">main =</span> <span class="st">"Rolling Coefficient: core_pce_yoy"</span>,</span>
+<span id="cb54-212"><a href="#cb54-212" aria-hidden="true" tabindex="-1"></a>     <span class="at">xlab =</span> <span class="st">"Date"</span>, <span class="at">ylab =</span> <span class="st">"Coefficient"</span>)</span>
+<span id="cb54-213"><a href="#cb54-213" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-214"><a href="#cb54-214" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(roll_dates, roll<span class="sc">$</span>UNRATE, <span class="at">type =</span> <span class="st">"l"</span>,</span>
+<span id="cb54-215"><a href="#cb54-215" aria-hidden="true" tabindex="-1"></a>     <span class="at">main =</span> <span class="st">"Rolling Coefficient: UNRATE"</span>,</span>
+<span id="cb54-216"><a href="#cb54-216" aria-hidden="true" tabindex="-1"></a>     <span class="at">xlab =</span> <span class="st">"Date"</span>, <span class="at">ylab =</span> <span class="st">"Coefficient"</span>)</span>
+<span id="cb54-217"><a href="#cb54-217" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-218"><a href="#cb54-218" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(roll_dates, roll<span class="sc">$</span>term_spread_10y_3m, <span class="at">type =</span> <span class="st">"l"</span>,</span>
+<span id="cb54-219"><a href="#cb54-219" aria-hidden="true" tabindex="-1"></a>     <span class="at">main =</span> <span class="st">"Rolling Coefficient: Term Spread"</span>,</span>
+<span id="cb54-220"><a href="#cb54-220" aria-hidden="true" tabindex="-1"></a>     <span class="at">xlab =</span> <span class="st">"Date"</span>, <span class="at">ylab =</span> <span class="st">"Coefficient"</span>)</span>
+<span id="cb54-221"><a href="#cb54-221" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb54-222"><a href="#cb54-222" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-223"><a href="#cb54-223" aria-hidden="true" tabindex="-1"></a>Rolling coefficients provide a visual way to assess whether the reaction function changes across different periods.</span>
+<span id="cb54-224"><a href="#cb54-224" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-225"><a href="#cb54-225" aria-hidden="true" tabindex="-1"></a><span class="fu">## Breakpoint Analysis</span></span>
+<span id="cb54-226"><a href="#cb54-226" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-229"><a href="#cb54-229" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb54-230"><a href="#cb54-230" aria-hidden="true" tabindex="-1"></a>rq1_formula <span class="ot">&lt;-</span> ff_target <span class="sc">~</span> core_pce_yoy <span class="sc">+</span> UNRATE <span class="sc">+</span></span>
+<span id="cb54-231"><a href="#cb54-231" aria-hidden="true" tabindex="-1"></a>  term_spread_10y_3m <span class="sc">+</span> BAA10Y <span class="sc">+</span> ANFCI</span>
+<span id="cb54-232"><a href="#cb54-232" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-233"><a href="#cb54-233" aria-hidden="true" tabindex="-1"></a>bp <span class="ot">&lt;-</span> <span class="fu">breakpoints</span>(rq1_formula, <span class="at">data =</span> df_reg_rq1, <span class="at">breaks =</span> BP_MAX_BREAKS)</span>
+<span id="cb54-234"><a href="#cb54-234" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-235"><a href="#cb54-235" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(bp)</span>
+<span id="cb54-236"><a href="#cb54-236" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(bp)</span>
+<span id="cb54-237"><a href="#cb54-237" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb54-238"><a href="#cb54-238" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-241"><a href="#cb54-241" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb54-242"><a href="#cb54-242" aria-hidden="true" tabindex="-1"></a><span class="co"># Number of breaks is a setting (BP_N_BREAKS); the dates come from the fitted</span></span>
+<span id="cb54-243"><a href="#cb54-243" aria-hidden="true" tabindex="-1"></a><span class="co"># model. BIC's own choice is printed for comparison.</span></span>
+<span id="cb54-244"><a href="#cb54-244" aria-hidden="true" tabindex="-1"></a>bic_breaks <span class="ot">&lt;-</span> <span class="fu">length</span>(<span class="fu">breakpoints</span>(bp)<span class="sc">$</span>breakpoints)</span>
+<span id="cb54-245"><a href="#cb54-245" aria-hidden="true" tabindex="-1"></a>bic_breaks</span>
+<span id="cb54-246"><a href="#cb54-246" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-247"><a href="#cb54-247" aria-hidden="true" tabindex="-1"></a>bp_rows  <span class="ot">&lt;-</span> <span class="fu">breakpoints</span>(bp, <span class="at">breaks =</span> BP_N_BREAKS)<span class="sc">$</span>breakpoints</span>
+<span id="cb54-248"><a href="#cb54-248" aria-hidden="true" tabindex="-1"></a>n_breaks <span class="ot">&lt;-</span> <span class="fu">length</span>(bp_rows)</span>
+<span id="cb54-249"><a href="#cb54-249" aria-hidden="true" tabindex="-1"></a>bp_dates <span class="ot">&lt;-</span> df_reg_rq1<span class="sc">$</span>date[bp_rows]</span>
+<span id="cb54-250"><a href="#cb54-250" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-251"><a href="#cb54-251" aria-hidden="true" tabindex="-1"></a>n_breaks</span>
+<span id="cb54-252"><a href="#cb54-252" aria-hidden="true" tabindex="-1"></a>bp_dates</span>
+<span id="cb54-253"><a href="#cb54-253" aria-hidden="true" tabindex="-1"></a><span class="fu">confint</span>(bp, <span class="at">breaks =</span> n_breaks)</span>
+<span id="cb54-254"><a href="#cb54-254" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb54-255"><a href="#cb54-255" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-258"><a href="#cb54-258" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb54-259"><a href="#cb54-259" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(df_reg_rq1<span class="sc">$</span>date, df_reg_rq1<span class="sc">$</span>ff_target, <span class="at">type =</span> <span class="st">"l"</span>)</span>
+<span id="cb54-260"><a href="#cb54-260" aria-hidden="true" tabindex="-1"></a><span class="fu">abline</span>(<span class="at">v =</span> bp_dates, <span class="at">col =</span> <span class="st">"red"</span>)</span>
+<span id="cb54-261"><a href="#cb54-261" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb54-262"><a href="#cb54-262" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-263"><a href="#cb54-263" aria-hidden="true" tabindex="-1"></a>The analysis uses <span class="in">`r n_breaks`</span> breaks, estimated at <span class="in">`r paste(format(bp_dates, "%b %Y"), collapse = ", ")`</span>. BIC alone would pick <span class="in">`r bic_breaks`</span>, the most the test allows; with trending variables and serially correlated errors BIC tends to over-select breaks, so the number of breaks is kept as an explicit choice.</span>
+<span id="cb54-264"><a href="#cb54-264" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-265"><a href="#cb54-265" aria-hidden="true" tabindex="-1"></a><span class="fu">## Chow Tests</span></span>
+<span id="cb54-266"><a href="#cb54-266" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-269"><a href="#cb54-269" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb54-270"><a href="#cb54-270" aria-hidden="true" tabindex="-1"></a>chow_dates <span class="ot">&lt;-</span> <span class="fu">sort</span>(<span class="fu">unique</span>(<span class="fu">c</span>(CHOW_EVENT_DATES, bp_dates)))</span>
+<span id="cb54-271"><a href="#cb54-271" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-272"><a href="#cb54-272" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (d <span class="cf">in</span> <span class="fu">as.list</span>(chow_dates)) {</span>
+<span id="cb54-273"><a href="#cb54-273" aria-hidden="true" tabindex="-1"></a>  idx <span class="ot">&lt;-</span> <span class="fu">which</span>(df_reg_rq1<span class="sc">$</span>date <span class="sc">==</span> d)</span>
+<span id="cb54-274"><a href="#cb54-274" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="fu">length</span>(idx) <span class="sc">&gt;</span> <span class="dv">0</span>) {</span>
+<span id="cb54-275"><a href="#cb54-275" aria-hidden="true" tabindex="-1"></a>    test <span class="ot">&lt;-</span> <span class="fu">sctest</span>(rq1_formula, <span class="at">type =</span> <span class="st">"Chow"</span>, <span class="at">point =</span> idx, <span class="at">data =</span> df_reg_rq1)</span>
+<span id="cb54-276"><a href="#cb54-276" aria-hidden="true" tabindex="-1"></a>    <span class="fu">cat</span>(<span class="st">"Date:"</span>, <span class="fu">format</span>(d),</span>
+<span id="cb54-277"><a href="#cb54-277" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> (d <span class="sc">%in%</span> bp_dates) <span class="st">"(estimated break)"</span> <span class="cf">else</span> <span class="st">"(event)"</span>,</span>
+<span id="cb54-278"><a href="#cb54-278" aria-hidden="true" tabindex="-1"></a>        <span class="st">"| F ="</span>, <span class="fu">round</span>(test<span class="sc">$</span>statistic, <span class="dv">2</span>),</span>
+<span id="cb54-279"><a href="#cb54-279" aria-hidden="true" tabindex="-1"></a>        <span class="st">"| p-value ="</span>, <span class="fu">format</span>(test<span class="sc">$</span>p.value, <span class="at">scientific =</span> <span class="cn">TRUE</span>), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb54-280"><a href="#cb54-280" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb54-281"><a href="#cb54-281" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb54-282"><a href="#cb54-282" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb54-283"><a href="#cb54-283" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-284"><a href="#cb54-284" aria-hidden="true" tabindex="-1"></a>The Chow tests evaluate whether the regression relationship shifts at both estimated and theory-motivated break dates.</span>
+<span id="cb54-285"><a href="#cb54-285" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-286"><a href="#cb54-286" aria-hidden="true" tabindex="-1"></a><span class="fu">## Sub-Period Regressions</span></span>
+<span id="cb54-287"><a href="#cb54-287" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-290"><a href="#cb54-290" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb54-291"><a href="#cb54-291" aria-hidden="true" tabindex="-1"></a><span class="co"># Sub-periods run between the estimated break dates.</span></span>
+<span id="cb54-292"><a href="#cb54-292" aria-hidden="true" tabindex="-1"></a>period_starts <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fu">min</span>(df_reg_rq1<span class="sc">$</span>date), bp_dates)</span>
+<span id="cb54-293"><a href="#cb54-293" aria-hidden="true" tabindex="-1"></a>period_ends   <span class="ot">&lt;-</span> <span class="fu">c</span>(bp_dates, <span class="fu">max</span>(df_reg_rq1<span class="sc">$</span>date) <span class="sc">+</span> <span class="dv">1</span>)</span>
+<span id="cb54-294"><a href="#cb54-294" aria-hidden="true" tabindex="-1"></a>period_labels <span class="ot">&lt;-</span> <span class="fu">paste0</span>(<span class="fu">format</span>(period_starts, <span class="st">"%Y"</span>), <span class="st">"-"</span>, <span class="fu">format</span>(period_ends <span class="sc">-</span> <span class="dv">1</span>, <span class="st">"%Y"</span>))</span>
+<span id="cb54-295"><a href="#cb54-295" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-296"><a href="#cb54-296" aria-hidden="true" tabindex="-1"></a>df_reg_rq1<span class="sc">$</span>period <span class="ot">&lt;-</span> <span class="fu">cut</span>(</span>
+<span id="cb54-297"><a href="#cb54-297" aria-hidden="true" tabindex="-1"></a>  df_reg_rq1<span class="sc">$</span>date,</span>
+<span id="cb54-298"><a href="#cb54-298" aria-hidden="true" tabindex="-1"></a>  <span class="at">breaks =</span> <span class="fu">c</span>(period_starts, <span class="fu">max</span>(df_reg_rq1<span class="sc">$</span>date) <span class="sc">+</span> <span class="dv">1</span>),</span>
+<span id="cb54-299"><a href="#cb54-299" aria-hidden="true" tabindex="-1"></a>  <span class="at">labels =</span> period_labels,</span>
+<span id="cb54-300"><a href="#cb54-300" aria-hidden="true" tabindex="-1"></a>  <span class="at">right =</span> <span class="cn">FALSE</span></span>
+<span id="cb54-301"><a href="#cb54-301" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb54-302"><a href="#cb54-302" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-303"><a href="#cb54-303" aria-hidden="true" tabindex="-1"></a>models <span class="ot">&lt;-</span> <span class="fu">lapply</span>(period_labels, <span class="cf">function</span>(p) {</span>
+<span id="cb54-304"><a href="#cb54-304" aria-hidden="true" tabindex="-1"></a>  <span class="fu">lm</span>(rq1_formula, <span class="at">data =</span> <span class="fu">subset</span>(df_reg_rq1, period <span class="sc">==</span> p))</span>
+<span id="cb54-305"><a href="#cb54-305" aria-hidden="true" tabindex="-1"></a>})</span>
+<span id="cb54-306"><a href="#cb54-306" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(models) <span class="ot">&lt;-</span> period_labels</span>
+<span id="cb54-307"><a href="#cb54-307" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-308"><a href="#cb54-308" aria-hidden="true" tabindex="-1"></a><span class="fu">lapply</span>(models, summary)</span>
+<span id="cb54-309"><a href="#cb54-309" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb54-310"><a href="#cb54-310" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-313"><a href="#cb54-313" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb54-314"><a href="#cb54-314" aria-hidden="true" tabindex="-1"></a>coef_table <span class="ot">&lt;-</span> <span class="fu">do.call</span>(rbind, <span class="fu">lapply</span>(models, coef))</span>
+<span id="cb54-315"><a href="#cb54-315" aria-hidden="true" tabindex="-1"></a>coef_table</span>
+<span id="cb54-316"><a href="#cb54-316" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb54-317"><a href="#cb54-317" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-320"><a href="#cb54-320" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb54-321"><a href="#cb54-321" aria-hidden="true" tabindex="-1"></a>coef_table <span class="ot">&lt;-</span> <span class="fu">do.call</span>(rbind, <span class="fu">lapply</span>(<span class="fu">names</span>(models), <span class="cf">function</span>(p) {</span>
+<span id="cb54-322"><a href="#cb54-322" aria-hidden="true" tabindex="-1"></a>  df <span class="ot">&lt;-</span> <span class="fu">tidy</span>(models[[p]])</span>
+<span id="cb54-323"><a href="#cb54-323" aria-hidden="true" tabindex="-1"></a>  df<span class="sc">$</span>period <span class="ot">&lt;-</span> p</span>
+<span id="cb54-324"><a href="#cb54-324" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(df)</span>
+<span id="cb54-325"><a href="#cb54-325" aria-hidden="true" tabindex="-1"></a>}))</span>
+<span id="cb54-326"><a href="#cb54-326" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-327"><a href="#cb54-327" aria-hidden="true" tabindex="-1"></a>coef_table</span>
+<span id="cb54-328"><a href="#cb54-328" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb54-329"><a href="#cb54-329" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-332"><a href="#cb54-332" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb54-333"><a href="#cb54-333" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(coef_table[coef_table<span class="sc">$</span>term <span class="sc">!=</span> <span class="st">"(Intercept)"</span>, ],</span>
+<span id="cb54-334"><a href="#cb54-334" aria-hidden="true" tabindex="-1"></a>       <span class="fu">aes</span>(<span class="at">x =</span> period, <span class="at">y =</span> estimate, <span class="at">color =</span> term, <span class="at">group =</span> term)) <span class="sc">+</span></span>
+<span id="cb54-335"><a href="#cb54-335" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>() <span class="sc">+</span></span>
+<span id="cb54-336"><a href="#cb54-336" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>()</span>
+<span id="cb54-337"><a href="#cb54-337" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb54-338"><a href="#cb54-338" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-339"><a href="#cb54-339" aria-hidden="true" tabindex="-1"></a>Sub-period regressions make it easier to interpret how the policy rule differs across historical regimes.</span>
+</code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
+</div></div></div></div></div>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+      &nbsp;
+    </div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    <div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/inukbaik/fomc-policy-modeling/blob/main/rule.qmd" class="toc-action"><i class="bi bi-github"></i>View source</a></li></ul></div></div>
+    <div class="nav-footer-right">
+<p>Built with R and Quarto. Data: FRED and the Federal Reserve.</p>
+</div>
+  </div>
+</footer>
+
+
+
+
+</body></html>

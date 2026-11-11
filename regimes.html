@@ -1,0 +1,2050 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.11.9">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>The Regimes: Grouping Macro Conditions (RQ2) – FOMC Policy Modeling</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<script src="site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/scrollable-regions/scrollable-regions.js" type="module"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-63b5708e65d6cd79cd7618c58d0c21e7.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-dark-447e42e69aaa9833c0ba1b986f430b20.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-63b5708e65d6cd79cd7618c58d0c21e7.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-d31a0c91b01e363be7b7a36e602e2c70.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-dark-c1afb647e6504aed1ecd096a1ed45b6d.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="site_libs/bootstrap/bootstrap-d31a0c91b01e363be7b7a36e602e2c70.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+
+</head>
+
+<body class="nav-fixed quarto-light"><a id="quarto-skip-link" class="visually-hidden-focusable" href="#quarto-document-content">Skip to main content</a><script id="quarto-html-before-body" type="application/javascript">
+    const toggleBodyColorMode = (bsSheetEl) => {
+      const mode = bsSheetEl.getAttribute("data-mode");
+      const bodyEl = window.document.querySelector("body");
+      if (mode === "dark") {
+        bodyEl.classList.add("quarto-dark");
+        bodyEl.classList.remove("quarto-light");
+      } else {
+        bodyEl.classList.add("quarto-light");
+        bodyEl.classList.remove("quarto-dark");
+      }
+    }
+    const toggleBodyColorPrimary = () => {
+      const bsSheetEl = window.document.querySelector("link#quarto-bootstrap:not([rel=disabled-stylesheet])");
+      if (bsSheetEl) {
+        toggleBodyColorMode(bsSheetEl);
+      }
+    }
+    const setColorSchemeToggle = (alternate) => {
+      const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+      for (let i=0; i < toggles.length; i++) {
+        const toggle = toggles[i];
+        if (toggle) {
+          toggle.setAttribute("aria-checked", alternate ? "true" : "false");
+          if (alternate) {
+            toggle.classList.add("alternate");
+          } else {
+            toggle.classList.remove("alternate");
+          }
+        }
+      }
+    };
+    const toggleColorMode = (alternate) => {
+      // Switch the stylesheets
+      const primaryStylesheets = window.document.querySelectorAll('link.quarto-color-scheme:not(.quarto-color-alternate)');
+      const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+      manageTransitions('#quarto-margin-sidebar .nav-link', false);
+      if (alternate) {
+        // note: dark is layered on light, we don't disable primary!
+        enableStylesheet(alternateStylesheets);
+        for (const sheetNode of alternateStylesheets) {
+          if (sheetNode.id === "quarto-bootstrap") {
+            toggleBodyColorMode(sheetNode);
+          }
+        }
+      } else {
+        disableStylesheet(alternateStylesheets);
+        enableStylesheet(primaryStylesheets)
+        toggleBodyColorPrimary();
+      }
+      manageTransitions('#quarto-margin-sidebar .nav-link', true);
+      // Switch the toggles
+      setColorSchemeToggle(alternate)
+    }
+    // Hack to workaround the fact that safari doesn't
+    // properly recolor the scrollbar when toggling (#1455).
+    // Not run on load: stylesheets are set before first paint there, and
+    // scrolling would undo the scroll to a URL fragment (#14973).
+    // The one pixel nudge keeps the reader where they were.
+    const refreshSafariScrollbar = () => {
+      if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+        manageTransitions("body", false);
+        const scrollY = window.scrollY;
+        window.scrollTo(0, scrollY > 0 ? scrollY - 1 : 1);
+        setTimeout(() => {
+          window.scrollTo(0, scrollY);
+          manageTransitions("body", true);
+        }, 40);
+      }
+    }
+    const disableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        stylesheet.rel = 'disabled-stylesheet';
+      }
+    }
+    const enableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        if(stylesheet.rel !== 'stylesheet') { // for Chrome, which will still FOUC without this check
+          stylesheet.rel = 'stylesheet';
+        }
+      }
+    }
+    const manageTransitions = (selector, allowTransitions) => {
+      const els = window.document.querySelectorAll(selector);
+      for (let i=0; i < els.length; i++) {
+        const el = els[i];
+        if (allowTransitions) {
+          el.classList.remove('notransition');
+        } else {
+          el.classList.add('notransition');
+        }
+      }
+    }
+    const isFileUrl = () => {
+      return window.location.protocol === 'file:';
+    }
+    const hasAlternateSentinel = () => {
+      let styleSentinel = getColorSchemeSentinel();
+      if (styleSentinel !== null) {
+        return styleSentinel === "alternate";
+      } else {
+        return false;
+      }
+    }
+    const setStyleSentinel = (alternate) => {
+      const value = alternate ? "alternate" : "default";
+      if (!isFileUrl()) {
+        window.localStorage.setItem("quarto-color-scheme", value);
+      } else {
+        localAlternateSentinel = value;
+      }
+    }
+    const getColorSchemeSentinel = () => {
+      if (!isFileUrl()) {
+        const storageValue = window.localStorage.getItem("quarto-color-scheme");
+        return storageValue != null ? storageValue : localAlternateSentinel;
+      } else {
+        return localAlternateSentinel;
+      }
+    }
+    const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+      const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+      const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+      let newTheme = '';
+      if(authorPrefersDark) {
+        newTheme = isAlternate ? baseTheme : alternateTheme;
+      } else {
+        newTheme = isAlternate ? alternateTheme : baseTheme;
+      }
+      const changeGiscusTheme = () => {
+        // From: https://github.com/giscus/giscus/issues/336
+        const sendMessage = (message) => {
+          const iframe = document.querySelector('iframe.giscus-frame');
+          if (!iframe) return;
+          iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+        }
+        sendMessage({
+          setConfig: {
+            theme: newTheme
+          }
+        });
+      }
+      const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+      if (isGiscussLoaded) {
+        changeGiscusTheme();
+      }
+    };
+    const authorPrefersDark = false;
+    const darkModeDefault = authorPrefersDark;
+      document.querySelector('link#quarto-text-highlighting-styles.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+      document.querySelector('link#quarto-bootstrap.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+    let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+    // Dark / light mode switch
+    window.quartoToggleColorScheme = () => {
+      // Read the current dark / light value
+      let toAlternate = !hasAlternateSentinel();
+      toggleColorMode(toAlternate);
+      refreshSafariScrollbar();
+      setStyleSentinel(toAlternate);
+      toggleGiscusIfUsed(toAlternate, darkModeDefault);
+      window.dispatchEvent(new Event('resize'));
+    };
+    // Switch to dark mode if need be
+    if (hasAlternateSentinel()) {
+      toggleColorMode(true);
+    } else {
+      toggleColorMode(false);
+    }
+  </script>
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark" aria-label="Site">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="./index.html">
+    <span class="navbar-title">FOMC Policy Modeling</span>
+    </a>
+  </div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="./index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./data.html"> 
+<span class="menu-text">The data</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./rule.html"> 
+<span class="menu-text">The rule</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link active" href="./regimes.html" aria-current="page"> 
+<span class="menu-text">The regimes</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./prediction.html"> 
+<span class="menu-text">The prediction</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./changes.html"> 
+<span class="menu-text">What changed</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/inukbaik/fomc-policy-modeling"> <i class="bi bi-github" role="img" aria-label="GitHub repository">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+  <button type="button" role="switch" aria-checked="false" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode" aria-label="Toggle dark mode"><i class="bi"></i></button>
+</div>
+            <div id="quarto-search" class="" title="Search"></div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" aria-labelledby="toc-title" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#data-preparation" id="toc-data-preparation" class="nav-link active" data-scroll-target="#data-preparation">Data Preparation</a></li>
+  <li><a href="#event-sensitive-feature-construction" id="toc-event-sensitive-feature-construction" class="nav-link" data-scroll-target="#event-sensitive-feature-construction">Event-Sensitive Feature Construction</a></li>
+  <li><a href="#missingness-screening" id="toc-missingness-screening" class="nav-link" data-scroll-target="#missingness-screening">Missingness Screening</a></li>
+  <li><a href="#variable-selection-for-clustering" id="toc-variable-selection-for-clustering" class="nav-link" data-scroll-target="#variable-selection-for-clustering">Variable Selection for Clustering</a></li>
+  <li><a href="#correlation-check-on-final-clustering-inputs" id="toc-correlation-check-on-final-clustering-inputs" class="nav-link" data-scroll-target="#correlation-check-on-final-clustering-inputs">Correlation Check on Final Clustering Inputs</a></li>
+  <li><a href="#scaling-and-pca" id="toc-scaling-and-pca" class="nav-link" data-scroll-target="#scaling-and-pca">Scaling and PCA</a></li>
+  <li><a href="#clustering" id="toc-clustering" class="nav-link" data-scroll-target="#clustering">Clustering</a></li>
+  <li><a href="#cluster-visualization" id="toc-cluster-visualization" class="nav-link" data-scroll-target="#cluster-visualization">Cluster Visualization</a></li>
+  <li><a href="#regimes-over-time" id="toc-regimes-over-time" class="nav-link" data-scroll-target="#regimes-over-time">Regimes Over Time</a></li>
+  <li><a href="#regimes-and-historical-events" id="toc-regimes-and-historical-events" class="nav-link" data-scroll-target="#regimes-and-historical-events">Regimes and Historical Events</a></li>
+  <li><a href="#regime-duration" id="toc-regime-duration" class="nav-link" data-scroll-target="#regime-duration">Regime Duration</a></li>
+  <li><a href="#cluster-profiles" id="toc-cluster-profiles" class="nav-link" data-scroll-target="#cluster-profiles">Cluster Profiles</a></li>
+  <li><a href="#extra-variable-summary" id="toc-extra-variable-summary" class="nav-link" data-scroll-target="#extra-variable-summary">Extra Variable Summary</a></li>
+  <li><a href="#event-window-summary" id="toc-event-window-summary" class="nav-link" data-scroll-target="#event-window-summary">Event Window Summary</a></li>
+  </ul>
+<div class="toc-actions"><ul><li><a href="https://github.com/inukbaik/fomc-policy-modeling/blob/main/regimes.qmd" class="toc-action"><i class="bi bi-github"></i>View source</a></li></ul></div></nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content" tabindex="-1">
+
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<div class="quarto-title-block"><div><h1 class="title">The Regimes: Grouping Macro Conditions (RQ2)</h1><button type="button" class="btn code-tools-button dropdown-toggle" id="quarto-code-tools-menu" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi"></i> Code</button><ul class="dropdown-menu dropdown-menu-end" aria-labelelledby="quarto-code-tools-menu"><li><a id="quarto-show-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Show All Code</a></li><li><a id="quarto-hide-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Hide All Code</a></li><li><hr class="dropdown-divider"></li><li><a id="quarto-view-source" class="dropdown-item" href="javascript:void(0)" role="button">View Source</a></li></ul></div></div>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Original course-project chapter
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>This chapter is the course-project team’s original analysis, written by teammates and kept as submitted. The only changes are shared data fixes and small cleanups (computed instead of hardcoded dates, clearer names); the methods were not revised for this portfolio. Known limitations:</p>
+<ul>
+<li><strong>Trending inputs.</strong> Several clustering inputs are levels that trend over decades (the core PCE price index, nominal oil prices, housing starts, the target itself). They can dominate the principal components, so clusters may separate eras rather than economic conditions.</li>
+<li><strong>Weak cluster structure.</strong> Average silhouette widths are low and similar for every k tried (see below), so the number of clusters is a fixed setting rather than something the data chooses.</li>
+<li><strong>No stability check.</strong> Clusters are not re-checked across random starts, sub-periods or alternative variable sets.</li>
+<li><strong>Fitted on the full sample.</strong> Each month’s regime label uses data from later years, which is fine for describing history but means the labels cannot be used as a predictor without refitting on past data only.</li>
+</ul>
+</div>
+</div>
+<section id="data-preparation" class="level2">
+<h2 class="anchored" data-anchor-id="data-preparation">Data Preparation</h2>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>data_rq2 <span class="ot">&lt;-</span> df_final <span class="sc">%&gt;%</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(date)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>data_rq2<span class="sc">$</span>policy_change <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(data_rq2<span class="sc">$</span>policy_change)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<p>The dataset is sorted in chronological order so the clustering results can later be interpreted as evolving regimes rather than disconnected groups.</p>
+</section>
+<section id="event-sensitive-feature-construction" class="level2">
+<h2 class="anchored" data-anchor-id="event-sensitive-feature-construction">Event-Sensitive Feature Construction</h2>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>data_rq2<span class="sc">$</span>ff_change_1m     <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="cn">NA</span>, <span class="fu">diff</span>(data_rq2<span class="sc">$</span>ff_target))</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>data_rq2<span class="sc">$</span>unrate_change_1m <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="cn">NA</span>, <span class="fu">diff</span>(data_rq2<span class="sc">$</span>UNRATE))</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>data_rq2<span class="sc">$</span>oil_change_1m    <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="cn">NA</span>, <span class="fu">diff</span>(data_rq2<span class="sc">$</span>WTISPLC))</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>data_rq2<span class="sc">$</span>house_change_1m  <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="cn">NA</span>, <span class="fu">diff</span>(data_rq2<span class="sc">$</span>HOUST))</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>data_rq2<span class="sc">$</span>credit_change_1m <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="cn">NA</span>, <span class="fu">diff</span>(data_rq2<span class="sc">$</span>BAA10Y))</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>data_rq2<span class="sc">$</span>fci_change_1m    <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="cn">NA</span>, <span class="fu">diff</span>(data_rq2<span class="sc">$</span>ANFCI))</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>data_rq2<span class="sc">$</span>infl_change_1m   <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="cn">NA</span>, <span class="fu">diff</span>(data_rq2<span class="sc">$</span>core_pce_yoy))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<p>Monthly changes were added so the clustering can reflect both the level of macroeconomic conditions and how quickly those conditions are shifting.</p>
+</section>
+<section id="missingness-screening" class="level2">
+<h2 class="anchored" data-anchor-id="missingness-screening">Missingness Screening</h2>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>num_data <span class="ot">&lt;-</span> data_rq2[, <span class="fu">setdiff</span>(<span class="fu">names</span>(data_rq2), <span class="st">"date"</span>)]</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>num_data <span class="ot">&lt;-</span> num_data[, <span class="fu">sapply</span>(num_data, is.numeric)]</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>na_share <span class="ot">&lt;-</span> <span class="fu">colMeans</span>(<span class="fu">is.na</span>(num_data))</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>na_share</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>           ff_target        policy_change                PCEPI 
+          0.00000000           0.00000000           0.00000000 
+            PCEPILFE                 MICH               UNRATE 
+          0.00000000           0.00000000           0.00000000 
+              PAYEMS               JTSJOL               JTSQUR 
+          0.00000000           0.36605317           0.36605317 
+              INDPRO                HOUST                RRSFS 
+          0.00000000           0.00000000           0.14723926 
+             WTISPLC                T5YIE               DGS3MO 
+          0.00000000           0.41717791           0.00000000 
+                DGS2                DGS10               T10Y3M 
+          0.00000000           0.00000000           0.00000000 
+              BAA10Y                ANFCI             DTWEXBGS 
+          0.00000000           0.00000000           0.49079755 
+        core_pce_yoy          unrate_lag1           payems_yoy 
+          0.00000000           0.00000000           0.00000000 
+  term_spread_10y_3m        inflation_gap        fomc_meetings 
+          0.00000000           0.00000000           0.00000000 
+      fomc_scheduled     fomc_unscheduled days_since_last_fomc 
+          0.00000000           0.00000000           0.00000000 
+        ff_change_1m     unrate_change_1m        oil_change_1m 
+          0.00204499           0.00204499           0.00204499 
+     house_change_1m     credit_change_1m        fci_change_1m 
+          0.00204499           0.00204499           0.00204499 
+      infl_change_1m 
+          0.00204499 </code></pre>
+</div>
+</div>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>num_data <span class="ot">&lt;-</span> num_data[, na_share <span class="sc">&lt;=</span> <span class="fl">0.20</span>]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<p>Variables with more than 20% missingness were excluded from the initial numeric screening step to keep the clustering input reasonably complete.</p>
+</section>
+<section id="variable-selection-for-clustering" class="level2">
+<h2 class="anchored" data-anchor-id="variable-selection-for-clustering">Variable Selection for Clustering</h2>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>cluster_vars_model <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="st">"ff_target"</span>,</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="st">"PCEPILFE"</span>,</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  <span class="st">"MICH"</span>,</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>  <span class="st">"UNRATE"</span>,</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>  <span class="st">"HOUST"</span>,</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>  <span class="st">"T10Y3M"</span>,</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>  <span class="st">"BAA10Y"</span>,</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>  <span class="st">"ANFCI"</span>,</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>  <span class="st">"WTISPLC"</span>,</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>  <span class="st">"core_pce_yoy"</span>,</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>  <span class="st">"payems_yoy"</span>,</span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>  <span class="st">"ff_change_1m"</span>,</span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>  <span class="st">"unrate_change_1m"</span>,</span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>  <span class="st">"oil_change_1m"</span>,</span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>  <span class="st">"credit_change_1m"</span>,</span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>  <span class="st">"fci_change_1m"</span>,</span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>  <span class="st">"infl_change_1m"</span></span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>cluster_vars_extra <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>  <span class="st">"policy_change"</span>,</span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a>  <span class="st">"fomc_meetings"</span>,</span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a>  <span class="st">"fomc_scheduled"</span>,</span>
+<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a>  <span class="st">"fomc_unscheduled"</span>,</span>
+<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a>  <span class="st">"days_since_last_fomc"</span></span>
+<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a>cluster_vars_model <span class="ot">&lt;-</span> <span class="fu">intersect</span>(cluster_vars_model, <span class="fu">names</span>(data_rq2))</span>
+<span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a>cluster_vars_extra <span class="ot">&lt;-</span> <span class="fu">intersect</span>(cluster_vars_extra, <span class="fu">names</span>(data_rq2))</span>
+<span id="cb6-31"><a href="#cb6-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-32"><a href="#cb6-32" aria-hidden="true" tabindex="-1"></a>cluster_df <span class="ot">&lt;-</span> data_rq2[, <span class="fu">c</span>(<span class="st">"date"</span>, cluster_vars_model, cluster_vars_extra)]</span>
+<span id="cb6-33"><a href="#cb6-33" aria-hidden="true" tabindex="-1"></a>cluster_df <span class="ot">&lt;-</span> <span class="fu">na.omit</span>(cluster_df)</span>
+<span id="cb6-34"><a href="#cb6-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-35"><a href="#cb6-35" aria-hidden="true" tabindex="-1"></a>cluster_x <span class="ot">&lt;-</span> cluster_df[, cluster_vars_model]</span>
+<span id="cb6-36"><a href="#cb6-36" aria-hidden="true" tabindex="-1"></a>cluster_x_extra <span class="ot">&lt;-</span> cluster_df[, cluster_vars_extra]</span>
+<span id="cb6-37"><a href="#cb6-37" aria-hidden="true" tabindex="-1"></a>dates <span class="ot">&lt;-</span> cluster_df<span class="sc">$</span>date</span>
+<span id="cb6-38"><a href="#cb6-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-39"><a href="#cb6-39" aria-hidden="true" tabindex="-1"></a><span class="fu">nrow</span>(cluster_x)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 488</code></pre>
+</div>
+</div>
+<p>The model variables are used for clustering itself, while the extra variables are kept for later interpretation of the resulting regimes.</p>
+</section>
+<section id="correlation-check-on-final-clustering-inputs" class="level2">
+<h2 class="anchored" data-anchor-id="correlation-check-on-final-clustering-inputs">Correlation Check on Final Clustering Inputs</h2>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>cor_mat2 <span class="ot">&lt;-</span> <span class="fu">cor</span>(cluster_x)</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="fu">corrplot</span>(cor_mat2, <span class="at">method =</span> <span class="st">"color"</span>, <span class="at">tl.cex =</span> <span class="fl">0.6</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="regimes_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid figure-img" width="768"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>remove_auto <span class="ot">&lt;-</span> <span class="fu">findCorrelation</span>(cor_mat2, <span class="at">cutoff =</span> <span class="fl">0.9</span>, <span class="at">names =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Variables removed due to high correlation:</span><span class="sc">\n</span><span class="st">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>Variables removed due to high correlation:</code></pre>
+</div>
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(remove_auto)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>character(0)</code></pre>
+</div>
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>cluster_x2 <span class="ot">&lt;-</span> cluster_x[, <span class="sc">!</span><span class="fu">names</span>(cluster_x) <span class="sc">%in%</span> remove_auto]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+</section>
+<section id="scaling-and-pca" class="level2">
+<h2 class="anchored" data-anchor-id="scaling-and-pca">Scaling and PCA</h2>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>cluster_scaled <span class="ot">&lt;-</span> <span class="fu">scale</span>(cluster_x2)</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>pca <span class="ot">&lt;-</span> <span class="fu">prcomp</span>(cluster_scaled)</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(pca)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>Importance of components:
+                          PC1    PC2    PC3     PC4     PC5     PC6     PC7
+Standard deviation     1.9366 1.5715 1.4653 1.23129 1.16235 0.99696 0.92800
+Proportion of Variance 0.2206 0.1453 0.1263 0.08918 0.07947 0.05847 0.05066
+Cumulative Proportion  0.2206 0.3659 0.4922 0.58135 0.66083 0.71929 0.76995
+                          PC8     PC9    PC10    PC11   PC12    PC13    PC14
+Standard deviation     0.8977 0.86100 0.76652 0.75275 0.6253 0.52941 0.47606
+Proportion of Variance 0.0474 0.04361 0.03456 0.03333 0.0230 0.01649 0.01333
+Cumulative Proportion  0.8174 0.86096 0.89553 0.92886 0.9518 0.96834 0.98167
+                          PC15    PC16    PC17
+Standard deviation     0.41871 0.30242 0.21170
+Proportion of Variance 0.01031 0.00538 0.00264
+Cumulative Proportion  0.99198 0.99736 1.00000</code></pre>
+</div>
+</div>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(pca, <span class="at">type =</span> <span class="st">"l"</span>, <span class="at">main =</span> <span class="st">"Scree Plot"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="regimes_files/figure-html/unnamed-chunk-10-1.png" class="img-fluid figure-img" width="768"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>cum_var <span class="ot">&lt;-</span> <span class="fu">cumsum</span>(pca<span class="sc">$</span>sdev<span class="sc">^</span><span class="dv">2</span> <span class="sc">/</span> <span class="fu">sum</span>(pca<span class="sc">$</span>sdev<span class="sc">^</span><span class="dv">2</span>))</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>cum_var</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code> [1] 0.2206063 0.3658730 0.4921730 0.5813541 0.6608274 0.7192934 0.7699517
+ [8] 0.8173561 0.8609630 0.8955252 0.9288561 0.9518530 0.9683399 0.9816713
+[15] 0.9919840 0.9973638 1.0000000</code></pre>
+</div>
+</div>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>n_pc <span class="ot">&lt;-</span> <span class="fu">which</span>(cum_var <span class="sc">&gt;=</span> <span class="fl">0.80</span>)[<span class="dv">1</span>]</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Number of PCs explaining at least 80% variance:"</span>, n_pc, <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>Number of PCs explaining at least 80% variance: 8 </code></pre>
+</div>
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>pc_scores <span class="ot">&lt;-</span> pca<span class="sc">$</span>x[, <span class="dv">1</span><span class="sc">:</span>n_pc, drop <span class="ot">=</span> <span class="cn">FALSE</span>]</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(pc_scores)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>            PC1      PC2         PC3         PC4         PC5         PC6
+[1,] -1.0259517 3.211953  0.67649946 -0.59071783  0.70255590 -1.48349683
+[2,] -0.6338084 3.559604  1.05020233 -0.01915887 -0.03732054  0.86334853
+[3,] -0.8350464 2.968623  0.07028865 -0.49580835 -0.29027309  1.10050453
+[4,] -0.5377608 2.769252 -0.89789935 -1.10964381  1.19891188  0.04259556
+[5,] -1.0996290 2.517992  0.16423705 -0.82477412 -0.83431362 -0.31970448
+[6,] -0.3892024 3.258946  1.31639438 -0.37457074 -0.28944675  0.90387550
+             PC7         PC8
+[1,]  0.87630751 -0.85137467
+[2,] -0.60581277 -1.09859599
+[3,] -0.60700865 -0.40404457
+[4,] -0.04855582 -0.01783271
+[5,]  0.18925050  1.00332560
+[6,]  0.06439124 -0.69309440</code></pre>
+</div>
+</div>
+<p>PCA is used to reduce dimensionality while retaining most of the variation in the clustering inputs.</p>
+</section>
+<section id="clustering" class="level2">
+<h2 class="anchored" data-anchor-id="clustering">Clustering</h2>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">fviz_nbclust</span>(pc_scores, kmeans, <span class="at">method =</span> <span class="st">"wss"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="regimes_files/figure-html/unnamed-chunk-13-1.png" class="img-fluid figure-img" width="768"></p>
+</figure>
+</div>
+</div>
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">fviz_nbclust</span>(pc_scores, kmeans, <span class="at">method =</span> <span class="st">"silhouette"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="regimes_files/figure-html/unnamed-chunk-13-2.png" class="img-fluid figure-img" width="768"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Silhouette diagnostics over K_RANGE; k itself is a setting (K_CLUSTERS).</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>dist_pc <span class="ot">&lt;-</span> <span class="fu">dist</span>(pc_scores)</span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>avg_sil <span class="ot">&lt;-</span> <span class="fu">sapply</span>(K_RANGE, <span class="cf">function</span>(kk) {</span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>  fit <span class="ot">&lt;-</span> <span class="fu">kmeans</span>(pc_scores, <span class="at">centers =</span> kk, <span class="at">nstart =</span> <span class="dv">50</span>)</span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mean</span>(<span class="fu">silhouette</span>(fit<span class="sc">$</span>cluster, dist_pc)[, <span class="st">"sil_width"</span>])</span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a>})</span>
+<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a><span class="fu">data.frame</span>(<span class="at">k =</span> K_RANGE, <span class="at">avg_silhouette =</span> <span class="fu">round</span>(avg_sil, <span class="dv">3</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>  k avg_silhouette
+1 2          0.236
+2 3          0.212
+3 4          0.231
+4 5          0.234
+5 6          0.201
+6 7          0.210
+7 8          0.214</code></pre>
+</div>
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>k <span class="ot">&lt;-</span> K_CLUSTERS</span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>km <span class="ot">&lt;-</span> <span class="fu">kmeans</span>(pc_scores, <span class="at">centers =</span> k, <span class="at">nstart =</span> <span class="dv">100</span>)</span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>result <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">date =</span> dates,</span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">cluster =</span> <span class="fu">factor</span>(km<span class="sc">$</span>cluster),</span>
+<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a>  cluster_x_extra</span>
+<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb27-10"><a href="#cb27-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-11"><a href="#cb27-11" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(result)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>        date cluster policy_change fomc_meetings fomc_scheduled
+1 1986-02-01       3             0             1              1
+2 1986-03-01       3             1             0              0
+3 1986-04-01       3             1             2              1
+4 1986-05-01       3             1             1              1
+5 1986-06-01       3             1             0              0
+6 1986-07-01       3             1             1              1
+  fomc_unscheduled days_since_last_fomc
+1                0                   47
+2                0                   18
+3                1                   49
+4                0                   10
+5                0                   12
+6                0                   42</code></pre>
+</div>
+</div>
+<p>The clustering uses k-means on the retained principal components. The analysis uses k = 3 clusters. Average silhouette widths for k = 2 to 8 are all between 0.20 and 0.24, which indicates weak cluster structure, so k is kept as an explicit choice rather than picked by silhouette.</p>
+</section>
+<section id="cluster-visualization" class="level2">
+<h2 class="anchored" data-anchor-id="cluster-visualization">Cluster Visualization</h2>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>plot_df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">date =</span> dates,</span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">PC1 =</span> pca<span class="sc">$</span>x[, <span class="dv">1</span>],</span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">PC2 =</span> pca<span class="sc">$</span>x[, <span class="dv">2</span>],</span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">cluster =</span> <span class="fu">factor</span>(km<span class="sc">$</span>cluster)</span>
+<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(plot_df, <span class="fu">aes</span>(<span class="at">x =</span> PC1, <span class="at">y =</span> PC2, <span class="at">color =</span> cluster)) <span class="sc">+</span></span>
+<span id="cb29-9"><a href="#cb29-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="dv">2</span>, <span class="at">alpha =</span> <span class="fl">0.7</span>) <span class="sc">+</span></span>
+<span id="cb29-10"><a href="#cb29-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_path</span>(<span class="fu">aes</span>(<span class="at">group =</span> <span class="dv">1</span>), <span class="at">color =</span> <span class="st">"gray70"</span>, <span class="at">alpha =</span> <span class="fl">0.3</span>, <span class="at">linewidth =</span> <span class="fl">0.4</span>) <span class="sc">+</span></span>
+<span id="cb29-11"><a href="#cb29-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb29-12"><a href="#cb29-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb29-13"><a href="#cb29-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Clusters in PCA Space"</span>,</span>
+<span id="cb29-14"><a href="#cb29-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">"Points connected in time order"</span>,</span>
+<span id="cb29-15"><a href="#cb29-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"PC1"</span>,</span>
+<span id="cb29-16"><a href="#cb29-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"PC2"</span></span>
+<span id="cb29-17"><a href="#cb29-17" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="regimes_files/figure-html/unnamed-chunk-15-1.png" class="img-fluid figure-img" width="768"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>pc_time_df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">date =</span> dates,</span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">PC1 =</span> pca<span class="sc">$</span>x[, <span class="dv">1</span>],</span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">cluster =</span> <span class="fu">factor</span>(km<span class="sc">$</span>cluster)</span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(pc_time_df, <span class="fu">aes</span>(<span class="at">x =</span> date, <span class="at">y =</span> PC1, <span class="at">color =</span> cluster)) <span class="sc">+</span></span>
+<span id="cb30-8"><a href="#cb30-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">linewidth =</span> <span class="fl">0.8</span>) <span class="sc">+</span></span>
+<span id="cb30-9"><a href="#cb30-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb30-10"><a href="#cb30-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb30-11"><a href="#cb30-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"PC1 Over Time"</span>,</span>
+<span id="cb30-12"><a href="#cb30-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Date"</span>,</span>
+<span id="cb30-13"><a href="#cb30-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"PC1"</span></span>
+<span id="cb30-14"><a href="#cb30-14" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="regimes_files/figure-html/unnamed-chunk-16-1.png" class="img-fluid figure-img" width="768"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>These plots show both the separation of regimes in reduced-dimensional space and the way regime structure evolves over time.</p>
+</section>
+<section id="regimes-over-time" class="level2">
+<h2 class="anchored" data-anchor-id="regimes-over-time">Regimes Over Time</h2>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(result, <span class="fu">aes</span>(<span class="at">x =</span> date, <span class="at">y =</span> <span class="dv">1</span>, <span class="at">fill =</span> cluster)) <span class="sc">+</span></span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_tile</span>(<span class="at">height =</span> <span class="fl">0.8</span>) <span class="sc">+</span></span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.title.y =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.text.y =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb31-7"><a href="#cb31-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.ticks.y =</span> <span class="fu">element_blank</span>()</span>
+<span id="cb31-8"><a href="#cb31-8" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb31-9"><a href="#cb31-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb31-10"><a href="#cb31-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Economic Regimes Over Time"</span>,</span>
+<span id="cb31-11"><a href="#cb31-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Date"</span>,</span>
+<span id="cb31-12"><a href="#cb31-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">fill =</span> <span class="st">"Cluster"</span></span>
+<span id="cb31-13"><a href="#cb31-13" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="regimes_files/figure-html/unnamed-chunk-17-1.png" class="img-fluid figure-img" width="768"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>This plot gives a compact time-line view of how regime membership changes across the sample.</p>
+</section>
+<section id="regimes-and-historical-events" class="level2">
+<h2 class="anchored" data-anchor-id="regimes-and-historical-events">Regimes and Historical Events</h2>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>event_df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">date =</span> <span class="fu">as.Date</span>(<span class="fu">c</span>(</span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"1990-08-01"</span>,  <span class="co"># Gulf War</span></span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">"2001-09-01"</span>,  <span class="co"># 9/11</span></span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">"2008-09-01"</span>,  <span class="co"># GFC / Lehman</span></span>
+<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">"2020-03-01"</span>,  <span class="co"># COVID shock</span></span>
+<span id="cb32-7"><a href="#cb32-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">"2022-02-01"</span>   <span class="co"># Russia-Ukraine war</span></span>
+<span id="cb32-8"><a href="#cb32-8" aria-hidden="true" tabindex="-1"></a>  )),</span>
+<span id="cb32-9"><a href="#cb32-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">label =</span> <span class="fu">c</span>(</span>
+<span id="cb32-10"><a href="#cb32-10" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Gulf War"</span>,</span>
+<span id="cb32-11"><a href="#cb32-11" aria-hidden="true" tabindex="-1"></a>    <span class="st">"9/11"</span>,</span>
+<span id="cb32-12"><a href="#cb32-12" aria-hidden="true" tabindex="-1"></a>    <span class="st">"GFC"</span>,</span>
+<span id="cb32-13"><a href="#cb32-13" aria-hidden="true" tabindex="-1"></a>    <span class="st">"COVID"</span>,</span>
+<span id="cb32-14"><a href="#cb32-14" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Russia-Ukraine"</span></span>
+<span id="cb32-15"><a href="#cb32-15" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb32-16"><a href="#cb32-16" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb32-17"><a href="#cb32-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-18"><a href="#cb32-18" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(result, <span class="fu">aes</span>(<span class="at">x =</span> date, <span class="at">y =</span> <span class="dv">1</span>, <span class="at">fill =</span> cluster)) <span class="sc">+</span></span>
+<span id="cb32-19"><a href="#cb32-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_tile</span>(<span class="at">height =</span> <span class="fl">0.8</span>) <span class="sc">+</span></span>
+<span id="cb32-20"><a href="#cb32-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(</span>
+<span id="cb32-21"><a href="#cb32-21" aria-hidden="true" tabindex="-1"></a>    <span class="at">data =</span> event_df,</span>
+<span id="cb32-22"><a href="#cb32-22" aria-hidden="true" tabindex="-1"></a>    <span class="fu">aes</span>(<span class="at">xintercept =</span> <span class="fu">as.numeric</span>(date)),</span>
+<span id="cb32-23"><a href="#cb32-23" aria-hidden="true" tabindex="-1"></a>    <span class="at">linetype =</span> <span class="st">"dashed"</span></span>
+<span id="cb32-24"><a href="#cb32-24" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb32-25"><a href="#cb32-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(</span>
+<span id="cb32-26"><a href="#cb32-26" aria-hidden="true" tabindex="-1"></a>    <span class="at">data =</span> event_df,</span>
+<span id="cb32-27"><a href="#cb32-27" aria-hidden="true" tabindex="-1"></a>    <span class="fu">aes</span>(<span class="at">x =</span> date, <span class="at">y =</span> <span class="fl">1.35</span>, <span class="at">label =</span> label),</span>
+<span id="cb32-28"><a href="#cb32-28" aria-hidden="true" tabindex="-1"></a>    <span class="at">angle =</span> <span class="dv">90</span>,</span>
+<span id="cb32-29"><a href="#cb32-29" aria-hidden="true" tabindex="-1"></a>    <span class="at">vjust =</span> <span class="sc">-</span><span class="fl">0.3</span>,</span>
+<span id="cb32-30"><a href="#cb32-30" aria-hidden="true" tabindex="-1"></a>    <span class="at">size =</span> <span class="dv">3</span>,</span>
+<span id="cb32-31"><a href="#cb32-31" aria-hidden="true" tabindex="-1"></a>    <span class="at">inherit.aes =</span> <span class="cn">FALSE</span></span>
+<span id="cb32-32"><a href="#cb32-32" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb32-33"><a href="#cb32-33" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb32-34"><a href="#cb32-34" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb32-35"><a href="#cb32-35" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.title.y =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb32-36"><a href="#cb32-36" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.text.y =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb32-37"><a href="#cb32-37" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.ticks.y =</span> <span class="fu">element_blank</span>()</span>
+<span id="cb32-38"><a href="#cb32-38" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb32-39"><a href="#cb32-39" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb32-40"><a href="#cb32-40" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Economic Regimes with Major Historical Events"</span>,</span>
+<span id="cb32-41"><a href="#cb32-41" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Date"</span>,</span>
+<span id="cb32-42"><a href="#cb32-42" aria-hidden="true" tabindex="-1"></a>    <span class="at">fill =</span> <span class="st">"Cluster"</span></span>
+<span id="cb32-43"><a href="#cb32-43" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="regimes_files/figure-html/unnamed-chunk-18-1.png" class="img-fluid figure-img" width="768"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Major historical events are overlaid on the regime timeline to assess whether regime changes line up with well-known macroeconomic disruptions.</p>
+</section>
+<section id="regime-duration" class="level2">
+<h2 class="anchored" data-anchor-id="regime-duration">Regime Duration</h2>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>result_spell <span class="ot">&lt;-</span> result <span class="sc">%&gt;%</span></span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">change_flag =</span> cluster <span class="sc">!=</span> <span class="fu">lag</span>(cluster, <span class="at">default =</span> <span class="fu">first</span>(cluster)),</span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">spell_id =</span> <span class="fu">cumsum</span>(change_flag)</span>
+<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb33-6"><a href="#cb33-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-7"><a href="#cb33-7" aria-hidden="true" tabindex="-1"></a>spell_summary <span class="ot">&lt;-</span> result_spell <span class="sc">%&gt;%</span></span>
+<span id="cb33-8"><a href="#cb33-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(spell_id, cluster) <span class="sc">%&gt;%</span></span>
+<span id="cb33-9"><a href="#cb33-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb33-10"><a href="#cb33-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">start =</span> <span class="fu">min</span>(date),</span>
+<span id="cb33-11"><a href="#cb33-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">end =</span> <span class="fu">max</span>(date),</span>
+<span id="cb33-12"><a href="#cb33-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">months =</span> <span class="fu">n</span>(),</span>
+<span id="cb33-13"><a href="#cb33-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">.groups =</span> <span class="st">"drop"</span></span>
+<span id="cb33-14"><a href="#cb33-14" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb33-15"><a href="#cb33-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(start)</span>
+<span id="cb33-16"><a href="#cb33-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-17"><a href="#cb33-17" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(spell_summary)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 8 × 5
+  spell_id cluster start      end        months
+     &lt;int&gt; &lt;fct&gt;   &lt;date&gt;     &lt;date&gt;      &lt;int&gt;
+1        0 3       1986-02-01 2001-08-01    187
+2        1 1       2001-09-01 2003-08-01     24
+3        2 3       2003-09-01 2005-05-01     21
+4        3 2       2005-06-01 2007-11-01     30
+5        4 1       2007-12-01 2017-05-01    114
+6        5 2       2017-06-01 2020-02-01     33
+7        6 1       2020-03-01 2021-03-01     13
+8        7 2       2021-04-01 2026-09-01     66</code></pre>
+</div>
+</div>
+<p>Spell analysis helps show whether the clusters behave like persistent macroeconomic regimes rather than very short-lived fluctuations.</p>
+</section>
+<section id="cluster-profiles" class="level2">
+<h2 class="anchored" data-anchor-id="cluster-profiles">Cluster Profiles</h2>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>cluster_profile <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(cluster_x2, <span class="at">cluster =</span> <span class="fu">factor</span>(km<span class="sc">$</span>cluster)) <span class="sc">%&gt;%</span></span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(cluster) <span class="sc">%&gt;%</span></span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="fu">across</span>(<span class="fu">everything</span>(), mean), <span class="at">.groups =</span> <span class="st">"drop"</span>)</span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(cluster_profile)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 3 × 18
+  cluster ff_target PCEPILFE  MICH UNRATE HOUST T10Y3M BAA10Y  ANFCI WTISPLC
+  &lt;fct&gt;       &lt;dbl&gt;    &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;   &lt;dbl&gt;
+1 1           0.594     91.7  2.92   7.02 1047.  2.28    3.00 -0.119    66.8
+2 2           3.32     107.   3.60   4.18 1462.  0.219   1.86 -0.439    70.6
+3 3           5.34      66.9  3.08   5.63 1500.  1.61    1.99 -0.256    22.3
+# ℹ 8 more variables: core_pce_yoy &lt;dbl&gt;, payems_yoy &lt;dbl&gt;, ff_change_1m &lt;dbl&gt;,
+#   unrate_change_1m &lt;dbl&gt;, oil_change_1m &lt;dbl&gt;, credit_change_1m &lt;dbl&gt;,
+#   fci_change_1m &lt;dbl&gt;, infl_change_1m &lt;dbl&gt;</code></pre>
+</div>
+</div>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>cluster_profile_scaled <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(cluster_scaled, <span class="at">cluster =</span> <span class="fu">factor</span>(km<span class="sc">$</span>cluster)) <span class="sc">%&gt;%</span></span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(cluster) <span class="sc">%&gt;%</span></span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="fu">across</span>(<span class="fu">everything</span>(), mean), <span class="at">.groups =</span> <span class="st">"drop"</span>)</span>
+<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a>cluster_profile_long <span class="ot">&lt;-</span> cluster_profile_scaled <span class="sc">%&gt;%</span></span>
+<span id="cb37-6"><a href="#cb37-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="sc">-</span>cluster, <span class="at">names_to =</span> <span class="st">"variable"</span>, <span class="at">values_to =</span> <span class="st">"mean_z"</span>)</span>
+<span id="cb37-7"><a href="#cb37-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-8"><a href="#cb37-8" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(cluster_profile_long, <span class="fu">aes</span>(<span class="at">x =</span> variable, <span class="at">y =</span> cluster, <span class="at">fill =</span> mean_z)) <span class="sc">+</span></span>
+<span id="cb37-9"><a href="#cb37-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_tile</span>() <span class="sc">+</span></span>
+<span id="cb37-10"><a href="#cb37-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_gradient2</span>() <span class="sc">+</span></span>
+<span id="cb37-11"><a href="#cb37-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb37-12"><a href="#cb37-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">60</span>, <span class="at">hjust =</span> <span class="dv">1</span>)) <span class="sc">+</span></span>
+<span id="cb37-13"><a href="#cb37-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb37-14"><a href="#cb37-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Cluster Profiles"</span>,</span>
+<span id="cb37-15"><a href="#cb37-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">"Average standardized value in each cluster"</span>,</span>
+<span id="cb37-16"><a href="#cb37-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">""</span>,</span>
+<span id="cb37-17"><a href="#cb37-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Cluster"</span>,</span>
+<span id="cb37-18"><a href="#cb37-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">fill =</span> <span class="st">"Mean z-score"</span></span>
+<span id="cb37-19"><a href="#cb37-19" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="regimes_files/figure-html/unnamed-chunk-21-1.png" class="img-fluid figure-img" width="768"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>These tables and heatmaps help interpret the economic meaning of each cluster in terms of inflation, labor markets, financial conditions, and policy timing.</p>
+</section>
+<section id="extra-variable-summary" class="level2">
+<h2 class="anchored" data-anchor-id="extra-variable-summary">Extra Variable Summary</h2>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="fu">ncol</span>(cluster_x_extra) <span class="sc">&gt;</span> <span class="dv">0</span>) {</span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>  extra_summary <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(cluster_x_extra, <span class="at">cluster =</span> <span class="fu">factor</span>(km<span class="sc">$</span>cluster)) <span class="sc">%&gt;%</span></span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">group_by</span>(cluster) <span class="sc">%&gt;%</span></span>
+<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">summarise</span>(<span class="fu">across</span>(<span class="fu">everything</span>(), mean), <span class="at">.groups =</span> <span class="st">"drop"</span>)</span>
+<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">print</span>(extra_summary)</span>
+<span id="cb38-6"><a href="#cb38-6" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 3 × 6
+  cluster policy_change fomc_meetings fomc_scheduled fomc_unscheduled
+  &lt;fct&gt;           &lt;dbl&gt;         &lt;dbl&gt;          &lt;dbl&gt;            &lt;dbl&gt;
+1 1               0.106         0.821          0.662           0.159 
+2 2               0.295         0.690          0.667           0.0233
+3 3               0.385         0.976          0.673           0.303 
+# ℹ 1 more variable: days_since_last_fomc &lt;dbl&gt;</code></pre>
+</div>
+</div>
+<p>This summary adds policy-related interpretation variables that were not used directly to build the clusters.</p>
+</section>
+<section id="event-window-summary" class="level2">
+<h2 class="anchored" data-anchor-id="event-window-summary">Event Window Summary</h2>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>event_windows <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">event =</span> <span class="fu">c</span>(<span class="st">"Gulf War"</span>, <span class="st">"Dot-com / 9-11"</span>, <span class="st">"GFC"</span>, <span class="st">"COVID"</span>, <span class="st">"Russia-Ukraine"</span>),</span>
+<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">start =</span> <span class="fu">as.Date</span>(<span class="fu">c</span>(<span class="st">"1990-08-01"</span>, <span class="st">"2001-03-01"</span>, <span class="st">"2007-12-01"</span>, <span class="st">"2020-03-01"</span>, <span class="st">"2022-02-01"</span>)),</span>
+<span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">end =</span> <span class="fu">as.Date</span>(<span class="fu">c</span>(<span class="st">"1991-03-01"</span>, <span class="st">"2002-12-01"</span>, <span class="st">"2009-06-01"</span>, <span class="st">"2020-12-01"</span>, <span class="st">"2023-12-01"</span>))</span>
+<span id="cb40-5"><a href="#cb40-5" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb40-6"><a href="#cb40-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb40-7"><a href="#cb40-7" aria-hidden="true" tabindex="-1"></a>event_cluster_summary <span class="ot">&lt;-</span> <span class="fu">lapply</span>(<span class="dv">1</span><span class="sc">:</span><span class="fu">nrow</span>(event_windows), <span class="cf">function</span>(i) {</span>
+<span id="cb40-8"><a href="#cb40-8" aria-hidden="true" tabindex="-1"></a>  temp <span class="ot">&lt;-</span> result[result<span class="sc">$</span>date <span class="sc">&gt;=</span> event_windows<span class="sc">$</span>start[i] <span class="sc">&amp;</span></span>
+<span id="cb40-9"><a href="#cb40-9" aria-hidden="true" tabindex="-1"></a>                   result<span class="sc">$</span>date <span class="sc">&lt;=</span> event_windows<span class="sc">$</span>end[i], ]</span>
+<span id="cb40-10"><a href="#cb40-10" aria-hidden="true" tabindex="-1"></a>  tb <span class="ot">&lt;-</span> <span class="fu">table</span>(temp<span class="sc">$</span>cluster)</span>
+<span id="cb40-11"><a href="#cb40-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">data.frame</span>(</span>
+<span id="cb40-12"><a href="#cb40-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">event =</span> event_windows<span class="sc">$</span>event[i],</span>
+<span id="cb40-13"><a href="#cb40-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">dominant_cluster =</span> <span class="fu">names</span>(<span class="fu">which.max</span>(tb)),</span>
+<span id="cb40-14"><a href="#cb40-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">dominant_share =</span> <span class="fu">as.numeric</span>(<span class="fu">max</span>(tb) <span class="sc">/</span> <span class="fu">sum</span>(tb))</span>
+<span id="cb40-15"><a href="#cb40-15" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb40-16"><a href="#cb40-16" aria-hidden="true" tabindex="-1"></a>})</span>
+<span id="cb40-17"><a href="#cb40-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb40-18"><a href="#cb40-18" aria-hidden="true" tabindex="-1"></a>event_cluster_summary <span class="ot">&lt;-</span> <span class="fu">do.call</span>(rbind, event_cluster_summary)</span>
+<span id="cb40-19"><a href="#cb40-19" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(event_cluster_summary)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>           event dominant_cluster dominant_share
+1       Gulf War                3      1.0000000
+2 Dot-com / 9-11                1      0.7272727
+3            GFC                1      1.0000000
+4          COVID                1      1.0000000
+5 Russia-Ukraine                2      1.0000000</code></pre>
+</div>
+</div>
+<p>The event-window summary checks whether each major shock period is dominated by a particular regime.</p>
+
+
+<!-- -->
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    // Ensure there is a toggle, if there isn't float one in the top right
+    if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+      const toggle = window.document.createElement('button');
+      toggle.type = "button";
+      toggle.setAttribute("role", "switch");
+      toggle.setAttribute("aria-checked", "false");
+      toggle.classList.add('top-right');
+      toggle.classList.add('quarto-color-scheme-toggle');
+      toggle.setAttribute("aria-label", "Toggle dark mode");
+      toggle.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+      const i = window.document.createElement("i");
+      i.classList.add('bi');
+      toggle.appendChild(i);
+      // Put the toggle in a landmark of its own, so that landmark navigation
+      // can reach it.
+      //
+      // The container is always a fresh direct child of body, and the toggle is
+      // never moved into page furniture that the theme or the author controls.
+      // The toggle is positioned against the page, so any ancestor that
+      // establishes a containing block captures it: a positioned element or a
+      // grid for position: absolute, and transform, filter, will-change or
+      // contain for position: fixed. A direct child of body has none of these
+      // to inherit, and the shift when one appears is silent and visual.
+      //
+      // ARIA says a document should have at most one banner, and axe reports a
+      // duplicate whether or not the banners carry distinct labels. So use a
+      // header when the page has no banner yet, and a named region otherwise.
+      //
+      // A header is a banner wherever it sits, unless it is inside sectioning
+      // content, so this cannot just look at the children of body: a custom
+      // page layout wraps the title block header in a plain div. An explicit
+      // role="banner" always counts.
+      const sectioning = 'article, aside, main, nav, section, [role="article"], [role="complementary"], [role="main"], [role="navigation"], [role="region"]';
+      const hasBanner = Array.from(
+        window.document.querySelectorAll('header:not([role]), [role="banner"]')
+      ).some(function(el) {
+        return el.hasAttribute("role") || el.closest(sectioning) === null;
+      });
+      const container = window.document.createElement(hasBanner ? "div" : "header");
+      if (hasBanner) {
+        container.setAttribute("role", "region");
+        container.setAttribute("aria-label", "Toggle dark mode");
+      }
+      container.classList.add('quarto-color-scheme-toggle-container');
+      container.appendChild(toggle);
+      window.document.body.appendChild(container);
+    }
+    setColorSchemeToggle(hasAlternateSentinel())
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+    const viewSource = window.document.getElementById('quarto-view-source') ||
+                       window.document.getElementById('quarto-code-tools-source');
+    if (viewSource) {
+      const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+      viewSource.addEventListener("click", function(e) {
+        if (sourceUrl) {
+          // rstudio viewer pane
+          if (/\bcapabilities=\b/.test(window.location)) {
+            window.open(sourceUrl);
+          } else {
+            window.location.href = sourceUrl;
+          }
+        } else {
+          const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+          modal.show();
+        }
+        return false;
+      });
+    }
+    function toggleCodeHandler(show) {
+      return function(e) {
+        const cellDetails = window.document.querySelectorAll(".cell details.code-fold");
+        for (let i=0; i<cellDetails.length; i++) {
+          const details = cellDetails[i];
+          if (show) {
+            details.open = true;
+          } else {
+            details.removeAttribute("open");
+          }
+        }
+        const cellCodeDivs = window.document.querySelectorAll(".cell div.sourceCode.cell-code");
+        const fromCls = show ? "hidden" : "unhidden";
+        const toCls = show ? "unhidden" : "hidden";
+        for (let i=0; i<cellCodeDivs.length; i++) {
+          const codeDiv = cellCodeDivs[i];
+          if (codeDiv.classList.contains(fromCls)) {
+            codeDiv.classList.remove(fromCls);
+            codeDiv.classList.add(toCls);
+          } 
+        }
+        return false;
+      }
+    }
+    const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+    if (hideAllCode) {
+      hideAllCode.addEventListener("click", toggleCodeHandler(false));
+    }
+    const showAllCode = window.document.getElementById("quarto-show-all-code");
+    if (showAllCode) {
+      showAllCode.addEventListener("click", toggleCodeHandler(true));
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/inukbaik\.github\.io\/fomc-policy-modeling\/");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+      window.quartoDecorateExternalLinks = function (root) {
+     var links = (root || window.document).querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+          if (!link.classList.contains('no-external-icon')) {
+          }
+        }
+      }
+      };
+      window.quartoDecorateExternalLinks(window.document);
+    // Esc closes the popup (WCAG 1.4.13) and focus leaving both trigger and
+    // popup closes it (WCAG 2.4.11); tippy handles neither for interactive popups.
+    const hideOnEscAndFocusOut = {
+      name: 'hideOnEscAndFocusOut',
+      defaultValue: true,
+      fn(instance) {
+        const dismiss = () => {
+          // A show scheduled by the trigger delay would otherwise reopen it
+          instance.clearDelayTimeouts();
+          instance.hide();
+        };
+        const onKeyDown = (event) => {
+          if (event.key !== 'Escape') {
+            return;
+          }
+          // Keep Esc from also reaching page handlers (e.g. reveal.js overview),
+          // except an open reveal.js slide menu, which Esc should close too.
+          // The menu handles keys only when its keyboard option is on.
+          const menuHandlesEsc = window.Reveal?.getPlugin?.('menu')?.isOpen() &&
+            window.Reveal.getConfig().menu?.keyboard !== false;
+          if (!menuHandlesEsc) {
+            event.stopPropagation();
+          }
+          if (instance.popper.contains(window.document.activeElement)) {
+            // Disabled while refocusing so the focus trigger does not reopen it
+            instance.disable();
+            instance.reference.focus();
+            instance.enable();
+          }
+          dismiss();
+        };
+        const onFocusOut = (event) => {
+          const target = event.relatedTarget;
+          if (target && !instance.reference.contains(target) &&
+              !instance.popper.contains(target)) {
+            dismiss();
+          }
+        };
+        // On the trigger too: a click trigger (code-annotations: select) has no
+        // blur handling. Attached for the instance's lifetime so leaving the
+        // trigger also cancels a show still pending on the trigger delay.
+        instance.reference.addEventListener('focusout', onFocusOut);
+        return {
+          onShow() {
+            window.document.addEventListener('keydown', onKeyDown, true);
+            instance.popper.addEventListener('focusout', onFocusOut);
+          },
+          onHide() {
+            window.document.removeEventListener('keydown', onKeyDown, true);
+            instance.popper.removeEventListener('focusout', onFocusOut);
+          },
+          onDestroy() {
+            instance.reference.removeEventListener('focusout', onFocusOut);
+          },
+        };
+      },
+    };
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+        plugins: [hideOnEscAndFocusOut],
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          // Each band is positioned against its own containing block, which is
+          // not the offsetParent of the lines, so place it from client rects.
+          const placeBand = (band, firstEl, lastEl, codeBlock) => {
+            const container = band.offsetParent;
+            if (container === null) {
+              return;
+            }
+            const containerRect = container.getBoundingClientRect();
+            // Reveal.js scales slides with a transform, so convert client
+            // pixels back to the CSS pixels of the container.
+            const scale = containerRect.height / container.offsetHeight || 1;
+            const firstRect = firstEl.getBoundingClientRect();
+            const lastRect = lastEl.getBoundingClientRect();
+            const top = (firstRect.top - containerRect.top) / scale - container.clientTop + container.scrollTop;
+            const height = (lastRect.bottom - firstRect.top) / scale;
+            band.style.top = top - 2 + "px";
+            band.style.height = height + 4 + "px";
+            if (codeBlock) {
+              // Without the copy button wrapper, the containing block is wider
+              // than the code block, so span the code block explicitly.
+              const blockRect = codeBlock.getBoundingClientRect();
+              band.style.left = (blockRect.left - containerRect.left) / scale - container.clientLeft + container.scrollLeft + "px";
+              band.style.width = blockRect.width / scale + "px";
+            }
+          };
+          if (lineIds.length > 0) {
+            const el = window.document.getElementById(lineIds[0]);
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const parent = el.parentElement.parentElement;
+            // cook up a div (if necessary) and position it
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            placeBand(div, el, lastEl, parent.closest("div.sourceCode") || parent);
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            placeBand(gutterDiv, el, lastEl);
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+  <script type="application/javascript">
+  window.quartoScrollableRegionsLabels = {"code":"Scrollable code","output":"Scrollable output"};
+  </script><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb42" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> "The Regimes: Grouping Macro Conditions (RQ2)"</span></span>
+<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb42-4"><a href="#cb42-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-7"><a href="#cb42-7" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb42-8"><a href="#cb42-8" aria-hidden="true" tabindex="-1"></a><span class="co">#| include: false</span></span>
+<span id="cb42-9"><a href="#cb42-9" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">"R/settings.R"</span>)</span>
+<span id="cb42-10"><a href="#cb42-10" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">"R/prepare_data.R"</span>)</span>
+<span id="cb42-11"><a href="#cb42-11" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb42-12"><a href="#cb42-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-13"><a href="#cb42-13" aria-hidden="true" tabindex="-1"></a>::: {.callout-note}</span>
+<span id="cb42-14"><a href="#cb42-14" aria-hidden="true" tabindex="-1"></a><span class="fu">## Original course-project chapter</span></span>
+<span id="cb42-15"><a href="#cb42-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-16"><a href="#cb42-16" aria-hidden="true" tabindex="-1"></a>This chapter is the course-project team's original analysis, written by</span>
+<span id="cb42-17"><a href="#cb42-17" aria-hidden="true" tabindex="-1"></a>teammates and kept as submitted. The only changes are shared data fixes</span>
+<span id="cb42-18"><a href="#cb42-18" aria-hidden="true" tabindex="-1"></a>and small cleanups (computed instead of hardcoded dates, clearer names);</span>
+<span id="cb42-19"><a href="#cb42-19" aria-hidden="true" tabindex="-1"></a>the methods were not revised for this portfolio. Known limitations:</span>
+<span id="cb42-20"><a href="#cb42-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-21"><a href="#cb42-21" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Trending inputs.** Several clustering inputs are levels that trend over</span>
+<span id="cb42-22"><a href="#cb42-22" aria-hidden="true" tabindex="-1"></a>  decades (the core PCE price index, nominal oil prices, housing starts,</span>
+<span id="cb42-23"><a href="#cb42-23" aria-hidden="true" tabindex="-1"></a>  the target itself). They can dominate the principal components, so</span>
+<span id="cb42-24"><a href="#cb42-24" aria-hidden="true" tabindex="-1"></a>  clusters may separate eras rather than economic conditions.</span>
+<span id="cb42-25"><a href="#cb42-25" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Weak cluster structure.** Average silhouette widths are low and similar</span>
+<span id="cb42-26"><a href="#cb42-26" aria-hidden="true" tabindex="-1"></a>  for every k tried (see below), so the number of clusters is a fixed</span>
+<span id="cb42-27"><a href="#cb42-27" aria-hidden="true" tabindex="-1"></a>  setting rather than something the data chooses.</span>
+<span id="cb42-28"><a href="#cb42-28" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**No stability check.** Clusters are not re-checked across random starts,</span>
+<span id="cb42-29"><a href="#cb42-29" aria-hidden="true" tabindex="-1"></a>  sub-periods or alternative variable sets.</span>
+<span id="cb42-30"><a href="#cb42-30" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Fitted on the full sample.** Each month's regime label uses data from</span>
+<span id="cb42-31"><a href="#cb42-31" aria-hidden="true" tabindex="-1"></a>  later years, which is fine for describing history but means the labels</span>
+<span id="cb42-32"><a href="#cb42-32" aria-hidden="true" tabindex="-1"></a>  cannot be used as a predictor without refitting on past data only.</span>
+<span id="cb42-33"><a href="#cb42-33" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb42-34"><a href="#cb42-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-35"><a href="#cb42-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-36"><a href="#cb42-36" aria-hidden="true" tabindex="-1"></a><span class="fu">## Data Preparation</span></span>
+<span id="cb42-37"><a href="#cb42-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-40"><a href="#cb42-40" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb42-41"><a href="#cb42-41" aria-hidden="true" tabindex="-1"></a>data_rq2 <span class="ot">&lt;-</span> df_final <span class="sc">%&gt;%</span></span>
+<span id="cb42-42"><a href="#cb42-42" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(date)</span>
+<span id="cb42-43"><a href="#cb42-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-44"><a href="#cb42-44" aria-hidden="true" tabindex="-1"></a>data_rq2<span class="sc">$</span>policy_change <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(data_rq2<span class="sc">$</span>policy_change)</span>
+<span id="cb42-45"><a href="#cb42-45" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb42-46"><a href="#cb42-46" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-47"><a href="#cb42-47" aria-hidden="true" tabindex="-1"></a>The dataset is sorted in chronological order so the clustering results can later be interpreted as evolving regimes rather than disconnected groups.</span>
+<span id="cb42-48"><a href="#cb42-48" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-49"><a href="#cb42-49" aria-hidden="true" tabindex="-1"></a><span class="fu">## Event-Sensitive Feature Construction</span></span>
+<span id="cb42-50"><a href="#cb42-50" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-53"><a href="#cb42-53" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb42-54"><a href="#cb42-54" aria-hidden="true" tabindex="-1"></a>data_rq2<span class="sc">$</span>ff_change_1m     <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="cn">NA</span>, <span class="fu">diff</span>(data_rq2<span class="sc">$</span>ff_target))</span>
+<span id="cb42-55"><a href="#cb42-55" aria-hidden="true" tabindex="-1"></a>data_rq2<span class="sc">$</span>unrate_change_1m <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="cn">NA</span>, <span class="fu">diff</span>(data_rq2<span class="sc">$</span>UNRATE))</span>
+<span id="cb42-56"><a href="#cb42-56" aria-hidden="true" tabindex="-1"></a>data_rq2<span class="sc">$</span>oil_change_1m    <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="cn">NA</span>, <span class="fu">diff</span>(data_rq2<span class="sc">$</span>WTISPLC))</span>
+<span id="cb42-57"><a href="#cb42-57" aria-hidden="true" tabindex="-1"></a>data_rq2<span class="sc">$</span>house_change_1m  <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="cn">NA</span>, <span class="fu">diff</span>(data_rq2<span class="sc">$</span>HOUST))</span>
+<span id="cb42-58"><a href="#cb42-58" aria-hidden="true" tabindex="-1"></a>data_rq2<span class="sc">$</span>credit_change_1m <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="cn">NA</span>, <span class="fu">diff</span>(data_rq2<span class="sc">$</span>BAA10Y))</span>
+<span id="cb42-59"><a href="#cb42-59" aria-hidden="true" tabindex="-1"></a>data_rq2<span class="sc">$</span>fci_change_1m    <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="cn">NA</span>, <span class="fu">diff</span>(data_rq2<span class="sc">$</span>ANFCI))</span>
+<span id="cb42-60"><a href="#cb42-60" aria-hidden="true" tabindex="-1"></a>data_rq2<span class="sc">$</span>infl_change_1m   <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="cn">NA</span>, <span class="fu">diff</span>(data_rq2<span class="sc">$</span>core_pce_yoy))</span>
+<span id="cb42-61"><a href="#cb42-61" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb42-62"><a href="#cb42-62" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-63"><a href="#cb42-63" aria-hidden="true" tabindex="-1"></a>Monthly changes were added so the clustering can reflect both the level of macroeconomic conditions and how quickly those conditions are shifting.</span>
+<span id="cb42-64"><a href="#cb42-64" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-65"><a href="#cb42-65" aria-hidden="true" tabindex="-1"></a><span class="fu">## Missingness Screening</span></span>
+<span id="cb42-66"><a href="#cb42-66" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-69"><a href="#cb42-69" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb42-70"><a href="#cb42-70" aria-hidden="true" tabindex="-1"></a>num_data <span class="ot">&lt;-</span> data_rq2[, <span class="fu">setdiff</span>(<span class="fu">names</span>(data_rq2), <span class="st">"date"</span>)]</span>
+<span id="cb42-71"><a href="#cb42-71" aria-hidden="true" tabindex="-1"></a>num_data <span class="ot">&lt;-</span> num_data[, <span class="fu">sapply</span>(num_data, is.numeric)]</span>
+<span id="cb42-72"><a href="#cb42-72" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-73"><a href="#cb42-73" aria-hidden="true" tabindex="-1"></a>na_share <span class="ot">&lt;-</span> <span class="fu">colMeans</span>(<span class="fu">is.na</span>(num_data))</span>
+<span id="cb42-74"><a href="#cb42-74" aria-hidden="true" tabindex="-1"></a>na_share</span>
+<span id="cb42-75"><a href="#cb42-75" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb42-76"><a href="#cb42-76" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-79"><a href="#cb42-79" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb42-80"><a href="#cb42-80" aria-hidden="true" tabindex="-1"></a>num_data <span class="ot">&lt;-</span> num_data[, na_share <span class="sc">&lt;=</span> <span class="fl">0.20</span>]</span>
+<span id="cb42-81"><a href="#cb42-81" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb42-82"><a href="#cb42-82" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-83"><a href="#cb42-83" aria-hidden="true" tabindex="-1"></a>Variables with more than 20% missingness were excluded from the initial numeric screening step to keep the clustering input reasonably complete.</span>
+<span id="cb42-84"><a href="#cb42-84" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-85"><a href="#cb42-85" aria-hidden="true" tabindex="-1"></a><span class="fu">## Variable Selection for Clustering</span></span>
+<span id="cb42-86"><a href="#cb42-86" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-89"><a href="#cb42-89" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb42-90"><a href="#cb42-90" aria-hidden="true" tabindex="-1"></a>cluster_vars_model <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
+<span id="cb42-91"><a href="#cb42-91" aria-hidden="true" tabindex="-1"></a>  <span class="st">"ff_target"</span>,</span>
+<span id="cb42-92"><a href="#cb42-92" aria-hidden="true" tabindex="-1"></a>  <span class="st">"PCEPILFE"</span>,</span>
+<span id="cb42-93"><a href="#cb42-93" aria-hidden="true" tabindex="-1"></a>  <span class="st">"MICH"</span>,</span>
+<span id="cb42-94"><a href="#cb42-94" aria-hidden="true" tabindex="-1"></a>  <span class="st">"UNRATE"</span>,</span>
+<span id="cb42-95"><a href="#cb42-95" aria-hidden="true" tabindex="-1"></a>  <span class="st">"HOUST"</span>,</span>
+<span id="cb42-96"><a href="#cb42-96" aria-hidden="true" tabindex="-1"></a>  <span class="st">"T10Y3M"</span>,</span>
+<span id="cb42-97"><a href="#cb42-97" aria-hidden="true" tabindex="-1"></a>  <span class="st">"BAA10Y"</span>,</span>
+<span id="cb42-98"><a href="#cb42-98" aria-hidden="true" tabindex="-1"></a>  <span class="st">"ANFCI"</span>,</span>
+<span id="cb42-99"><a href="#cb42-99" aria-hidden="true" tabindex="-1"></a>  <span class="st">"WTISPLC"</span>,</span>
+<span id="cb42-100"><a href="#cb42-100" aria-hidden="true" tabindex="-1"></a>  <span class="st">"core_pce_yoy"</span>,</span>
+<span id="cb42-101"><a href="#cb42-101" aria-hidden="true" tabindex="-1"></a>  <span class="st">"payems_yoy"</span>,</span>
+<span id="cb42-102"><a href="#cb42-102" aria-hidden="true" tabindex="-1"></a>  <span class="st">"ff_change_1m"</span>,</span>
+<span id="cb42-103"><a href="#cb42-103" aria-hidden="true" tabindex="-1"></a>  <span class="st">"unrate_change_1m"</span>,</span>
+<span id="cb42-104"><a href="#cb42-104" aria-hidden="true" tabindex="-1"></a>  <span class="st">"oil_change_1m"</span>,</span>
+<span id="cb42-105"><a href="#cb42-105" aria-hidden="true" tabindex="-1"></a>  <span class="st">"credit_change_1m"</span>,</span>
+<span id="cb42-106"><a href="#cb42-106" aria-hidden="true" tabindex="-1"></a>  <span class="st">"fci_change_1m"</span>,</span>
+<span id="cb42-107"><a href="#cb42-107" aria-hidden="true" tabindex="-1"></a>  <span class="st">"infl_change_1m"</span></span>
+<span id="cb42-108"><a href="#cb42-108" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb42-109"><a href="#cb42-109" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-110"><a href="#cb42-110" aria-hidden="true" tabindex="-1"></a>cluster_vars_extra <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
+<span id="cb42-111"><a href="#cb42-111" aria-hidden="true" tabindex="-1"></a>  <span class="st">"policy_change"</span>,</span>
+<span id="cb42-112"><a href="#cb42-112" aria-hidden="true" tabindex="-1"></a>  <span class="st">"fomc_meetings"</span>,</span>
+<span id="cb42-113"><a href="#cb42-113" aria-hidden="true" tabindex="-1"></a>  <span class="st">"fomc_scheduled"</span>,</span>
+<span id="cb42-114"><a href="#cb42-114" aria-hidden="true" tabindex="-1"></a>  <span class="st">"fomc_unscheduled"</span>,</span>
+<span id="cb42-115"><a href="#cb42-115" aria-hidden="true" tabindex="-1"></a>  <span class="st">"days_since_last_fomc"</span></span>
+<span id="cb42-116"><a href="#cb42-116" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb42-117"><a href="#cb42-117" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-118"><a href="#cb42-118" aria-hidden="true" tabindex="-1"></a>cluster_vars_model <span class="ot">&lt;-</span> <span class="fu">intersect</span>(cluster_vars_model, <span class="fu">names</span>(data_rq2))</span>
+<span id="cb42-119"><a href="#cb42-119" aria-hidden="true" tabindex="-1"></a>cluster_vars_extra <span class="ot">&lt;-</span> <span class="fu">intersect</span>(cluster_vars_extra, <span class="fu">names</span>(data_rq2))</span>
+<span id="cb42-120"><a href="#cb42-120" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-121"><a href="#cb42-121" aria-hidden="true" tabindex="-1"></a>cluster_df <span class="ot">&lt;-</span> data_rq2[, <span class="fu">c</span>(<span class="st">"date"</span>, cluster_vars_model, cluster_vars_extra)]</span>
+<span id="cb42-122"><a href="#cb42-122" aria-hidden="true" tabindex="-1"></a>cluster_df <span class="ot">&lt;-</span> <span class="fu">na.omit</span>(cluster_df)</span>
+<span id="cb42-123"><a href="#cb42-123" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-124"><a href="#cb42-124" aria-hidden="true" tabindex="-1"></a>cluster_x <span class="ot">&lt;-</span> cluster_df[, cluster_vars_model]</span>
+<span id="cb42-125"><a href="#cb42-125" aria-hidden="true" tabindex="-1"></a>cluster_x_extra <span class="ot">&lt;-</span> cluster_df[, cluster_vars_extra]</span>
+<span id="cb42-126"><a href="#cb42-126" aria-hidden="true" tabindex="-1"></a>dates <span class="ot">&lt;-</span> cluster_df<span class="sc">$</span>date</span>
+<span id="cb42-127"><a href="#cb42-127" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-128"><a href="#cb42-128" aria-hidden="true" tabindex="-1"></a><span class="fu">nrow</span>(cluster_x)</span>
+<span id="cb42-129"><a href="#cb42-129" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb42-130"><a href="#cb42-130" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-131"><a href="#cb42-131" aria-hidden="true" tabindex="-1"></a>The model variables are used for clustering itself, while the extra variables are kept for later interpretation of the resulting regimes.</span>
+<span id="cb42-132"><a href="#cb42-132" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-133"><a href="#cb42-133" aria-hidden="true" tabindex="-1"></a><span class="fu">## Correlation Check on Final Clustering Inputs</span></span>
+<span id="cb42-134"><a href="#cb42-134" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-137"><a href="#cb42-137" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb42-138"><a href="#cb42-138" aria-hidden="true" tabindex="-1"></a>cor_mat2 <span class="ot">&lt;-</span> <span class="fu">cor</span>(cluster_x)</span>
+<span id="cb42-139"><a href="#cb42-139" aria-hidden="true" tabindex="-1"></a><span class="fu">corrplot</span>(cor_mat2, <span class="at">method =</span> <span class="st">"color"</span>, <span class="at">tl.cex =</span> <span class="fl">0.6</span>)</span>
+<span id="cb42-140"><a href="#cb42-140" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb42-141"><a href="#cb42-141" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-144"><a href="#cb42-144" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb42-145"><a href="#cb42-145" aria-hidden="true" tabindex="-1"></a>remove_auto <span class="ot">&lt;-</span> <span class="fu">findCorrelation</span>(cor_mat2, <span class="at">cutoff =</span> <span class="fl">0.9</span>, <span class="at">names =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb42-146"><a href="#cb42-146" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Variables removed due to high correlation:</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb42-147"><a href="#cb42-147" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(remove_auto)</span>
+<span id="cb42-148"><a href="#cb42-148" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-149"><a href="#cb42-149" aria-hidden="true" tabindex="-1"></a>cluster_x2 <span class="ot">&lt;-</span> cluster_x[, <span class="sc">!</span><span class="fu">names</span>(cluster_x) <span class="sc">%in%</span> remove_auto]</span>
+<span id="cb42-150"><a href="#cb42-150" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb42-151"><a href="#cb42-151" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-152"><a href="#cb42-152" aria-hidden="true" tabindex="-1"></a><span class="fu">## Scaling and PCA</span></span>
+<span id="cb42-153"><a href="#cb42-153" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-156"><a href="#cb42-156" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb42-157"><a href="#cb42-157" aria-hidden="true" tabindex="-1"></a>cluster_scaled <span class="ot">&lt;-</span> <span class="fu">scale</span>(cluster_x2)</span>
+<span id="cb42-158"><a href="#cb42-158" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-159"><a href="#cb42-159" aria-hidden="true" tabindex="-1"></a>pca <span class="ot">&lt;-</span> <span class="fu">prcomp</span>(cluster_scaled)</span>
+<span id="cb42-160"><a href="#cb42-160" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(pca)</span>
+<span id="cb42-161"><a href="#cb42-161" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb42-162"><a href="#cb42-162" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-165"><a href="#cb42-165" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb42-166"><a href="#cb42-166" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(pca, <span class="at">type =</span> <span class="st">"l"</span>, <span class="at">main =</span> <span class="st">"Scree Plot"</span>)</span>
+<span id="cb42-167"><a href="#cb42-167" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb42-168"><a href="#cb42-168" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-171"><a href="#cb42-171" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb42-172"><a href="#cb42-172" aria-hidden="true" tabindex="-1"></a>cum_var <span class="ot">&lt;-</span> <span class="fu">cumsum</span>(pca<span class="sc">$</span>sdev<span class="sc">^</span><span class="dv">2</span> <span class="sc">/</span> <span class="fu">sum</span>(pca<span class="sc">$</span>sdev<span class="sc">^</span><span class="dv">2</span>))</span>
+<span id="cb42-173"><a href="#cb42-173" aria-hidden="true" tabindex="-1"></a>cum_var</span>
+<span id="cb42-174"><a href="#cb42-174" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb42-175"><a href="#cb42-175" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-178"><a href="#cb42-178" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb42-179"><a href="#cb42-179" aria-hidden="true" tabindex="-1"></a>n_pc <span class="ot">&lt;-</span> <span class="fu">which</span>(cum_var <span class="sc">&gt;=</span> <span class="fl">0.80</span>)[<span class="dv">1</span>]</span>
+<span id="cb42-180"><a href="#cb42-180" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Number of PCs explaining at least 80% variance:"</span>, n_pc, <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb42-181"><a href="#cb42-181" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-182"><a href="#cb42-182" aria-hidden="true" tabindex="-1"></a>pc_scores <span class="ot">&lt;-</span> pca<span class="sc">$</span>x[, <span class="dv">1</span><span class="sc">:</span>n_pc, drop <span class="ot">=</span> <span class="cn">FALSE</span>]</span>
+<span id="cb42-183"><a href="#cb42-183" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(pc_scores)</span>
+<span id="cb42-184"><a href="#cb42-184" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb42-185"><a href="#cb42-185" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-186"><a href="#cb42-186" aria-hidden="true" tabindex="-1"></a>PCA is used to reduce dimensionality while retaining most of the variation in the clustering inputs.</span>
+<span id="cb42-187"><a href="#cb42-187" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-188"><a href="#cb42-188" aria-hidden="true" tabindex="-1"></a><span class="fu">## Clustering</span></span>
+<span id="cb42-189"><a href="#cb42-189" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-192"><a href="#cb42-192" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb42-193"><a href="#cb42-193" aria-hidden="true" tabindex="-1"></a><span class="fu">fviz_nbclust</span>(pc_scores, kmeans, <span class="at">method =</span> <span class="st">"wss"</span>)</span>
+<span id="cb42-194"><a href="#cb42-194" aria-hidden="true" tabindex="-1"></a><span class="fu">fviz_nbclust</span>(pc_scores, kmeans, <span class="at">method =</span> <span class="st">"silhouette"</span>)</span>
+<span id="cb42-195"><a href="#cb42-195" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb42-196"><a href="#cb42-196" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-199"><a href="#cb42-199" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb42-200"><a href="#cb42-200" aria-hidden="true" tabindex="-1"></a><span class="co"># Silhouette diagnostics over K_RANGE; k itself is a setting (K_CLUSTERS).</span></span>
+<span id="cb42-201"><a href="#cb42-201" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
+<span id="cb42-202"><a href="#cb42-202" aria-hidden="true" tabindex="-1"></a>dist_pc <span class="ot">&lt;-</span> <span class="fu">dist</span>(pc_scores)</span>
+<span id="cb42-203"><a href="#cb42-203" aria-hidden="true" tabindex="-1"></a>avg_sil <span class="ot">&lt;-</span> <span class="fu">sapply</span>(K_RANGE, <span class="cf">function</span>(kk) {</span>
+<span id="cb42-204"><a href="#cb42-204" aria-hidden="true" tabindex="-1"></a>  fit <span class="ot">&lt;-</span> <span class="fu">kmeans</span>(pc_scores, <span class="at">centers =</span> kk, <span class="at">nstart =</span> <span class="dv">50</span>)</span>
+<span id="cb42-205"><a href="#cb42-205" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mean</span>(<span class="fu">silhouette</span>(fit<span class="sc">$</span>cluster, dist_pc)[, <span class="st">"sil_width"</span>])</span>
+<span id="cb42-206"><a href="#cb42-206" aria-hidden="true" tabindex="-1"></a>})</span>
+<span id="cb42-207"><a href="#cb42-207" aria-hidden="true" tabindex="-1"></a><span class="fu">data.frame</span>(<span class="at">k =</span> K_RANGE, <span class="at">avg_silhouette =</span> <span class="fu">round</span>(avg_sil, <span class="dv">3</span>))</span>
+<span id="cb42-208"><a href="#cb42-208" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-209"><a href="#cb42-209" aria-hidden="true" tabindex="-1"></a>k <span class="ot">&lt;-</span> K_CLUSTERS</span>
+<span id="cb42-210"><a href="#cb42-210" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
+<span id="cb42-211"><a href="#cb42-211" aria-hidden="true" tabindex="-1"></a>km <span class="ot">&lt;-</span> <span class="fu">kmeans</span>(pc_scores, <span class="at">centers =</span> k, <span class="at">nstart =</span> <span class="dv">100</span>)</span>
+<span id="cb42-212"><a href="#cb42-212" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-213"><a href="#cb42-213" aria-hidden="true" tabindex="-1"></a>result <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb42-214"><a href="#cb42-214" aria-hidden="true" tabindex="-1"></a>  <span class="at">date =</span> dates,</span>
+<span id="cb42-215"><a href="#cb42-215" aria-hidden="true" tabindex="-1"></a>  <span class="at">cluster =</span> <span class="fu">factor</span>(km<span class="sc">$</span>cluster),</span>
+<span id="cb42-216"><a href="#cb42-216" aria-hidden="true" tabindex="-1"></a>  cluster_x_extra</span>
+<span id="cb42-217"><a href="#cb42-217" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb42-218"><a href="#cb42-218" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-219"><a href="#cb42-219" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(result)</span>
+<span id="cb42-220"><a href="#cb42-220" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb42-221"><a href="#cb42-221" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-222"><a href="#cb42-222" aria-hidden="true" tabindex="-1"></a>The clustering uses k-means on the retained principal components. The analysis uses k = <span class="in">`r k`</span> clusters. Average silhouette widths for k = <span class="in">`r min(K_RANGE)`</span> to <span class="in">`r max(K_RANGE)`</span> are all between <span class="in">`r sprintf("%.2f", min(avg_sil))`</span> and <span class="in">`r sprintf("%.2f", max(avg_sil))`</span>, which indicates weak cluster structure, so k is kept as an explicit choice rather than picked by silhouette.</span>
+<span id="cb42-223"><a href="#cb42-223" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-224"><a href="#cb42-224" aria-hidden="true" tabindex="-1"></a><span class="fu">## Cluster Visualization</span></span>
+<span id="cb42-225"><a href="#cb42-225" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-228"><a href="#cb42-228" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb42-229"><a href="#cb42-229" aria-hidden="true" tabindex="-1"></a>plot_df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb42-230"><a href="#cb42-230" aria-hidden="true" tabindex="-1"></a>  <span class="at">date =</span> dates,</span>
+<span id="cb42-231"><a href="#cb42-231" aria-hidden="true" tabindex="-1"></a>  <span class="at">PC1 =</span> pca<span class="sc">$</span>x[, <span class="dv">1</span>],</span>
+<span id="cb42-232"><a href="#cb42-232" aria-hidden="true" tabindex="-1"></a>  <span class="at">PC2 =</span> pca<span class="sc">$</span>x[, <span class="dv">2</span>],</span>
+<span id="cb42-233"><a href="#cb42-233" aria-hidden="true" tabindex="-1"></a>  <span class="at">cluster =</span> <span class="fu">factor</span>(km<span class="sc">$</span>cluster)</span>
+<span id="cb42-234"><a href="#cb42-234" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb42-235"><a href="#cb42-235" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-236"><a href="#cb42-236" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(plot_df, <span class="fu">aes</span>(<span class="at">x =</span> PC1, <span class="at">y =</span> PC2, <span class="at">color =</span> cluster)) <span class="sc">+</span></span>
+<span id="cb42-237"><a href="#cb42-237" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="dv">2</span>, <span class="at">alpha =</span> <span class="fl">0.7</span>) <span class="sc">+</span></span>
+<span id="cb42-238"><a href="#cb42-238" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_path</span>(<span class="fu">aes</span>(<span class="at">group =</span> <span class="dv">1</span>), <span class="at">color =</span> <span class="st">"gray70"</span>, <span class="at">alpha =</span> <span class="fl">0.3</span>, <span class="at">linewidth =</span> <span class="fl">0.4</span>) <span class="sc">+</span></span>
+<span id="cb42-239"><a href="#cb42-239" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb42-240"><a href="#cb42-240" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb42-241"><a href="#cb42-241" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Clusters in PCA Space"</span>,</span>
+<span id="cb42-242"><a href="#cb42-242" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">"Points connected in time order"</span>,</span>
+<span id="cb42-243"><a href="#cb42-243" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"PC1"</span>,</span>
+<span id="cb42-244"><a href="#cb42-244" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"PC2"</span></span>
+<span id="cb42-245"><a href="#cb42-245" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb42-246"><a href="#cb42-246" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb42-247"><a href="#cb42-247" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-250"><a href="#cb42-250" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb42-251"><a href="#cb42-251" aria-hidden="true" tabindex="-1"></a>pc_time_df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb42-252"><a href="#cb42-252" aria-hidden="true" tabindex="-1"></a>  <span class="at">date =</span> dates,</span>
+<span id="cb42-253"><a href="#cb42-253" aria-hidden="true" tabindex="-1"></a>  <span class="at">PC1 =</span> pca<span class="sc">$</span>x[, <span class="dv">1</span>],</span>
+<span id="cb42-254"><a href="#cb42-254" aria-hidden="true" tabindex="-1"></a>  <span class="at">cluster =</span> <span class="fu">factor</span>(km<span class="sc">$</span>cluster)</span>
+<span id="cb42-255"><a href="#cb42-255" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb42-256"><a href="#cb42-256" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-257"><a href="#cb42-257" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(pc_time_df, <span class="fu">aes</span>(<span class="at">x =</span> date, <span class="at">y =</span> PC1, <span class="at">color =</span> cluster)) <span class="sc">+</span></span>
+<span id="cb42-258"><a href="#cb42-258" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">linewidth =</span> <span class="fl">0.8</span>) <span class="sc">+</span></span>
+<span id="cb42-259"><a href="#cb42-259" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb42-260"><a href="#cb42-260" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb42-261"><a href="#cb42-261" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"PC1 Over Time"</span>,</span>
+<span id="cb42-262"><a href="#cb42-262" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Date"</span>,</span>
+<span id="cb42-263"><a href="#cb42-263" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"PC1"</span></span>
+<span id="cb42-264"><a href="#cb42-264" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb42-265"><a href="#cb42-265" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb42-266"><a href="#cb42-266" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-267"><a href="#cb42-267" aria-hidden="true" tabindex="-1"></a>These plots show both the separation of regimes in reduced-dimensional space and the way regime structure evolves over time.</span>
+<span id="cb42-268"><a href="#cb42-268" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-269"><a href="#cb42-269" aria-hidden="true" tabindex="-1"></a><span class="fu">## Regimes Over Time</span></span>
+<span id="cb42-270"><a href="#cb42-270" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-273"><a href="#cb42-273" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb42-274"><a href="#cb42-274" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(result, <span class="fu">aes</span>(<span class="at">x =</span> date, <span class="at">y =</span> <span class="dv">1</span>, <span class="at">fill =</span> cluster)) <span class="sc">+</span></span>
+<span id="cb42-275"><a href="#cb42-275" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_tile</span>(<span class="at">height =</span> <span class="fl">0.8</span>) <span class="sc">+</span></span>
+<span id="cb42-276"><a href="#cb42-276" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb42-277"><a href="#cb42-277" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb42-278"><a href="#cb42-278" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.title.y =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb42-279"><a href="#cb42-279" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.text.y =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb42-280"><a href="#cb42-280" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.ticks.y =</span> <span class="fu">element_blank</span>()</span>
+<span id="cb42-281"><a href="#cb42-281" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb42-282"><a href="#cb42-282" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb42-283"><a href="#cb42-283" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Economic Regimes Over Time"</span>,</span>
+<span id="cb42-284"><a href="#cb42-284" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Date"</span>,</span>
+<span id="cb42-285"><a href="#cb42-285" aria-hidden="true" tabindex="-1"></a>    <span class="at">fill =</span> <span class="st">"Cluster"</span></span>
+<span id="cb42-286"><a href="#cb42-286" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb42-287"><a href="#cb42-287" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb42-288"><a href="#cb42-288" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-289"><a href="#cb42-289" aria-hidden="true" tabindex="-1"></a>This plot gives a compact time-line view of how regime membership changes across the sample.</span>
+<span id="cb42-290"><a href="#cb42-290" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-291"><a href="#cb42-291" aria-hidden="true" tabindex="-1"></a><span class="fu">## Regimes and Historical Events</span></span>
+<span id="cb42-292"><a href="#cb42-292" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-295"><a href="#cb42-295" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb42-296"><a href="#cb42-296" aria-hidden="true" tabindex="-1"></a>event_df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb42-297"><a href="#cb42-297" aria-hidden="true" tabindex="-1"></a>  <span class="at">date =</span> <span class="fu">as.Date</span>(<span class="fu">c</span>(</span>
+<span id="cb42-298"><a href="#cb42-298" aria-hidden="true" tabindex="-1"></a>    <span class="st">"1990-08-01"</span>,  <span class="co"># Gulf War</span></span>
+<span id="cb42-299"><a href="#cb42-299" aria-hidden="true" tabindex="-1"></a>    <span class="st">"2001-09-01"</span>,  <span class="co"># 9/11</span></span>
+<span id="cb42-300"><a href="#cb42-300" aria-hidden="true" tabindex="-1"></a>    <span class="st">"2008-09-01"</span>,  <span class="co"># GFC / Lehman</span></span>
+<span id="cb42-301"><a href="#cb42-301" aria-hidden="true" tabindex="-1"></a>    <span class="st">"2020-03-01"</span>,  <span class="co"># COVID shock</span></span>
+<span id="cb42-302"><a href="#cb42-302" aria-hidden="true" tabindex="-1"></a>    <span class="st">"2022-02-01"</span>   <span class="co"># Russia-Ukraine war</span></span>
+<span id="cb42-303"><a href="#cb42-303" aria-hidden="true" tabindex="-1"></a>  )),</span>
+<span id="cb42-304"><a href="#cb42-304" aria-hidden="true" tabindex="-1"></a>  <span class="at">label =</span> <span class="fu">c</span>(</span>
+<span id="cb42-305"><a href="#cb42-305" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Gulf War"</span>,</span>
+<span id="cb42-306"><a href="#cb42-306" aria-hidden="true" tabindex="-1"></a>    <span class="st">"9/11"</span>,</span>
+<span id="cb42-307"><a href="#cb42-307" aria-hidden="true" tabindex="-1"></a>    <span class="st">"GFC"</span>,</span>
+<span id="cb42-308"><a href="#cb42-308" aria-hidden="true" tabindex="-1"></a>    <span class="st">"COVID"</span>,</span>
+<span id="cb42-309"><a href="#cb42-309" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Russia-Ukraine"</span></span>
+<span id="cb42-310"><a href="#cb42-310" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb42-311"><a href="#cb42-311" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb42-312"><a href="#cb42-312" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-313"><a href="#cb42-313" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(result, <span class="fu">aes</span>(<span class="at">x =</span> date, <span class="at">y =</span> <span class="dv">1</span>, <span class="at">fill =</span> cluster)) <span class="sc">+</span></span>
+<span id="cb42-314"><a href="#cb42-314" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_tile</span>(<span class="at">height =</span> <span class="fl">0.8</span>) <span class="sc">+</span></span>
+<span id="cb42-315"><a href="#cb42-315" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(</span>
+<span id="cb42-316"><a href="#cb42-316" aria-hidden="true" tabindex="-1"></a>    <span class="at">data =</span> event_df,</span>
+<span id="cb42-317"><a href="#cb42-317" aria-hidden="true" tabindex="-1"></a>    <span class="fu">aes</span>(<span class="at">xintercept =</span> <span class="fu">as.numeric</span>(date)),</span>
+<span id="cb42-318"><a href="#cb42-318" aria-hidden="true" tabindex="-1"></a>    <span class="at">linetype =</span> <span class="st">"dashed"</span></span>
+<span id="cb42-319"><a href="#cb42-319" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb42-320"><a href="#cb42-320" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(</span>
+<span id="cb42-321"><a href="#cb42-321" aria-hidden="true" tabindex="-1"></a>    <span class="at">data =</span> event_df,</span>
+<span id="cb42-322"><a href="#cb42-322" aria-hidden="true" tabindex="-1"></a>    <span class="fu">aes</span>(<span class="at">x =</span> date, <span class="at">y =</span> <span class="fl">1.35</span>, <span class="at">label =</span> label),</span>
+<span id="cb42-323"><a href="#cb42-323" aria-hidden="true" tabindex="-1"></a>    <span class="at">angle =</span> <span class="dv">90</span>,</span>
+<span id="cb42-324"><a href="#cb42-324" aria-hidden="true" tabindex="-1"></a>    <span class="at">vjust =</span> <span class="sc">-</span><span class="fl">0.3</span>,</span>
+<span id="cb42-325"><a href="#cb42-325" aria-hidden="true" tabindex="-1"></a>    <span class="at">size =</span> <span class="dv">3</span>,</span>
+<span id="cb42-326"><a href="#cb42-326" aria-hidden="true" tabindex="-1"></a>    <span class="at">inherit.aes =</span> <span class="cn">FALSE</span></span>
+<span id="cb42-327"><a href="#cb42-327" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb42-328"><a href="#cb42-328" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb42-329"><a href="#cb42-329" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb42-330"><a href="#cb42-330" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.title.y =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb42-331"><a href="#cb42-331" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.text.y =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb42-332"><a href="#cb42-332" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.ticks.y =</span> <span class="fu">element_blank</span>()</span>
+<span id="cb42-333"><a href="#cb42-333" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb42-334"><a href="#cb42-334" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb42-335"><a href="#cb42-335" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Economic Regimes with Major Historical Events"</span>,</span>
+<span id="cb42-336"><a href="#cb42-336" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Date"</span>,</span>
+<span id="cb42-337"><a href="#cb42-337" aria-hidden="true" tabindex="-1"></a>    <span class="at">fill =</span> <span class="st">"Cluster"</span></span>
+<span id="cb42-338"><a href="#cb42-338" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb42-339"><a href="#cb42-339" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb42-340"><a href="#cb42-340" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-341"><a href="#cb42-341" aria-hidden="true" tabindex="-1"></a>Major historical events are overlaid on the regime timeline to assess whether regime changes line up with well-known macroeconomic disruptions.</span>
+<span id="cb42-342"><a href="#cb42-342" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-343"><a href="#cb42-343" aria-hidden="true" tabindex="-1"></a><span class="fu">## Regime Duration</span></span>
+<span id="cb42-344"><a href="#cb42-344" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-347"><a href="#cb42-347" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb42-348"><a href="#cb42-348" aria-hidden="true" tabindex="-1"></a>result_spell <span class="ot">&lt;-</span> result <span class="sc">%&gt;%</span></span>
+<span id="cb42-349"><a href="#cb42-349" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb42-350"><a href="#cb42-350" aria-hidden="true" tabindex="-1"></a>    <span class="at">change_flag =</span> cluster <span class="sc">!=</span> <span class="fu">lag</span>(cluster, <span class="at">default =</span> <span class="fu">first</span>(cluster)),</span>
+<span id="cb42-351"><a href="#cb42-351" aria-hidden="true" tabindex="-1"></a>    <span class="at">spell_id =</span> <span class="fu">cumsum</span>(change_flag)</span>
+<span id="cb42-352"><a href="#cb42-352" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb42-353"><a href="#cb42-353" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-354"><a href="#cb42-354" aria-hidden="true" tabindex="-1"></a>spell_summary <span class="ot">&lt;-</span> result_spell <span class="sc">%&gt;%</span></span>
+<span id="cb42-355"><a href="#cb42-355" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(spell_id, cluster) <span class="sc">%&gt;%</span></span>
+<span id="cb42-356"><a href="#cb42-356" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb42-357"><a href="#cb42-357" aria-hidden="true" tabindex="-1"></a>    <span class="at">start =</span> <span class="fu">min</span>(date),</span>
+<span id="cb42-358"><a href="#cb42-358" aria-hidden="true" tabindex="-1"></a>    <span class="at">end =</span> <span class="fu">max</span>(date),</span>
+<span id="cb42-359"><a href="#cb42-359" aria-hidden="true" tabindex="-1"></a>    <span class="at">months =</span> <span class="fu">n</span>(),</span>
+<span id="cb42-360"><a href="#cb42-360" aria-hidden="true" tabindex="-1"></a>    <span class="at">.groups =</span> <span class="st">"drop"</span></span>
+<span id="cb42-361"><a href="#cb42-361" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb42-362"><a href="#cb42-362" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(start)</span>
+<span id="cb42-363"><a href="#cb42-363" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-364"><a href="#cb42-364" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(spell_summary)</span>
+<span id="cb42-365"><a href="#cb42-365" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb42-366"><a href="#cb42-366" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-367"><a href="#cb42-367" aria-hidden="true" tabindex="-1"></a>Spell analysis helps show whether the clusters behave like persistent macroeconomic regimes rather than very short-lived fluctuations.</span>
+<span id="cb42-368"><a href="#cb42-368" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-369"><a href="#cb42-369" aria-hidden="true" tabindex="-1"></a><span class="fu">## Cluster Profiles</span></span>
+<span id="cb42-370"><a href="#cb42-370" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-373"><a href="#cb42-373" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb42-374"><a href="#cb42-374" aria-hidden="true" tabindex="-1"></a>cluster_profile <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(cluster_x2, <span class="at">cluster =</span> <span class="fu">factor</span>(km<span class="sc">$</span>cluster)) <span class="sc">%&gt;%</span></span>
+<span id="cb42-375"><a href="#cb42-375" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(cluster) <span class="sc">%&gt;%</span></span>
+<span id="cb42-376"><a href="#cb42-376" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="fu">across</span>(<span class="fu">everything</span>(), mean), <span class="at">.groups =</span> <span class="st">"drop"</span>)</span>
+<span id="cb42-377"><a href="#cb42-377" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-378"><a href="#cb42-378" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(cluster_profile)</span>
+<span id="cb42-379"><a href="#cb42-379" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb42-380"><a href="#cb42-380" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-383"><a href="#cb42-383" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb42-384"><a href="#cb42-384" aria-hidden="true" tabindex="-1"></a>cluster_profile_scaled <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(cluster_scaled, <span class="at">cluster =</span> <span class="fu">factor</span>(km<span class="sc">$</span>cluster)) <span class="sc">%&gt;%</span></span>
+<span id="cb42-385"><a href="#cb42-385" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(cluster) <span class="sc">%&gt;%</span></span>
+<span id="cb42-386"><a href="#cb42-386" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="fu">across</span>(<span class="fu">everything</span>(), mean), <span class="at">.groups =</span> <span class="st">"drop"</span>)</span>
+<span id="cb42-387"><a href="#cb42-387" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-388"><a href="#cb42-388" aria-hidden="true" tabindex="-1"></a>cluster_profile_long <span class="ot">&lt;-</span> cluster_profile_scaled <span class="sc">%&gt;%</span></span>
+<span id="cb42-389"><a href="#cb42-389" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="sc">-</span>cluster, <span class="at">names_to =</span> <span class="st">"variable"</span>, <span class="at">values_to =</span> <span class="st">"mean_z"</span>)</span>
+<span id="cb42-390"><a href="#cb42-390" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-391"><a href="#cb42-391" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(cluster_profile_long, <span class="fu">aes</span>(<span class="at">x =</span> variable, <span class="at">y =</span> cluster, <span class="at">fill =</span> mean_z)) <span class="sc">+</span></span>
+<span id="cb42-392"><a href="#cb42-392" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_tile</span>() <span class="sc">+</span></span>
+<span id="cb42-393"><a href="#cb42-393" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_gradient2</span>() <span class="sc">+</span></span>
+<span id="cb42-394"><a href="#cb42-394" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb42-395"><a href="#cb42-395" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">60</span>, <span class="at">hjust =</span> <span class="dv">1</span>)) <span class="sc">+</span></span>
+<span id="cb42-396"><a href="#cb42-396" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb42-397"><a href="#cb42-397" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Cluster Profiles"</span>,</span>
+<span id="cb42-398"><a href="#cb42-398" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">"Average standardized value in each cluster"</span>,</span>
+<span id="cb42-399"><a href="#cb42-399" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">""</span>,</span>
+<span id="cb42-400"><a href="#cb42-400" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Cluster"</span>,</span>
+<span id="cb42-401"><a href="#cb42-401" aria-hidden="true" tabindex="-1"></a>    <span class="at">fill =</span> <span class="st">"Mean z-score"</span></span>
+<span id="cb42-402"><a href="#cb42-402" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb42-403"><a href="#cb42-403" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb42-404"><a href="#cb42-404" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-405"><a href="#cb42-405" aria-hidden="true" tabindex="-1"></a>These tables and heatmaps help interpret the economic meaning of each cluster in terms of inflation, labor markets, financial conditions, and policy timing.</span>
+<span id="cb42-406"><a href="#cb42-406" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-407"><a href="#cb42-407" aria-hidden="true" tabindex="-1"></a><span class="fu">## Extra Variable Summary</span></span>
+<span id="cb42-408"><a href="#cb42-408" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-411"><a href="#cb42-411" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb42-412"><a href="#cb42-412" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="fu">ncol</span>(cluster_x_extra) <span class="sc">&gt;</span> <span class="dv">0</span>) {</span>
+<span id="cb42-413"><a href="#cb42-413" aria-hidden="true" tabindex="-1"></a>  extra_summary <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(cluster_x_extra, <span class="at">cluster =</span> <span class="fu">factor</span>(km<span class="sc">$</span>cluster)) <span class="sc">%&gt;%</span></span>
+<span id="cb42-414"><a href="#cb42-414" aria-hidden="true" tabindex="-1"></a>    <span class="fu">group_by</span>(cluster) <span class="sc">%&gt;%</span></span>
+<span id="cb42-415"><a href="#cb42-415" aria-hidden="true" tabindex="-1"></a>    <span class="fu">summarise</span>(<span class="fu">across</span>(<span class="fu">everything</span>(), mean), <span class="at">.groups =</span> <span class="st">"drop"</span>)</span>
+<span id="cb42-416"><a href="#cb42-416" aria-hidden="true" tabindex="-1"></a>  <span class="fu">print</span>(extra_summary)</span>
+<span id="cb42-417"><a href="#cb42-417" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb42-418"><a href="#cb42-418" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb42-419"><a href="#cb42-419" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-420"><a href="#cb42-420" aria-hidden="true" tabindex="-1"></a>This summary adds policy-related interpretation variables that were not used directly to build the clusters.</span>
+<span id="cb42-421"><a href="#cb42-421" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-422"><a href="#cb42-422" aria-hidden="true" tabindex="-1"></a><span class="fu">## Event Window Summary</span></span>
+<span id="cb42-423"><a href="#cb42-423" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-426"><a href="#cb42-426" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb42-427"><a href="#cb42-427" aria-hidden="true" tabindex="-1"></a>event_windows <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb42-428"><a href="#cb42-428" aria-hidden="true" tabindex="-1"></a>  <span class="at">event =</span> <span class="fu">c</span>(<span class="st">"Gulf War"</span>, <span class="st">"Dot-com / 9-11"</span>, <span class="st">"GFC"</span>, <span class="st">"COVID"</span>, <span class="st">"Russia-Ukraine"</span>),</span>
+<span id="cb42-429"><a href="#cb42-429" aria-hidden="true" tabindex="-1"></a>  <span class="at">start =</span> <span class="fu">as.Date</span>(<span class="fu">c</span>(<span class="st">"1990-08-01"</span>, <span class="st">"2001-03-01"</span>, <span class="st">"2007-12-01"</span>, <span class="st">"2020-03-01"</span>, <span class="st">"2022-02-01"</span>)),</span>
+<span id="cb42-430"><a href="#cb42-430" aria-hidden="true" tabindex="-1"></a>  <span class="at">end =</span> <span class="fu">as.Date</span>(<span class="fu">c</span>(<span class="st">"1991-03-01"</span>, <span class="st">"2002-12-01"</span>, <span class="st">"2009-06-01"</span>, <span class="st">"2020-12-01"</span>, <span class="st">"2023-12-01"</span>))</span>
+<span id="cb42-431"><a href="#cb42-431" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb42-432"><a href="#cb42-432" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-433"><a href="#cb42-433" aria-hidden="true" tabindex="-1"></a>event_cluster_summary <span class="ot">&lt;-</span> <span class="fu">lapply</span>(<span class="dv">1</span><span class="sc">:</span><span class="fu">nrow</span>(event_windows), <span class="cf">function</span>(i) {</span>
+<span id="cb42-434"><a href="#cb42-434" aria-hidden="true" tabindex="-1"></a>  temp <span class="ot">&lt;-</span> result[result<span class="sc">$</span>date <span class="sc">&gt;=</span> event_windows<span class="sc">$</span>start[i] <span class="sc">&amp;</span></span>
+<span id="cb42-435"><a href="#cb42-435" aria-hidden="true" tabindex="-1"></a>                   result<span class="sc">$</span>date <span class="sc">&lt;=</span> event_windows<span class="sc">$</span>end[i], ]</span>
+<span id="cb42-436"><a href="#cb42-436" aria-hidden="true" tabindex="-1"></a>  tb <span class="ot">&lt;-</span> <span class="fu">table</span>(temp<span class="sc">$</span>cluster)</span>
+<span id="cb42-437"><a href="#cb42-437" aria-hidden="true" tabindex="-1"></a>  <span class="fu">data.frame</span>(</span>
+<span id="cb42-438"><a href="#cb42-438" aria-hidden="true" tabindex="-1"></a>    <span class="at">event =</span> event_windows<span class="sc">$</span>event[i],</span>
+<span id="cb42-439"><a href="#cb42-439" aria-hidden="true" tabindex="-1"></a>    <span class="at">dominant_cluster =</span> <span class="fu">names</span>(<span class="fu">which.max</span>(tb)),</span>
+<span id="cb42-440"><a href="#cb42-440" aria-hidden="true" tabindex="-1"></a>    <span class="at">dominant_share =</span> <span class="fu">as.numeric</span>(<span class="fu">max</span>(tb) <span class="sc">/</span> <span class="fu">sum</span>(tb))</span>
+<span id="cb42-441"><a href="#cb42-441" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb42-442"><a href="#cb42-442" aria-hidden="true" tabindex="-1"></a>})</span>
+<span id="cb42-443"><a href="#cb42-443" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-444"><a href="#cb42-444" aria-hidden="true" tabindex="-1"></a>event_cluster_summary <span class="ot">&lt;-</span> <span class="fu">do.call</span>(rbind, event_cluster_summary)</span>
+<span id="cb42-445"><a href="#cb42-445" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(event_cluster_summary)</span>
+<span id="cb42-446"><a href="#cb42-446" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb42-447"><a href="#cb42-447" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-448"><a href="#cb42-448" aria-hidden="true" tabindex="-1"></a>The event-window summary checks whether each major shock period is dominated by a particular regime.</span>
+</code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
+</div></div></div></div></div>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+      &nbsp;
+    </div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    <div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/inukbaik/fomc-policy-modeling/blob/main/regimes.qmd" class="toc-action"><i class="bi bi-github"></i>View source</a></li></ul></div></div>
+    <div class="nav-footer-right">
+<p>Built with R and Quarto. Data: FRED and the Federal Reserve.</p>
+</div>
+  </div>
+</footer>
+
+
+
+
+</body></html>

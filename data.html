@@ -1,0 +1,1830 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.11.9">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>The Data – FOMC Policy Modeling</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<script src="site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/scrollable-regions/scrollable-regions.js" type="module"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-63b5708e65d6cd79cd7618c58d0c21e7.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-dark-447e42e69aaa9833c0ba1b986f430b20.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-63b5708e65d6cd79cd7618c58d0c21e7.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-d31a0c91b01e363be7b7a36e602e2c70.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-dark-c1afb647e6504aed1ecd096a1ed45b6d.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="site_libs/bootstrap/bootstrap-d31a0c91b01e363be7b7a36e602e2c70.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+
+</head>
+
+<body class="nav-fixed quarto-light"><a id="quarto-skip-link" class="visually-hidden-focusable" href="#quarto-document-content">Skip to main content</a><script id="quarto-html-before-body" type="application/javascript">
+    const toggleBodyColorMode = (bsSheetEl) => {
+      const mode = bsSheetEl.getAttribute("data-mode");
+      const bodyEl = window.document.querySelector("body");
+      if (mode === "dark") {
+        bodyEl.classList.add("quarto-dark");
+        bodyEl.classList.remove("quarto-light");
+      } else {
+        bodyEl.classList.add("quarto-light");
+        bodyEl.classList.remove("quarto-dark");
+      }
+    }
+    const toggleBodyColorPrimary = () => {
+      const bsSheetEl = window.document.querySelector("link#quarto-bootstrap:not([rel=disabled-stylesheet])");
+      if (bsSheetEl) {
+        toggleBodyColorMode(bsSheetEl);
+      }
+    }
+    const setColorSchemeToggle = (alternate) => {
+      const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+      for (let i=0; i < toggles.length; i++) {
+        const toggle = toggles[i];
+        if (toggle) {
+          toggle.setAttribute("aria-checked", alternate ? "true" : "false");
+          if (alternate) {
+            toggle.classList.add("alternate");
+          } else {
+            toggle.classList.remove("alternate");
+          }
+        }
+      }
+    };
+    const toggleColorMode = (alternate) => {
+      // Switch the stylesheets
+      const primaryStylesheets = window.document.querySelectorAll('link.quarto-color-scheme:not(.quarto-color-alternate)');
+      const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+      manageTransitions('#quarto-margin-sidebar .nav-link', false);
+      if (alternate) {
+        // note: dark is layered on light, we don't disable primary!
+        enableStylesheet(alternateStylesheets);
+        for (const sheetNode of alternateStylesheets) {
+          if (sheetNode.id === "quarto-bootstrap") {
+            toggleBodyColorMode(sheetNode);
+          }
+        }
+      } else {
+        disableStylesheet(alternateStylesheets);
+        enableStylesheet(primaryStylesheets)
+        toggleBodyColorPrimary();
+      }
+      manageTransitions('#quarto-margin-sidebar .nav-link', true);
+      // Switch the toggles
+      setColorSchemeToggle(alternate)
+    }
+    // Hack to workaround the fact that safari doesn't
+    // properly recolor the scrollbar when toggling (#1455).
+    // Not run on load: stylesheets are set before first paint there, and
+    // scrolling would undo the scroll to a URL fragment (#14973).
+    // The one pixel nudge keeps the reader where they were.
+    const refreshSafariScrollbar = () => {
+      if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+        manageTransitions("body", false);
+        const scrollY = window.scrollY;
+        window.scrollTo(0, scrollY > 0 ? scrollY - 1 : 1);
+        setTimeout(() => {
+          window.scrollTo(0, scrollY);
+          manageTransitions("body", true);
+        }, 40);
+      }
+    }
+    const disableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        stylesheet.rel = 'disabled-stylesheet';
+      }
+    }
+    const enableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        if(stylesheet.rel !== 'stylesheet') { // for Chrome, which will still FOUC without this check
+          stylesheet.rel = 'stylesheet';
+        }
+      }
+    }
+    const manageTransitions = (selector, allowTransitions) => {
+      const els = window.document.querySelectorAll(selector);
+      for (let i=0; i < els.length; i++) {
+        const el = els[i];
+        if (allowTransitions) {
+          el.classList.remove('notransition');
+        } else {
+          el.classList.add('notransition');
+        }
+      }
+    }
+    const isFileUrl = () => {
+      return window.location.protocol === 'file:';
+    }
+    const hasAlternateSentinel = () => {
+      let styleSentinel = getColorSchemeSentinel();
+      if (styleSentinel !== null) {
+        return styleSentinel === "alternate";
+      } else {
+        return false;
+      }
+    }
+    const setStyleSentinel = (alternate) => {
+      const value = alternate ? "alternate" : "default";
+      if (!isFileUrl()) {
+        window.localStorage.setItem("quarto-color-scheme", value);
+      } else {
+        localAlternateSentinel = value;
+      }
+    }
+    const getColorSchemeSentinel = () => {
+      if (!isFileUrl()) {
+        const storageValue = window.localStorage.getItem("quarto-color-scheme");
+        return storageValue != null ? storageValue : localAlternateSentinel;
+      } else {
+        return localAlternateSentinel;
+      }
+    }
+    const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+      const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+      const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+      let newTheme = '';
+      if(authorPrefersDark) {
+        newTheme = isAlternate ? baseTheme : alternateTheme;
+      } else {
+        newTheme = isAlternate ? alternateTheme : baseTheme;
+      }
+      const changeGiscusTheme = () => {
+        // From: https://github.com/giscus/giscus/issues/336
+        const sendMessage = (message) => {
+          const iframe = document.querySelector('iframe.giscus-frame');
+          if (!iframe) return;
+          iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+        }
+        sendMessage({
+          setConfig: {
+            theme: newTheme
+          }
+        });
+      }
+      const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+      if (isGiscussLoaded) {
+        changeGiscusTheme();
+      }
+    };
+    const authorPrefersDark = false;
+    const darkModeDefault = authorPrefersDark;
+      document.querySelector('link#quarto-text-highlighting-styles.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+      document.querySelector('link#quarto-bootstrap.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+    let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+    // Dark / light mode switch
+    window.quartoToggleColorScheme = () => {
+      // Read the current dark / light value
+      let toAlternate = !hasAlternateSentinel();
+      toggleColorMode(toAlternate);
+      refreshSafariScrollbar();
+      setStyleSentinel(toAlternate);
+      toggleGiscusIfUsed(toAlternate, darkModeDefault);
+      window.dispatchEvent(new Event('resize'));
+    };
+    // Switch to dark mode if need be
+    if (hasAlternateSentinel()) {
+      toggleColorMode(true);
+    } else {
+      toggleColorMode(false);
+    }
+  </script>
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark" aria-label="Site">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="./index.html">
+    <span class="navbar-title">FOMC Policy Modeling</span>
+    </a>
+  </div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="./index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link active" href="./data.html" aria-current="page"> 
+<span class="menu-text">The data</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./rule.html"> 
+<span class="menu-text">The rule</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./regimes.html"> 
+<span class="menu-text">The regimes</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./prediction.html"> 
+<span class="menu-text">The prediction</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./changes.html"> 
+<span class="menu-text">What changed</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/inukbaik/fomc-policy-modeling"> <i class="bi bi-github" role="img" aria-label="GitHub repository">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+  <button type="button" role="switch" aria-checked="false" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode" aria-label="Toggle dark mode"><i class="bi"></i></button>
+</div>
+            <div id="quarto-search" class="" title="Search"></div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" aria-labelledby="toc-title" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#setup" id="toc-setup" class="nav-link active" data-scroll-target="#setup">Setup</a></li>
+  <li><a href="#settings" id="toc-settings" class="nav-link" data-scroll-target="#settings">Settings</a></li>
+  <li><a href="#load-data" id="toc-load-data" class="nav-link" data-scroll-target="#load-data">Load Data</a></li>
+  <li><a href="#initial-data-checks" id="toc-initial-data-checks" class="nav-link" data-scroll-target="#initial-data-checks">Initial Data Checks</a></li>
+  <li><a href="#data-cleaning" id="toc-data-cleaning" class="nav-link" data-scroll-target="#data-cleaning">Data Cleaning</a>
+  <ul class="collapse">
+  <li><a href="#fix-variable-types" id="toc-fix-variable-types" class="nav-link" data-scroll-target="#fix-variable-types">Fix Variable Types</a></li>
+  <li><a href="#remove-invalid-or-incomplete-observations" id="toc-remove-invalid-or-incomplete-observations" class="nav-link" data-scroll-target="#remove-invalid-or-incomplete-observations">Remove Invalid or Incomplete Observations</a></li>
+  <li><a href="#handle-missing-values" id="toc-handle-missing-values" class="nav-link" data-scroll-target="#handle-missing-values">Handle Missing Values</a></li>
+  </ul></li>
+  <li><a href="#feature-engineering" id="toc-feature-engineering" class="nav-link" data-scroll-target="#feature-engineering">Feature Engineering</a>
+  <ul class="collapse">
+  <li><a href="#create-derived-variables" id="toc-create-derived-variables" class="nav-link" data-scroll-target="#create-derived-variables">Create Derived Variables</a></li>
+  <li><a href="#create-target-related-variables" id="toc-create-target-related-variables" class="nav-link" data-scroll-target="#create-target-related-variables">Create Target-Related Variables</a></li>
+  </ul></li>
+  <li><a href="#final-modeling-dataset" id="toc-final-modeling-dataset" class="nav-link" data-scroll-target="#final-modeling-dataset">Final Modeling Dataset</a></li>
+  <li><a href="#exploratory-data-analysis" id="toc-exploratory-data-analysis" class="nav-link" data-scroll-target="#exploratory-data-analysis">Exploratory Data Analysis</a>
+  <ul class="collapse">
+  <li><a href="#distribution-checks" id="toc-distribution-checks" class="nav-link" data-scroll-target="#distribution-checks">Distribution Checks</a></li>
+  <li><a href="#relationship-exploration" id="toc-relationship-exploration" class="nav-link" data-scroll-target="#relationship-exploration">Relationship Exploration</a></li>
+  <li><a href="#key-eda-findings" id="toc-key-eda-findings" class="nav-link" data-scroll-target="#key-eda-findings">Key EDA Findings</a></li>
+  </ul></li>
+  </ul>
+<div class="toc-actions"><ul><li><a href="https://github.com/inukbaik/fomc-policy-modeling/blob/main/data.qmd" class="toc-action"><i class="bi bi-github"></i>View source</a></li></ul></div></nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content" tabindex="-1">
+
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<div class="quarto-title-block"><div><h1 class="title">The Data</h1><button type="button" class="btn code-tools-button dropdown-toggle" id="quarto-code-tools-menu" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi"></i> Code</button><ul class="dropdown-menu dropdown-menu-end" aria-labelelledby="quarto-code-tools-menu"><li><a id="quarto-show-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Show All Code</a></li><li><a id="quarto-hide-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Hide All Code</a></li><li><hr class="dropdown-divider"></li><li><a id="quarto-view-source" class="dropdown-item" href="javascript:void(0)" role="button">View Source</a></li></ul></div></div>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>This page builds the monthly dataset used by every chapter and explores it. The data are fetched from FRED and the Federal Reserve’s FOMC calendar by <code>R/acquire_data.R</code>; nothing is committed to the repository. The chapters are <a href="./rule.html">The rule</a> (RQ1), <a href="./regimes.html">The regimes</a> (RQ2) and <a href="./prediction.html">The prediction</a> (RQ3).</p>
+<section id="setup" class="level1">
+<h1>Setup</h1>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyr)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(glmnet)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tseries)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(zoo)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(cluster)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(strucchange)</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(randomForest)</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(xgboost)</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(nnet)</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(purrr)</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(broom)</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(corrplot)</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(caret)</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(factoextra)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+</section>
+<section id="settings" class="level1">
+<h1>Settings</h1>
+<p>Analysis choices in one place. Everything else (sample end, break dates, number of clusters) is computed from the data.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>SAMPLE_START    <span class="ot">&lt;-</span> <span class="fu">as.Date</span>(<span class="st">"1986-01-01"</span>)  <span class="co"># start of the modeling sample</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>MAX_GAP_FILL    <span class="ot">&lt;-</span> <span class="dv">1</span>                      <span class="co"># fill internal gaps up to this many months</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>BP_MAX_BREAKS   <span class="ot">&lt;-</span> <span class="dv">5</span>                      <span class="co"># most structural breaks the test considers (RQ1)</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>BP_N_BREAKS     <span class="ot">&lt;-</span> <span class="dv">3</span>                      <span class="co"># breaks used (RQ1); BIC picks the max here, see C4</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>K_RANGE         <span class="ot">&lt;-</span> <span class="dv">2</span><span class="sc">:</span><span class="dv">8</span>                    <span class="co"># cluster counts shown in diagnostics (RQ2)</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>K_CLUSTERS      <span class="ot">&lt;-</span> <span class="dv">3</span>                      <span class="co"># clusters used (RQ2); silhouette is flat, see C5</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>LABEL_WINDOW_DAYS <span class="ot">&lt;-</span> <span class="dv">2</span>                    <span class="co"># days after a decision to read the new target (RQ3)</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Days after the end of month m by which month m's value is published.</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Cautious approximations of the usual release calendar; series not listed</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="co"># (market data, Michigan survey, oil, the target itself) are known by the</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="co"># end of month m. Real release dates (ALFRED) will replace this later.</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>RELEASE_DELAY_DAYS <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">UNRATE   =</span> <span class="dv">10</span>,  <span class="co"># Employment Situation, first Friday of m+1</span></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">PAYEMS   =</span> <span class="dv">10</span>,</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">INDPRO   =</span> <span class="dv">18</span>,  <span class="co"># industrial production, mid m+1</span></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>  <span class="at">HOUST    =</span> <span class="dv">20</span>,  <span class="co"># housing starts, around the 17th-19th of m+1</span></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>  <span class="at">PCEPILFE =</span> <span class="dv">31</span>,  <span class="co"># personal income and outlays, end of m+1</span></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>  <span class="at">PCEPI    =</span> <span class="dv">31</span></span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>ZLB_MAX_TARGET  <span class="ot">&lt;-</span> <span class="fl">0.25</span>                   <span class="co"># target at or below this = zero lower bound (RQ3 feature)</span></span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a><span class="co"># Inputs of the ordered probit and hazard models (RQ3), fixed in advance,</span></span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a><span class="co"># Taylor-rule style: last decision, inflation, unemployment, market</span></span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a><span class="co"># expectations, zero lower bound.</span></span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>RQ3_TAYLOR_VARS <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"prev_move"</span>, <span class="st">"inflation_gap"</span>, <span class="st">"UNRATE"</span>, <span class="st">"market_2y_spread"</span>, <span class="st">"at_zlb"</span>)</span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>RQ3_START_TRAIN <span class="ot">&lt;-</span> <span class="dv">200</span>                    <span class="co"># meetings in the first training window</span></span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>RQ3_STEP        <span class="ot">&lt;-</span> <span class="dv">12</span>                     <span class="co"># meetings per test block</span></span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>RQ3_ROLLING_WINDOW <span class="ot">&lt;-</span> <span class="dv">120</span>                 <span class="co"># meetings in the rolling-window check (~15 years), fixed in advance</span></span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>RQ3_WEIGHT_OPTIONS <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="cn">FALSE</span>, <span class="cn">TRUE</span>)      <span class="co"># tuning tries unweighted and inverse-frequency class weights (RQ3)</span></span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>RQ3_SEED        <span class="ot">&lt;-</span> <span class="dv">597</span>                    <span class="co"># seed for model fitting and the bootstrap (RQ3)</span></span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>RQ3_BOOT_REPS   <span class="ot">&lt;-</span> <span class="dv">1000</span>                   <span class="co"># bootstrap resamples for score intervals (RQ3)</span></span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a>RQ3_CORES       <span class="ot">&lt;-</span> <span class="fu">max</span>(<span class="dv">1</span>, parallel<span class="sc">::</span><span class="fu">detectCores</span>(<span class="at">logical =</span> <span class="cn">FALSE</span>) <span class="sc">-</span> <span class="dv">2</span>)  <span class="co"># parallel folds (1 on Windows)</span></span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a>RQ3_BOOT_BLOCK  <span class="ot">&lt;-</span> <span class="dv">8</span>                      <span class="co"># meetings per bootstrap block (~1 year)</span></span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a><span class="co"># Events tested with Chow tests alongside the estimated break dates (RQ1)</span></span>
+<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a>CHOW_EVENT_DATES <span class="ot">&lt;-</span> <span class="fu">as.Date</span>(<span class="fu">c</span>(</span>
+<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a>  <span class="st">"2001-09-01"</span>,  <span class="co"># 9/11</span></span>
+<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a>  <span class="st">"2008-01-01"</span>,  <span class="co"># start of 2008 easing</span></span>
+<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a>  <span class="st">"2008-11-01"</span>,  <span class="co"># zero lower bound reached</span></span>
+<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a>  <span class="st">"2020-03-01"</span>   <span class="co"># COVID</span></span>
+<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+</section>
+<section id="load-data" class="level1">
+<h1>Load Data</h1>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">597</span>)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Produced by R/acquire_data.R</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>df_raw <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"data/macro_monthly.csv"</span>)</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(df_raw)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 531  22</code></pre>
+</div>
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(df_raw)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code> [1] "date"          "ff_target"     "policy_change" "PCEPI"        
+ [5] "PCEPILFE"      "MICH"          "UNRATE"        "PAYEMS"       
+ [9] "JTSJOL"        "JTSQUR"        "INDPRO"        "HOUST"        
+[13] "RRSFS"         "WTISPLC"       "T5YIE"         "DGS3MO"       
+[17] "DGS2"          "DGS10"         "T10Y3M"        "BAA10Y"       
+[21] "ANFCI"         "DTWEXBGS"     </code></pre>
+</div>
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(df_raw)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>        date ff_target policy_change  PCEPI PCEPILFE MICH UNRATE PAYEMS JTSJOL
+1 1982-09-01 10.250000         FALSE 45.233   44.459  4.5   10.1  89183     NA
+2 1982-10-01  9.596774          TRUE 45.487   44.741  4.7   10.4  88907     NA
+3 1982-11-01  9.300000          TRUE 45.624   44.906  4.5   10.8  88786     NA
+4 1982-12-01  8.709677          TRUE 45.693   45.049  3.7   10.8  88771     NA
+5 1983-01-01  8.500000         FALSE 45.906   45.357  2.8   10.4  88990     NA
+6 1983-02-01  8.500000         FALSE 45.984   45.525  3.0   10.4  88917     NA
+  JTSQUR  INDPRO HOUST RRSFS WTISPLC T5YIE   DGS3MO      DGS2    DGS10   T10Y3M
+1     NA 47.9008  1144    NA   35.63    NA 8.192857 11.783333 12.33905 4.146190
+2     NA 47.4371  1173    NA   35.68    NA 7.967500 10.187500 10.90650 2.939000
+3     NA 47.2830  1372    NA   34.15    NA 8.346316  9.795789 10.55053 2.204211
+4     NA 46.9485  1303    NA   31.72    NA 8.202727  9.662273 10.54000 2.337273
+5     NA 47.8234  1586    NA   31.19    NA 8.117143  9.327619 10.45714 2.340000
+6     NA 47.5233  1699    NA   28.95    NA 8.394211  9.636316 10.72474 2.330526
+  BAA10Y   ANFCI DTWEXBGS
+1     NA 4.29875       NA
+2     NA 3.43660       NA
+3     NA 1.73250       NA
+4     NA 1.33000       NA
+5     NA 0.93625       NA
+6     NA 0.56625       NA</code></pre>
+</div>
+</div>
+</section>
+<section id="initial-data-checks" class="level1">
+<h1>Initial Data Checks</h1>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># missing values by column</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="fu">colSums</span>(<span class="fu">is.na</span>(df_raw))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>         date     ff_target policy_change         PCEPI      PCEPILFE 
+            0             0             0             2             2 
+         MICH        UNRATE        PAYEMS        JTSJOL        JTSQUR 
+            2             2             1           221           221 
+       INDPRO         HOUST         RRSFS       WTISPLC         T5YIE 
+            2             2           115             1           244 
+       DGS3MO          DGS2         DGS10        T10Y3M        BAA10Y 
+            0             0             0             0            40 
+        ANFCI      DTWEXBGS 
+            1           281 </code></pre>
+</div>
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># duplicated rows</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>(<span class="fu">duplicated</span>(df_raw))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0</code></pre>
+</div>
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># blank strings in character columns</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="fu">sapply</span>(df_raw[, <span class="fu">sapply</span>(df_raw, is.character), <span class="at">drop =</span> <span class="cn">FALSE</span>], <span class="cf">function</span>(x) <span class="fu">sum</span>(<span class="fu">trimws</span>(x) <span class="sc">==</span> <span class="st">""</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>date 
+   0 </code></pre>
+</div>
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># check whether date conversion may fail</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="st">"date"</span> <span class="sc">%in%</span> <span class="fu">names</span>(df_raw)) {</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">sum</span>(<span class="fu">is.na</span>(<span class="fu">as.Date</span>(df_raw<span class="sc">$</span>date)))</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">range</span>(<span class="fu">as.Date</span>(df_raw<span class="sc">$</span>date), <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "1982-09-01" "2026-11-01"</code></pre>
+</div>
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># look for columns with only one unique value</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="fu">sapply</span>(df_raw, <span class="cf">function</span>(x) <span class="fu">length</span>(<span class="fu">unique</span>(x[<span class="sc">!</span><span class="fu">is.na</span>(x)])))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>         date     ff_target policy_change         PCEPI      PCEPILFE 
+          531           203             2           524           528 
+         MICH        UNRATE        PAYEMS        JTSJOL        JTSQUR 
+           42            73           525           305            19 
+       INDPRO         HOUST         RRSFS       WTISPLC         T5YIE 
+          528           427           413           517           284 
+       DGS3MO          DGS2         DGS10        T10Y3M        BAA10Y 
+          526           528           529           530           477 
+        ANFCI      DTWEXBGS 
+          515           250 </code></pre>
+</div>
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co"># check for infinite values in numeric columns</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="fu">sapply</span>(df_raw[, <span class="fu">sapply</span>(df_raw, is.numeric), <span class="at">drop =</span> <span class="cn">FALSE</span>], <span class="cf">function</span>(x) <span class="fu">sum</span>(<span class="fu">is.infinite</span>(x)))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>ff_target     PCEPI  PCEPILFE      MICH    UNRATE    PAYEMS    JTSJOL    JTSQUR 
+        0         0         0         0         0         0         0         0 
+   INDPRO     HOUST     RRSFS   WTISPLC     T5YIE    DGS3MO      DGS2     DGS10 
+        0         0         0         0         0         0         0         0 
+   T10Y3M    BAA10Y     ANFCI  DTWEXBGS 
+        0         0         0         0 </code></pre>
+</div>
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co"># inspect suspicious numeric ranges</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(df_raw[, <span class="fu">sapply</span>(df_raw, is.numeric), <span class="at">drop =</span> <span class="cn">FALSE</span>])</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>   ff_target          PCEPI           PCEPILFE           MICH      
+ Min.   : 0.125   Min.   : 45.23   Min.   : 44.46   Min.   :0.400  
+ 1st Qu.: 1.000   1st Qu.: 65.24   1st Qu.: 66.54   1st Qu.:2.800  
+ Median : 3.875   Median : 80.10   Median : 80.66   Median :3.000  
+ Mean   : 3.782   Mean   : 82.30   Mean   : 82.39   Mean   :3.183  
+ 3rd Qu.: 5.500   3rd Qu.: 97.48   3rd Qu.: 97.20   3rd Qu.:3.300  
+ Max.   :11.435   Max.   :132.26   Max.   :130.90   Max.   :6.600  
+                  NAs    :2        NAs    :2        NAs    :2      
+     UNRATE           PAYEMS           JTSJOL          JTSQUR     
+ Min.   : 3.400   Min.   : 88771   Min.   : 2232   Min.   :1.200  
+ 1st Qu.: 4.500   1st Qu.:111520   1st Qu.: 3774   1st Qu.:1.800  
+ Median : 5.500   Median :131532   Median : 4754   Median :2.000  
+ Mean   : 5.879   Mean   :128559   Mean   : 5522   Mean   :2.008  
+ 3rd Qu.: 7.000   3rd Qu.:141452   3rd Qu.: 7083   3rd Qu.:2.200  
+ Max.   :14.800   Max.   :159293   Max.   :12301   Max.   :3.000  
+ NAs    :2        NAs    :1        NAs    :221     NAs    :221    
+     INDPRO           HOUST          RRSFS           WTISPLC      
+ Min.   : 46.95   Min.   : 478   Min.   :114052   Min.   : 11.28  
+ 1st Qu.: 65.37   1st Qu.:1176   1st Qu.:153919   1st Qu.: 21.00  
+ Median : 91.90   Median :1410   Median :170001   Median : 36.98  
+ Mean   : 84.84   Mean   :1376   Mean   :171317   Mean   : 47.44  
+ 3rd Qu.:100.02   3rd Qu.:1624   3rd Qu.:192990   3rd Qu.: 70.62  
+ Max.   :104.10   Max.   :2273   Max.   :229244   Max.   :133.93  
+ NAs    :2        NAs    :2      NAs    :115      NAs    :1       
+     T5YIE            DGS3MO              DGS2             DGS10        
+ Min.   :-1.399   Min.   : 0.01143   Min.   : 0.1153   Min.   : 0.6236  
+ 1st Qu.: 1.647   1st Qu.: 0.92832   1st Qu.: 1.4253   1st Qu.: 2.8980  
+ Median : 2.021   Median : 3.86682   Median : 4.1400   Median : 4.5645  
+ Mean   : 1.970   Mean   : 3.63124   Mean   : 4.2029   Mean   : 5.1633  
+ 3rd Qu.: 2.365   3rd Qu.: 5.49311   3rd Qu.: 6.1505   3rd Qu.: 6.8793  
+ Max.   : 3.411   Max.   :10.90043   Max.   :12.9067   Max.   :13.5629  
+ NAs    :244                                                            
+     T10Y3M            BAA10Y          ANFCI             DTWEXBGS     
+ Min.   :-1.7345   Min.   :1.290   Min.   :-1.17750   Min.   : 86.32  
+ 1st Qu.: 0.5514   1st Qu.:1.738   1st Qu.:-0.59131   1st Qu.: 93.78  
+ Median : 1.5796   Median :2.128   Median :-0.44775   Median :110.86  
+ Mean   : 1.5321   Mean   :2.262   Mean   :-0.21900   Mean   :106.60  
+ 3rd Qu.: 2.5457   3rd Qu.:2.661   3rd Qu.:-0.04231   3rd Qu.:117.15  
+ Max.   : 4.1462   Max.   :6.014   Max.   : 4.29875   Max.   :128.84  
+                   NAs    :40      NAs    :1          NAs    :281     </code></pre>
+</div>
+</div>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>raw_dates  <span class="ot">&lt;-</span> <span class="fu">as.Date</span>(df_raw<span class="sc">$</span>date)</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>na_share   <span class="ot">&lt;-</span> <span class="fu">sort</span>(<span class="fu">colMeans</span>(<span class="fu">is.na</span>(df_raw[, <span class="sc">-</span><span class="dv">1</span>])), <span class="at">decreasing =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>most_missing <span class="ot">&lt;-</span> <span class="fu">names</span>(na_share[na_share <span class="sc">&gt;</span> <span class="fl">0.2</span>])</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<p>The raw dataset has 0 duplicate rows and covers 1982-09-01 to 2026-11-01. The main issue is missingness: series that start later (DTWEXBGS, T5YIE, JTSJOL, JTSQUR, RRSFS) are missing for more than 20% of months, and the most recent months are incomplete because of publication delays. These are handled in the cleaning steps below.</p>
+</section>
+<section id="data-cleaning" class="level1">
+<h1>Data Cleaning</h1>
+<section id="fix-variable-types" class="level2">
+<h2 class="anchored" data-anchor-id="fix-variable-types">Fix Variable Types</h2>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>df_clean <span class="ot">&lt;-</span> df_raw <span class="sc">%&gt;%</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">date =</span> <span class="fu">as.Date</span>(date))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<p>The date variable was converted to <code>Date</code> format so the dataset could be filtered, joined, and ordered consistently in later preprocessing steps.</p>
+</section>
+<section id="remove-invalid-or-incomplete-observations" class="level2">
+<h2 class="anchored" data-anchor-id="remove-invalid-or-incomplete-observations">Remove Invalid or Incomplete Observations</h2>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Sample end: the last month in which every series has been published.</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Series are released with different delays, so later months are incomplete.</span></span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>series_cols <span class="ot">&lt;-</span> <span class="fu">setdiff</span>(<span class="fu">names</span>(df_clean), <span class="st">"date"</span>)</span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>last_obs <span class="ot">&lt;-</span> <span class="fu">sapply</span>(series_cols, <span class="cf">function</span>(col) {</span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">max</span>(df_clean<span class="sc">$</span>date[<span class="sc">!</span><span class="fu">is.na</span>(df_clean[[col]])])</span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a>})</span>
+<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a>SAMPLE_END <span class="ot">&lt;-</span> <span class="fu">as.Date</span>(<span class="fu">min</span>(last_obs))</span>
+<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a><span class="fu">sort</span>(<span class="fu">as.Date</span>(last_obs))  <span class="co"># last available month per series</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>        PCEPI      PCEPILFE          MICH        JTSJOL        JTSQUR 
+ "2026-09-01"  "2026-09-01"  "2026-09-01"  "2026-09-01"  "2026-09-01" 
+       INDPRO         HOUST         RRSFS        UNRATE        PAYEMS 
+ "2026-09-01"  "2026-09-01"  "2026-09-01"  "2026-10-01"  "2026-10-01" 
+      WTISPLC         ANFCI      DTWEXBGS     ff_target policy_change 
+ "2026-10-01"  "2026-10-01"  "2026-10-01"  "2026-11-01"  "2026-11-01" 
+        T5YIE        DGS3MO          DGS2         DGS10        T10Y3M 
+ "2026-11-01"  "2026-11-01"  "2026-11-01"  "2026-11-01"  "2026-11-01" 
+       BAA10Y 
+ "2026-11-01" </code></pre>
+</div>
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>df_clean <span class="ot">&lt;-</span> df_clean <span class="sc">%&gt;%</span></span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(date <span class="sc">&lt;=</span> SAMPLE_END)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<p>The sample ends in September 2026, the last month in which every series has been published. Later months are dropped because some series are released with a delay of one to two months.</p>
+</section>
+<section id="handle-missing-values" class="level2">
+<h2 class="anchored" data-anchor-id="handle-missing-values">Handle Missing Values</h2>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Fill short gaps inside a series (e.g. October 2025, when the government</span></span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a><span class="co"># shutdown stopped some releases) by carrying the last value forward.</span></span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Carrying forward never uses later data, so it adds no look-ahead.</span></span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Leading NAs (before a series starts) are left alone.</span></span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>before <span class="ot">&lt;-</span> df_clean</span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a>df_clean <span class="ot">&lt;-</span> df_clean <span class="sc">%&gt;%</span></span>
+<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(date) <span class="sc">%&gt;%</span></span>
+<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(</span>
+<span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">all_of</span>(series_cols),</span>
+<span id="cb28-11"><a href="#cb28-11" aria-hidden="true" tabindex="-1"></a>    <span class="sc">~</span> zoo<span class="sc">::</span><span class="fu">na.locf</span>(.x, <span class="at">na.rm =</span> <span class="cn">FALSE</span>, <span class="at">maxgap =</span> MAX_GAP_FILL)</span>
+<span id="cb28-12"><a href="#cb28-12" aria-hidden="true" tabindex="-1"></a>  ))</span>
+<span id="cb28-13"><a href="#cb28-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-14"><a href="#cb28-14" aria-hidden="true" tabindex="-1"></a>filled <span class="ot">&lt;-</span> <span class="fu">map_dfr</span>(series_cols, <span class="cf">function</span>(col) {</span>
+<span id="cb28-15"><a href="#cb28-15" aria-hidden="true" tabindex="-1"></a>  idx <span class="ot">&lt;-</span> <span class="fu">which</span>(<span class="fu">is.na</span>(before[[col]]) <span class="sc">&amp;</span> <span class="sc">!</span><span class="fu">is.na</span>(df_clean[[col]]))</span>
+<span id="cb28-16"><a href="#cb28-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tibble</span>(<span class="at">series =</span> col, <span class="at">date =</span> before<span class="sc">$</span>date[idx], <span class="at">filled_with =</span> df_clean[[col]][idx])</span>
+<span id="cb28-17"><a href="#cb28-17" aria-hidden="true" tabindex="-1"></a>})</span>
+<span id="cb28-18"><a href="#cb28-18" aria-hidden="true" tabindex="-1"></a>filled</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 2 × 3
+  series date       filled_with
+  &lt;chr&gt;  &lt;date&gt;           &lt;dbl&gt;
+1 UNRATE 2025-10-01         4.4
+2 RRSFS  2025-10-01    216179  </code></pre>
+</div>
+</div>
+<p>2 value(s) were missing inside a series and filled with the previous month’s value: UNRATE Oct 2025, RRSFS Oct 2025.</p>
+<p>Oil prices come from <code>WTISPLC</code>, the monthly WTI spot price, which has a longer history than the daily series.</p>
+</section>
+</section>
+<section id="feature-engineering" class="level1">
+<h1>Feature Engineering</h1>
+<section id="create-derived-variables" class="level2">
+<h2 class="anchored" data-anchor-id="create-derived-variables">Create Derived Variables</h2>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>df_clean <span class="ot">&lt;-</span> df_clean <span class="sc">%&gt;%</span></span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(date) <span class="sc">%&gt;%</span></span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">core_pce_yoy      =</span> <span class="dv">100</span> <span class="sc">*</span> (PCEPILFE <span class="sc">/</span> <span class="fu">lag</span>(PCEPILFE, <span class="dv">12</span>) <span class="sc">-</span> <span class="dv">1</span>),</span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">unrate_lag1       =</span> <span class="fu">lag</span>(UNRATE, <span class="dv">1</span>),</span>
+<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">payems_yoy        =</span> <span class="dv">100</span> <span class="sc">*</span> (PAYEMS <span class="sc">/</span> <span class="fu">lag</span>(PAYEMS, <span class="dv">12</span>) <span class="sc">-</span> <span class="dv">1</span>),</span>
+<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">term_spread_10y_3m =</span> DGS10 <span class="sc">-</span> DGS3MO,</span>
+<span id="cb30-8"><a href="#cb30-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">inflation_gap     =</span> core_pce_yoy <span class="sc">-</span> <span class="dv">2</span></span>
+<span id="cb30-9"><a href="#cb30-9" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<p>Several derived variables were created to better capture macroeconomic conditions relevant to policy decisions, including core inflation growth, lagged unemployment, payroll growth, the term spread, and the inflation gap relative to the 2 percent target.</p>
+</section>
+<section id="create-target-related-variables" class="level2">
+<h2 class="anchored" data-anchor-id="create-target-related-variables">Create Target-Related Variables</h2>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Produced by R/acquire_data.R. Keep meetings and conference calls; drop</span></span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a><span class="co"># notation votes and the cancelled March 2020 meeting. `date` is the first day</span></span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a><span class="co"># of the meeting, as in the original fed_meetings.csv.</span></span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>fomc_meetings <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"data/fomc_meetings.csv"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span>type <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"cancelled"</span>, <span class="st">"notation_vote"</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">date =</span> <span class="fu">as.Date</span>(start_date))</span>
+<span id="cb31-7"><a href="#cb31-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-8"><a href="#cb31-8" aria-hidden="true" tabindex="-1"></a>fomc_monthly <span class="ot">&lt;-</span> fomc_meetings <span class="sc">%&gt;%</span></span>
+<span id="cb31-9"><a href="#cb31-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">month =</span> <span class="fu">as.Date</span>(<span class="fu">format</span>(date, <span class="st">"%Y-%m-01"</span>))) <span class="sc">%&gt;%</span></span>
+<span id="cb31-10"><a href="#cb31-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(month) <span class="sc">%&gt;%</span></span>
+<span id="cb31-11"><a href="#cb31-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb31-12"><a href="#cb31-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">fomc_meetings    =</span> <span class="fu">n</span>(),</span>
+<span id="cb31-13"><a href="#cb31-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">fomc_scheduled   =</span> <span class="fu">sum</span>(is_scheduled, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb31-14"><a href="#cb31-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">fomc_unscheduled =</span> <span class="fu">sum</span>(<span class="sc">!</span>is_scheduled, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb31-15"><a href="#cb31-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">.groups =</span> <span class="st">"drop"</span></span>
+<span id="cb31-16"><a href="#cb31-16" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb31-17"><a href="#cb31-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-18"><a href="#cb31-18" aria-hidden="true" tabindex="-1"></a>df_clean <span class="ot">&lt;-</span> df_clean <span class="sc">%&gt;%</span></span>
+<span id="cb31-19"><a href="#cb31-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">month =</span> <span class="fu">as.Date</span>(<span class="fu">format</span>(date, <span class="st">"%Y-%m-01"</span>))) <span class="sc">%&gt;%</span></span>
+<span id="cb31-20"><a href="#cb31-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(fomc_monthly, <span class="at">by =</span> <span class="st">"month"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb31-21"><a href="#cb31-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb31-22"><a href="#cb31-22" aria-hidden="true" tabindex="-1"></a>    <span class="at">fomc_meetings    =</span> dplyr<span class="sc">::</span><span class="fu">coalesce</span>(fomc_meetings, <span class="dv">0</span>),</span>
+<span id="cb31-23"><a href="#cb31-23" aria-hidden="true" tabindex="-1"></a>    <span class="at">fomc_scheduled   =</span> dplyr<span class="sc">::</span><span class="fu">coalesce</span>(fomc_scheduled, <span class="dv">0</span>),</span>
+<span id="cb31-24"><a href="#cb31-24" aria-hidden="true" tabindex="-1"></a>    <span class="at">fomc_unscheduled =</span> dplyr<span class="sc">::</span><span class="fu">coalesce</span>(fomc_unscheduled, <span class="dv">0</span>)</span>
+<span id="cb31-25"><a href="#cb31-25" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<p>Monthly FOMC meeting counts were merged into the main dataset so the analysis could distinguish between months with scheduled meetings, unscheduled meetings, and no meetings.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>fomc_dates <span class="ot">&lt;-</span> fomc_meetings <span class="sc">%&gt;%</span></span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(date)</span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>df_clean <span class="ot">&lt;-</span> df_clean <span class="sc">%&gt;%</span></span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rowwise</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb32-7"><a href="#cb32-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">days_since_last_fomc =</span> <span class="fu">as.numeric</span>(date <span class="sc">-</span> <span class="fu">max</span>(fomc_dates<span class="sc">$</span>date[fomc_dates<span class="sc">$</span>date <span class="sc">&lt;</span> date]))</span>
+<span id="cb32-8"><a href="#cb32-8" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb32-9"><a href="#cb32-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb32-10"><a href="#cb32-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>month)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<p>The variable <code>days_since_last_fomc</code> was added to measure how much time had passed since the most recent FOMC meeting, providing a simple timing feature related to policy activity.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>df_final <span class="ot">&lt;-</span> df_clean <span class="sc">%&gt;%</span></span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(date <span class="sc">&gt;=</span> SAMPLE_START)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<p>After preprocessing and feature construction, the final working dataset was restricted to the post-1986 period to align with the availability of the selected variables and the scope of the modeling analysis.</p>
+</section>
+</section>
+<section id="final-modeling-dataset" class="level1">
+<h1>Final Modeling Dataset</h1>
+<p>The final modeling dataset is obtained after preprocessing, variable replacement, and feature engineering. The sample is restricted to the post-1986 period so that the analysis is based on a more consistent set of available variables. This dataset is used as the input for the remaining exploratory and modeling steps.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(df_final)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 489  31</code></pre>
+</div>
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(df_final)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 31
+  date       ff_target policy_change PCEPI PCEPILFE  MICH UNRATE PAYEMS JTSJOL
+  &lt;date&gt;         &lt;dbl&gt; &lt;lgl&gt;         &lt;dbl&gt;    &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;  &lt;int&gt;  &lt;int&gt;
+1 1986-01-01      7.75 FALSE          51.1     51.1   2.9    6.7  98732     NA
+2 1986-02-01      7.75 FALSE          51.1     51.2   2.8    7.2  98847     NA
+3 1986-03-01      7.35 TRUE           51.0     51.4   2.3    7.2  98934     NA
+4 1986-04-01      7.12 TRUE           50.9     51.5   2.4    7.1  99121     NA
+5 1986-05-01      6.77 TRUE           51.0     51.6   2.7    7.2  99248     NA
+6 1986-06-01      6.87 TRUE           51.2     51.7   2.9    7.2  99155     NA
+# ℹ 22 more variables: JTSQUR &lt;dbl&gt;, INDPRO &lt;dbl&gt;, HOUST &lt;int&gt;, RRSFS &lt;int&gt;,
+#   WTISPLC &lt;dbl&gt;, T5YIE &lt;dbl&gt;, DGS3MO &lt;dbl&gt;, DGS2 &lt;dbl&gt;, DGS10 &lt;dbl&gt;,
+#   T10Y3M &lt;dbl&gt;, BAA10Y &lt;dbl&gt;, ANFCI &lt;dbl&gt;, DTWEXBGS &lt;dbl&gt;,
+#   core_pce_yoy &lt;dbl&gt;, unrate_lag1 &lt;dbl&gt;, payems_yoy &lt;dbl&gt;,
+#   term_spread_10y_3m &lt;dbl&gt;, inflation_gap &lt;dbl&gt;, fomc_meetings &lt;dbl&gt;,
+#   fomc_scheduled &lt;dbl&gt;, fomc_unscheduled &lt;dbl&gt;, days_since_last_fomc &lt;dbl&gt;</code></pre>
+</div>
+</div>
+</section>
+<section id="exploratory-data-analysis" class="level1">
+<h1>Exploratory Data Analysis</h1>
+<section id="distribution-checks" class="level2">
+<h2 class="anchored" data-anchor-id="distribution-checks">Distribution Checks</h2>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(df_final, <span class="fu">aes</span>(<span class="at">x =</span> ff_target)) <span class="sc">+</span></span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(<span class="at">bins =</span> <span class="dv">30</span>) <span class="sc">+</span></span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Distribution of Federal Funds Target Rate"</span>,</span>
+<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Federal Funds Target Rate"</span>,</span>
+<span id="cb38-6"><a href="#cb38-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Frequency"</span></span>
+<span id="cb38-7"><a href="#cb38-7" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="data_files/figure-html/unnamed-chunk-5-1.png" class="img-fluid figure-img" width="768"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(df_final, <span class="fu">aes</span>(<span class="at">x =</span> date, <span class="at">y =</span> ff_target)) <span class="sc">+</span></span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>() <span class="sc">+</span></span>
+<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Federal Funds Target Rate Over Time"</span>,</span>
+<span id="cb39-5"><a href="#cb39-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Date"</span>,</span>
+<span id="cb39-6"><a href="#cb39-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Federal Funds Target Rate"</span></span>
+<span id="cb39-7"><a href="#cb39-7" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="data_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid figure-img" width="768"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>missing_summary <span class="ot">&lt;-</span> <span class="fu">colSums</span>(<span class="fu">is.na</span>(df_final))</span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a>missing_df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">Variable =</span> <span class="fu">names</span>(missing_summary),</span>
+<span id="cb40-5"><a href="#cb40-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">Missing_Count =</span> <span class="fu">as.numeric</span>(missing_summary)</span>
+<span id="cb40-6"><a href="#cb40-6" aria-hidden="true" tabindex="-1"></a>) <span class="sc">%&gt;%</span></span>
+<span id="cb40-7"><a href="#cb40-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(Missing_Count))</span>
+<span id="cb40-8"><a href="#cb40-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb40-9"><a href="#cb40-9" aria-hidden="true" tabindex="-1"></a>missing_df <span class="sc">%&gt;%</span></span>
+<span id="cb40-10"><a href="#cb40-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(Missing_Count <span class="sc">&gt;</span> <span class="dv">0</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb40-11"><a href="#cb40-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">reorder</span>(Variable, Missing_Count), <span class="at">y =</span> Missing_Count)) <span class="sc">+</span></span>
+<span id="cb40-12"><a href="#cb40-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>() <span class="sc">+</span></span>
+<span id="cb40-13"><a href="#cb40-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span></span>
+<span id="cb40-14"><a href="#cb40-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb40-15"><a href="#cb40-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Missing Values by Variable"</span>,</span>
+<span id="cb40-16"><a href="#cb40-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Variable"</span>,</span>
+<span id="cb40-17"><a href="#cb40-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Number of Missing Values"</span></span>
+<span id="cb40-18"><a href="#cb40-18" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="data_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid figure-img" width="768"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>The distribution of the federal funds target rate and its movement over time were examined to understand the scale and temporal behavior of the response variable. Missing-value patterns were also reviewed to identify whether any variables still contained gaps after preprocessing.</p>
+</section>
+<section id="relationship-exploration" class="level2">
+<h2 class="anchored" data-anchor-id="relationship-exploration">Relationship Exploration</h2>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>candidate_vars <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"UNRATE"</span>, <span class="st">"PCEPI"</span>, <span class="st">"DGS10"</span>, <span class="st">"T10Y3M"</span>)</span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a>selected_vars <span class="ot">&lt;-</span> candidate_vars[candidate_vars <span class="sc">%in%</span> <span class="fu">names</span>(df_final)]</span>
+<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb41-4"><a href="#cb41-4" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="fu">length</span>(selected_vars) <span class="sc">&gt;</span> <span class="dv">0</span>) {</span>
+<span id="cb41-5"><a href="#cb41-5" aria-hidden="true" tabindex="-1"></a>  df_long <span class="ot">&lt;-</span> df_final <span class="sc">%&gt;%</span></span>
+<span id="cb41-6"><a href="#cb41-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(date, <span class="fu">all_of</span>(selected_vars)) <span class="sc">%&gt;%</span></span>
+<span id="cb41-7"><a href="#cb41-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">pivot_longer</span>(<span class="sc">-</span>date, <span class="at">names_to =</span> <span class="st">"Variable"</span>, <span class="at">values_to =</span> <span class="st">"Value"</span>)</span>
+<span id="cb41-8"><a href="#cb41-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb41-9"><a href="#cb41-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(df_long, <span class="fu">aes</span>(<span class="at">x =</span> date, <span class="at">y =</span> Value)) <span class="sc">+</span></span>
+<span id="cb41-10"><a href="#cb41-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_line</span>() <span class="sc">+</span></span>
+<span id="cb41-11"><a href="#cb41-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">facet_wrap</span>(<span class="sc">~</span> Variable, <span class="at">scales =</span> <span class="st">"free_y"</span>, <span class="at">ncol =</span> <span class="dv">2</span>) <span class="sc">+</span></span>
+<span id="cb41-12"><a href="#cb41-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(</span>
+<span id="cb41-13"><a href="#cb41-13" aria-hidden="true" tabindex="-1"></a>      <span class="at">title =</span> <span class="st">"Selected Predictors Over Time"</span>,</span>
+<span id="cb41-14"><a href="#cb41-14" aria-hidden="true" tabindex="-1"></a>      <span class="at">x =</span> <span class="st">"Date"</span>,</span>
+<span id="cb41-15"><a href="#cb41-15" aria-hidden="true" tabindex="-1"></a>      <span class="at">y =</span> <span class="st">"Value"</span></span>
+<span id="cb41-16"><a href="#cb41-16" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb41-17"><a href="#cb41-17" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="data_files/figure-html/unnamed-chunk-8-1.png" class="img-fluid figure-img" width="768"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a>numeric_df <span class="ot">&lt;-</span> df_final <span class="sc">%&gt;%</span> <span class="fu">select</span>(<span class="fu">where</span>(is.numeric))</span>
+<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a>cor_mat <span class="ot">&lt;-</span> <span class="fu">cor</span>(numeric_df, <span class="at">use =</span> <span class="st">"complete.obs"</span>)</span>
+<span id="cb42-4"><a href="#cb42-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-5"><a href="#cb42-5" aria-hidden="true" tabindex="-1"></a>cor_long <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(<span class="fu">as.table</span>(cor_mat))</span>
+<span id="cb42-6"><a href="#cb42-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-7"><a href="#cb42-7" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(cor_long, <span class="fu">aes</span>(<span class="at">x =</span> Var1, <span class="at">y =</span> Var2, <span class="at">fill =</span> Freq)) <span class="sc">+</span></span>
+<span id="cb42-8"><a href="#cb42-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_tile</span>() <span class="sc">+</span></span>
+<span id="cb42-9"><a href="#cb42-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_gradient2</span>(<span class="at">low =</span> <span class="st">"blue"</span>, <span class="at">mid =</span> <span class="st">"white"</span>, <span class="at">high =</span> <span class="st">"red"</span>, <span class="at">midpoint =</span> <span class="dv">0</span>) <span class="sc">+</span></span>
+<span id="cb42-10"><a href="#cb42-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">90</span>, <span class="at">hjust =</span> <span class="dv">1</span>)) <span class="sc">+</span></span>
+<span id="cb42-11"><a href="#cb42-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb42-12"><a href="#cb42-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Correlation Heatmap of Numeric Variables"</span>,</span>
+<span id="cb42-13"><a href="#cb42-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">""</span>,</span>
+<span id="cb42-14"><a href="#cb42-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">""</span>,</span>
+<span id="cb42-15"><a href="#cb42-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">fill =</span> <span class="st">"Correlation"</span></span>
+<span id="cb42-16"><a href="#cb42-16" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="data_files/figure-html/unnamed-chunk-9-1.png" class="img-fluid figure-img" width="768"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Selected macroeconomic predictors were examined over time to compare their movement with changes in the policy target. Correlation analysis was also used to identify strong linear relationships among numeric variables, which is useful for understanding redundancy and potential multicollinearity in later modeling steps.</p>
+</section>
+<section id="key-eda-findings" class="level2">
+<h2 class="anchored" data-anchor-id="key-eda-findings">Key EDA Findings</h2>
+<p>Overall, the exploratory analysis showed that the dataset is time-ordered and contains variables that vary meaningfully across different monetary policy environments. The federal funds target displays clear changes over time rather than a uniform distribution, and several predictors appear to move in related patterns. The correlation analysis also suggests that some variables are highly related, which supports paying attention to multicollinearity and model flexibility in the later modeling stage.</p>
+
+
+<!-- -->
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    // Ensure there is a toggle, if there isn't float one in the top right
+    if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+      const toggle = window.document.createElement('button');
+      toggle.type = "button";
+      toggle.setAttribute("role", "switch");
+      toggle.setAttribute("aria-checked", "false");
+      toggle.classList.add('top-right');
+      toggle.classList.add('quarto-color-scheme-toggle');
+      toggle.setAttribute("aria-label", "Toggle dark mode");
+      toggle.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+      const i = window.document.createElement("i");
+      i.classList.add('bi');
+      toggle.appendChild(i);
+      // Put the toggle in a landmark of its own, so that landmark navigation
+      // can reach it.
+      //
+      // The container is always a fresh direct child of body, and the toggle is
+      // never moved into page furniture that the theme or the author controls.
+      // The toggle is positioned against the page, so any ancestor that
+      // establishes a containing block captures it: a positioned element or a
+      // grid for position: absolute, and transform, filter, will-change or
+      // contain for position: fixed. A direct child of body has none of these
+      // to inherit, and the shift when one appears is silent and visual.
+      //
+      // ARIA says a document should have at most one banner, and axe reports a
+      // duplicate whether or not the banners carry distinct labels. So use a
+      // header when the page has no banner yet, and a named region otherwise.
+      //
+      // A header is a banner wherever it sits, unless it is inside sectioning
+      // content, so this cannot just look at the children of body: a custom
+      // page layout wraps the title block header in a plain div. An explicit
+      // role="banner" always counts.
+      const sectioning = 'article, aside, main, nav, section, [role="article"], [role="complementary"], [role="main"], [role="navigation"], [role="region"]';
+      const hasBanner = Array.from(
+        window.document.querySelectorAll('header:not([role]), [role="banner"]')
+      ).some(function(el) {
+        return el.hasAttribute("role") || el.closest(sectioning) === null;
+      });
+      const container = window.document.createElement(hasBanner ? "div" : "header");
+      if (hasBanner) {
+        container.setAttribute("role", "region");
+        container.setAttribute("aria-label", "Toggle dark mode");
+      }
+      container.classList.add('quarto-color-scheme-toggle-container');
+      container.appendChild(toggle);
+      window.document.body.appendChild(container);
+    }
+    setColorSchemeToggle(hasAlternateSentinel())
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+    const viewSource = window.document.getElementById('quarto-view-source') ||
+                       window.document.getElementById('quarto-code-tools-source');
+    if (viewSource) {
+      const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+      viewSource.addEventListener("click", function(e) {
+        if (sourceUrl) {
+          // rstudio viewer pane
+          if (/\bcapabilities=\b/.test(window.location)) {
+            window.open(sourceUrl);
+          } else {
+            window.location.href = sourceUrl;
+          }
+        } else {
+          const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+          modal.show();
+        }
+        return false;
+      });
+    }
+    function toggleCodeHandler(show) {
+      return function(e) {
+        const cellDetails = window.document.querySelectorAll(".cell details.code-fold");
+        for (let i=0; i<cellDetails.length; i++) {
+          const details = cellDetails[i];
+          if (show) {
+            details.open = true;
+          } else {
+            details.removeAttribute("open");
+          }
+        }
+        const cellCodeDivs = window.document.querySelectorAll(".cell div.sourceCode.cell-code");
+        const fromCls = show ? "hidden" : "unhidden";
+        const toCls = show ? "unhidden" : "hidden";
+        for (let i=0; i<cellCodeDivs.length; i++) {
+          const codeDiv = cellCodeDivs[i];
+          if (codeDiv.classList.contains(fromCls)) {
+            codeDiv.classList.remove(fromCls);
+            codeDiv.classList.add(toCls);
+          } 
+        }
+        return false;
+      }
+    }
+    const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+    if (hideAllCode) {
+      hideAllCode.addEventListener("click", toggleCodeHandler(false));
+    }
+    const showAllCode = window.document.getElementById("quarto-show-all-code");
+    if (showAllCode) {
+      showAllCode.addEventListener("click", toggleCodeHandler(true));
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/inukbaik\.github\.io\/fomc-policy-modeling\/");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+      window.quartoDecorateExternalLinks = function (root) {
+     var links = (root || window.document).querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+          if (!link.classList.contains('no-external-icon')) {
+          }
+        }
+      }
+      };
+      window.quartoDecorateExternalLinks(window.document);
+    // Esc closes the popup (WCAG 1.4.13) and focus leaving both trigger and
+    // popup closes it (WCAG 2.4.11); tippy handles neither for interactive popups.
+    const hideOnEscAndFocusOut = {
+      name: 'hideOnEscAndFocusOut',
+      defaultValue: true,
+      fn(instance) {
+        const dismiss = () => {
+          // A show scheduled by the trigger delay would otherwise reopen it
+          instance.clearDelayTimeouts();
+          instance.hide();
+        };
+        const onKeyDown = (event) => {
+          if (event.key !== 'Escape') {
+            return;
+          }
+          // Keep Esc from also reaching page handlers (e.g. reveal.js overview),
+          // except an open reveal.js slide menu, which Esc should close too.
+          // The menu handles keys only when its keyboard option is on.
+          const menuHandlesEsc = window.Reveal?.getPlugin?.('menu')?.isOpen() &&
+            window.Reveal.getConfig().menu?.keyboard !== false;
+          if (!menuHandlesEsc) {
+            event.stopPropagation();
+          }
+          if (instance.popper.contains(window.document.activeElement)) {
+            // Disabled while refocusing so the focus trigger does not reopen it
+            instance.disable();
+            instance.reference.focus();
+            instance.enable();
+          }
+          dismiss();
+        };
+        const onFocusOut = (event) => {
+          const target = event.relatedTarget;
+          if (target && !instance.reference.contains(target) &&
+              !instance.popper.contains(target)) {
+            dismiss();
+          }
+        };
+        // On the trigger too: a click trigger (code-annotations: select) has no
+        // blur handling. Attached for the instance's lifetime so leaving the
+        // trigger also cancels a show still pending on the trigger delay.
+        instance.reference.addEventListener('focusout', onFocusOut);
+        return {
+          onShow() {
+            window.document.addEventListener('keydown', onKeyDown, true);
+            instance.popper.addEventListener('focusout', onFocusOut);
+          },
+          onHide() {
+            window.document.removeEventListener('keydown', onKeyDown, true);
+            instance.popper.removeEventListener('focusout', onFocusOut);
+          },
+          onDestroy() {
+            instance.reference.removeEventListener('focusout', onFocusOut);
+          },
+        };
+      },
+    };
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+        plugins: [hideOnEscAndFocusOut],
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          // Each band is positioned against its own containing block, which is
+          // not the offsetParent of the lines, so place it from client rects.
+          const placeBand = (band, firstEl, lastEl, codeBlock) => {
+            const container = band.offsetParent;
+            if (container === null) {
+              return;
+            }
+            const containerRect = container.getBoundingClientRect();
+            // Reveal.js scales slides with a transform, so convert client
+            // pixels back to the CSS pixels of the container.
+            const scale = containerRect.height / container.offsetHeight || 1;
+            const firstRect = firstEl.getBoundingClientRect();
+            const lastRect = lastEl.getBoundingClientRect();
+            const top = (firstRect.top - containerRect.top) / scale - container.clientTop + container.scrollTop;
+            const height = (lastRect.bottom - firstRect.top) / scale;
+            band.style.top = top - 2 + "px";
+            band.style.height = height + 4 + "px";
+            if (codeBlock) {
+              // Without the copy button wrapper, the containing block is wider
+              // than the code block, so span the code block explicitly.
+              const blockRect = codeBlock.getBoundingClientRect();
+              band.style.left = (blockRect.left - containerRect.left) / scale - container.clientLeft + container.scrollLeft + "px";
+              band.style.width = blockRect.width / scale + "px";
+            }
+          };
+          if (lineIds.length > 0) {
+            const el = window.document.getElementById(lineIds[0]);
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const parent = el.parentElement.parentElement;
+            // cook up a div (if necessary) and position it
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            placeBand(div, el, lastEl, parent.closest("div.sourceCode") || parent);
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            placeBand(gutterDiv, el, lastEl);
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+  <script type="application/javascript">
+  window.quartoScrollableRegionsLabels = {"code":"Scrollable code","output":"Scrollable output"};
+  </script><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb43" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> "The Data"</span></span>
+<span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb43-4"><a href="#cb43-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-7"><a href="#cb43-7" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb43-8"><a href="#cb43-8" aria-hidden="true" tabindex="-1"></a><span class="co">#| include: false</span></span>
+<span id="cb43-9"><a href="#cb43-9" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">read_chunk</span>(<span class="st">"R/settings.R"</span>)</span>
+<span id="cb43-10"><a href="#cb43-10" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">read_chunk</span>(<span class="st">"R/prepare_data.R"</span>)</span>
+<span id="cb43-11"><a href="#cb43-11" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb43-12"><a href="#cb43-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-13"><a href="#cb43-13" aria-hidden="true" tabindex="-1"></a>This page builds the monthly dataset used by every chapter and explores it.</span>
+<span id="cb43-14"><a href="#cb43-14" aria-hidden="true" tabindex="-1"></a>The data are fetched from FRED and the Federal Reserve's FOMC calendar by</span>
+<span id="cb43-15"><a href="#cb43-15" aria-hidden="true" tabindex="-1"></a><span class="in">`R/acquire_data.R`</span>; nothing is committed to the repository. The chapters</span>
+<span id="cb43-16"><a href="#cb43-16" aria-hidden="true" tabindex="-1"></a>are <span class="co">[</span><span class="ot">The rule</span><span class="co">](rule.qmd)</span> (RQ1), <span class="co">[</span><span class="ot">The regimes</span><span class="co">](regimes.qmd)</span> (RQ2) and</span>
+<span id="cb43-17"><a href="#cb43-17" aria-hidden="true" tabindex="-1"></a><span class="co">[</span><span class="ot">The prediction</span><span class="co">](prediction.qmd)</span> (RQ3).</span>
+<span id="cb43-18"><a href="#cb43-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-19"><a href="#cb43-19" aria-hidden="true" tabindex="-1"></a><span class="fu"># Setup</span></span>
+<span id="cb43-20"><a href="#cb43-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-21"><a href="#cb43-21" aria-hidden="true" tabindex="-1"></a><span class="in">```{r libraries}</span></span>
+<span id="cb43-22"><a href="#cb43-22" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb43-23"><a href="#cb43-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-24"><a href="#cb43-24" aria-hidden="true" tabindex="-1"></a><span class="fu"># Settings</span></span>
+<span id="cb43-25"><a href="#cb43-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-26"><a href="#cb43-26" aria-hidden="true" tabindex="-1"></a>Analysis choices in one place. Everything else (sample end, break dates,</span>
+<span id="cb43-27"><a href="#cb43-27" aria-hidden="true" tabindex="-1"></a>number of clusters) is computed from the data.</span>
+<span id="cb43-28"><a href="#cb43-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-29"><a href="#cb43-29" aria-hidden="true" tabindex="-1"></a><span class="in">```{r settings}</span></span>
+<span id="cb43-30"><a href="#cb43-30" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb43-31"><a href="#cb43-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-32"><a href="#cb43-32" aria-hidden="true" tabindex="-1"></a><span class="fu"># Load Data</span></span>
+<span id="cb43-33"><a href="#cb43-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-34"><a href="#cb43-34" aria-hidden="true" tabindex="-1"></a><span class="in">```{r load}</span></span>
+<span id="cb43-35"><a href="#cb43-35" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb43-36"><a href="#cb43-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-37"><a href="#cb43-37" aria-hidden="true" tabindex="-1"></a><span class="fu"># Initial Data Checks</span></span>
+<span id="cb43-38"><a href="#cb43-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-41"><a href="#cb43-41" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb43-42"><a href="#cb43-42" aria-hidden="true" tabindex="-1"></a><span class="co"># missing values by column</span></span>
+<span id="cb43-43"><a href="#cb43-43" aria-hidden="true" tabindex="-1"></a><span class="fu">colSums</span>(<span class="fu">is.na</span>(df_raw))</span>
+<span id="cb43-44"><a href="#cb43-44" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-45"><a href="#cb43-45" aria-hidden="true" tabindex="-1"></a><span class="co"># duplicated rows</span></span>
+<span id="cb43-46"><a href="#cb43-46" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>(<span class="fu">duplicated</span>(df_raw))</span>
+<span id="cb43-47"><a href="#cb43-47" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-48"><a href="#cb43-48" aria-hidden="true" tabindex="-1"></a><span class="co"># blank strings in character columns</span></span>
+<span id="cb43-49"><a href="#cb43-49" aria-hidden="true" tabindex="-1"></a><span class="fu">sapply</span>(df_raw[, <span class="fu">sapply</span>(df_raw, is.character), <span class="at">drop =</span> <span class="cn">FALSE</span>], <span class="cf">function</span>(x) <span class="fu">sum</span>(<span class="fu">trimws</span>(x) <span class="sc">==</span> <span class="st">""</span>))</span>
+<span id="cb43-50"><a href="#cb43-50" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-51"><a href="#cb43-51" aria-hidden="true" tabindex="-1"></a><span class="co"># check whether date conversion may fail</span></span>
+<span id="cb43-52"><a href="#cb43-52" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="st">"date"</span> <span class="sc">%in%</span> <span class="fu">names</span>(df_raw)) {</span>
+<span id="cb43-53"><a href="#cb43-53" aria-hidden="true" tabindex="-1"></a>  <span class="fu">sum</span>(<span class="fu">is.na</span>(<span class="fu">as.Date</span>(df_raw<span class="sc">$</span>date)))</span>
+<span id="cb43-54"><a href="#cb43-54" aria-hidden="true" tabindex="-1"></a>  <span class="fu">range</span>(<span class="fu">as.Date</span>(df_raw<span class="sc">$</span>date), <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb43-55"><a href="#cb43-55" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb43-56"><a href="#cb43-56" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-57"><a href="#cb43-57" aria-hidden="true" tabindex="-1"></a><span class="co"># look for columns with only one unique value</span></span>
+<span id="cb43-58"><a href="#cb43-58" aria-hidden="true" tabindex="-1"></a><span class="fu">sapply</span>(df_raw, <span class="cf">function</span>(x) <span class="fu">length</span>(<span class="fu">unique</span>(x[<span class="sc">!</span><span class="fu">is.na</span>(x)])))</span>
+<span id="cb43-59"><a href="#cb43-59" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-60"><a href="#cb43-60" aria-hidden="true" tabindex="-1"></a><span class="co"># check for infinite values in numeric columns</span></span>
+<span id="cb43-61"><a href="#cb43-61" aria-hidden="true" tabindex="-1"></a><span class="fu">sapply</span>(df_raw[, <span class="fu">sapply</span>(df_raw, is.numeric), <span class="at">drop =</span> <span class="cn">FALSE</span>], <span class="cf">function</span>(x) <span class="fu">sum</span>(<span class="fu">is.infinite</span>(x)))</span>
+<span id="cb43-62"><a href="#cb43-62" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-63"><a href="#cb43-63" aria-hidden="true" tabindex="-1"></a><span class="co"># inspect suspicious numeric ranges</span></span>
+<span id="cb43-64"><a href="#cb43-64" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(df_raw[, <span class="fu">sapply</span>(df_raw, is.numeric), <span class="at">drop =</span> <span class="cn">FALSE</span>])</span>
+<span id="cb43-65"><a href="#cb43-65" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb43-66"><a href="#cb43-66" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-69"><a href="#cb43-69" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb43-70"><a href="#cb43-70" aria-hidden="true" tabindex="-1"></a>raw_dates  <span class="ot">&lt;-</span> <span class="fu">as.Date</span>(df_raw<span class="sc">$</span>date)</span>
+<span id="cb43-71"><a href="#cb43-71" aria-hidden="true" tabindex="-1"></a>na_share   <span class="ot">&lt;-</span> <span class="fu">sort</span>(<span class="fu">colMeans</span>(<span class="fu">is.na</span>(df_raw[, <span class="sc">-</span><span class="dv">1</span>])), <span class="at">decreasing =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb43-72"><a href="#cb43-72" aria-hidden="true" tabindex="-1"></a>most_missing <span class="ot">&lt;-</span> <span class="fu">names</span>(na_share[na_share <span class="sc">&gt;</span> <span class="fl">0.2</span>])</span>
+<span id="cb43-73"><a href="#cb43-73" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb43-74"><a href="#cb43-74" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-75"><a href="#cb43-75" aria-hidden="true" tabindex="-1"></a>The raw dataset has <span class="in">`r sum(duplicated(df_raw))`</span> duplicate rows and covers <span class="in">`r format(min(raw_dates))`</span> to <span class="in">`r format(max(raw_dates))`</span>. The main issue is missingness: series that start later (<span class="in">`r paste(most_missing, collapse = ", ")`</span>) are missing for more than 20% of months, and the most recent months are incomplete because of publication delays. These are handled in the cleaning steps below.</span>
+<span id="cb43-76"><a href="#cb43-76" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-77"><a href="#cb43-77" aria-hidden="true" tabindex="-1"></a><span class="fu"># Data Cleaning</span></span>
+<span id="cb43-78"><a href="#cb43-78" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-79"><a href="#cb43-79" aria-hidden="true" tabindex="-1"></a><span class="fu">## Fix Variable Types</span></span>
+<span id="cb43-80"><a href="#cb43-80" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-81"><a href="#cb43-81" aria-hidden="true" tabindex="-1"></a><span class="in">```{r fix-types}</span></span>
+<span id="cb43-82"><a href="#cb43-82" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb43-83"><a href="#cb43-83" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-84"><a href="#cb43-84" aria-hidden="true" tabindex="-1"></a>The date variable was converted to <span class="in">`Date`</span> format so the dataset could be filtered, joined, and ordered consistently in later preprocessing steps.</span>
+<span id="cb43-85"><a href="#cb43-85" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-86"><a href="#cb43-86" aria-hidden="true" tabindex="-1"></a><span class="fu">## Remove Invalid or Incomplete Observations</span></span>
+<span id="cb43-87"><a href="#cb43-87" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-88"><a href="#cb43-88" aria-hidden="true" tabindex="-1"></a><span class="in">```{r sample-end}</span></span>
+<span id="cb43-89"><a href="#cb43-89" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb43-90"><a href="#cb43-90" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-91"><a href="#cb43-91" aria-hidden="true" tabindex="-1"></a>The sample ends in <span class="in">`r format(SAMPLE_END, "%B %Y")`</span>, the last month in which every series has been published. Later months are dropped because some series are released with a delay of one to two months.</span>
+<span id="cb43-92"><a href="#cb43-92" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-93"><a href="#cb43-93" aria-hidden="true" tabindex="-1"></a><span class="fu">## Handle Missing Values</span></span>
+<span id="cb43-94"><a href="#cb43-94" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-95"><a href="#cb43-95" aria-hidden="true" tabindex="-1"></a><span class="in">```{r fill-gaps}</span></span>
+<span id="cb43-96"><a href="#cb43-96" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb43-97"><a href="#cb43-97" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-98"><a href="#cb43-98" aria-hidden="true" tabindex="-1"></a><span class="in">`r nrow(filled)`</span> value(s) were missing inside a series and filled with the previous month's value: <span class="in">`r paste(filled$series, format(filled$date, "%b %Y"), collapse = ", ")`</span>.</span>
+<span id="cb43-99"><a href="#cb43-99" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-100"><a href="#cb43-100" aria-hidden="true" tabindex="-1"></a>Oil prices come from <span class="in">`WTISPLC`</span>, the monthly WTI spot price, which has a longer history than the daily series.</span>
+<span id="cb43-101"><a href="#cb43-101" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-102"><a href="#cb43-102" aria-hidden="true" tabindex="-1"></a><span class="fu"># Feature Engineering</span></span>
+<span id="cb43-103"><a href="#cb43-103" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-104"><a href="#cb43-104" aria-hidden="true" tabindex="-1"></a><span class="fu">## Create Derived Variables</span></span>
+<span id="cb43-105"><a href="#cb43-105" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-106"><a href="#cb43-106" aria-hidden="true" tabindex="-1"></a><span class="in">```{r derived}</span></span>
+<span id="cb43-107"><a href="#cb43-107" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb43-108"><a href="#cb43-108" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-109"><a href="#cb43-109" aria-hidden="true" tabindex="-1"></a>Several derived variables were created to better capture macroeconomic conditions relevant to policy decisions, including core inflation growth, lagged unemployment, payroll growth, the term spread, and the inflation gap relative to the 2 percent target.</span>
+<span id="cb43-110"><a href="#cb43-110" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-111"><a href="#cb43-111" aria-hidden="true" tabindex="-1"></a><span class="fu">## Create Target-Related Variables</span></span>
+<span id="cb43-112"><a href="#cb43-112" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-113"><a href="#cb43-113" aria-hidden="true" tabindex="-1"></a><span class="in">```{r fomc-counts}</span></span>
+<span id="cb43-114"><a href="#cb43-114" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb43-115"><a href="#cb43-115" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-116"><a href="#cb43-116" aria-hidden="true" tabindex="-1"></a>Monthly FOMC meeting counts were merged into the main dataset so the analysis could distinguish between months with scheduled meetings, unscheduled meetings, and no meetings.</span>
+<span id="cb43-117"><a href="#cb43-117" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-118"><a href="#cb43-118" aria-hidden="true" tabindex="-1"></a><span class="in">```{r fomc-timing}</span></span>
+<span id="cb43-119"><a href="#cb43-119" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb43-120"><a href="#cb43-120" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-121"><a href="#cb43-121" aria-hidden="true" tabindex="-1"></a>The variable <span class="in">`days_since_last_fomc`</span> was added to measure how much time had passed since the most recent FOMC meeting, providing a simple timing feature related to policy activity.</span>
+<span id="cb43-122"><a href="#cb43-122" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-123"><a href="#cb43-123" aria-hidden="true" tabindex="-1"></a><span class="in">```{r final}</span></span>
+<span id="cb43-124"><a href="#cb43-124" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb43-125"><a href="#cb43-125" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-126"><a href="#cb43-126" aria-hidden="true" tabindex="-1"></a>After preprocessing and feature construction, the final working dataset was restricted to the post-1986 period to align with the availability of the selected variables and the scope of the modeling analysis.</span>
+<span id="cb43-127"><a href="#cb43-127" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-128"><a href="#cb43-128" aria-hidden="true" tabindex="-1"></a><span class="fu"># Final Modeling Dataset</span></span>
+<span id="cb43-129"><a href="#cb43-129" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-130"><a href="#cb43-130" aria-hidden="true" tabindex="-1"></a>The final modeling dataset is obtained after preprocessing, variable replacement, and feature engineering. The sample is restricted to the post-1986 period so that the analysis is based on a more consistent set of available variables. This dataset is used as the input for the remaining exploratory and modeling steps.</span>
+<span id="cb43-131"><a href="#cb43-131" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-134"><a href="#cb43-134" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb43-135"><a href="#cb43-135" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(df_final)</span>
+<span id="cb43-136"><a href="#cb43-136" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(df_final)</span>
+<span id="cb43-137"><a href="#cb43-137" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb43-138"><a href="#cb43-138" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-139"><a href="#cb43-139" aria-hidden="true" tabindex="-1"></a><span class="fu"># Exploratory Data Analysis</span></span>
+<span id="cb43-140"><a href="#cb43-140" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-141"><a href="#cb43-141" aria-hidden="true" tabindex="-1"></a><span class="fu">## Distribution Checks</span></span>
+<span id="cb43-142"><a href="#cb43-142" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-145"><a href="#cb43-145" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb43-146"><a href="#cb43-146" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(df_final, <span class="fu">aes</span>(<span class="at">x =</span> ff_target)) <span class="sc">+</span></span>
+<span id="cb43-147"><a href="#cb43-147" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(<span class="at">bins =</span> <span class="dv">30</span>) <span class="sc">+</span></span>
+<span id="cb43-148"><a href="#cb43-148" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb43-149"><a href="#cb43-149" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Distribution of Federal Funds Target Rate"</span>,</span>
+<span id="cb43-150"><a href="#cb43-150" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Federal Funds Target Rate"</span>,</span>
+<span id="cb43-151"><a href="#cb43-151" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Frequency"</span></span>
+<span id="cb43-152"><a href="#cb43-152" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb43-153"><a href="#cb43-153" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb43-154"><a href="#cb43-154" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-157"><a href="#cb43-157" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb43-158"><a href="#cb43-158" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(df_final, <span class="fu">aes</span>(<span class="at">x =</span> date, <span class="at">y =</span> ff_target)) <span class="sc">+</span></span>
+<span id="cb43-159"><a href="#cb43-159" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>() <span class="sc">+</span></span>
+<span id="cb43-160"><a href="#cb43-160" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb43-161"><a href="#cb43-161" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Federal Funds Target Rate Over Time"</span>,</span>
+<span id="cb43-162"><a href="#cb43-162" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Date"</span>,</span>
+<span id="cb43-163"><a href="#cb43-163" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Federal Funds Target Rate"</span></span>
+<span id="cb43-164"><a href="#cb43-164" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb43-165"><a href="#cb43-165" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb43-166"><a href="#cb43-166" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-169"><a href="#cb43-169" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb43-170"><a href="#cb43-170" aria-hidden="true" tabindex="-1"></a>missing_summary <span class="ot">&lt;-</span> <span class="fu">colSums</span>(<span class="fu">is.na</span>(df_final))</span>
+<span id="cb43-171"><a href="#cb43-171" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-172"><a href="#cb43-172" aria-hidden="true" tabindex="-1"></a>missing_df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb43-173"><a href="#cb43-173" aria-hidden="true" tabindex="-1"></a>  <span class="at">Variable =</span> <span class="fu">names</span>(missing_summary),</span>
+<span id="cb43-174"><a href="#cb43-174" aria-hidden="true" tabindex="-1"></a>  <span class="at">Missing_Count =</span> <span class="fu">as.numeric</span>(missing_summary)</span>
+<span id="cb43-175"><a href="#cb43-175" aria-hidden="true" tabindex="-1"></a>) <span class="sc">%&gt;%</span></span>
+<span id="cb43-176"><a href="#cb43-176" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(Missing_Count))</span>
+<span id="cb43-177"><a href="#cb43-177" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-178"><a href="#cb43-178" aria-hidden="true" tabindex="-1"></a>missing_df <span class="sc">%&gt;%</span></span>
+<span id="cb43-179"><a href="#cb43-179" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(Missing_Count <span class="sc">&gt;</span> <span class="dv">0</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb43-180"><a href="#cb43-180" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">reorder</span>(Variable, Missing_Count), <span class="at">y =</span> Missing_Count)) <span class="sc">+</span></span>
+<span id="cb43-181"><a href="#cb43-181" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>() <span class="sc">+</span></span>
+<span id="cb43-182"><a href="#cb43-182" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span></span>
+<span id="cb43-183"><a href="#cb43-183" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb43-184"><a href="#cb43-184" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Missing Values by Variable"</span>,</span>
+<span id="cb43-185"><a href="#cb43-185" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Variable"</span>,</span>
+<span id="cb43-186"><a href="#cb43-186" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Number of Missing Values"</span></span>
+<span id="cb43-187"><a href="#cb43-187" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb43-188"><a href="#cb43-188" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb43-189"><a href="#cb43-189" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-190"><a href="#cb43-190" aria-hidden="true" tabindex="-1"></a>The distribution of the federal funds target rate and its movement over time were examined to understand the scale and temporal behavior of the response variable. Missing-value patterns were also reviewed to identify whether any variables still contained gaps after preprocessing.</span>
+<span id="cb43-191"><a href="#cb43-191" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-192"><a href="#cb43-192" aria-hidden="true" tabindex="-1"></a><span class="fu">## Relationship Exploration</span></span>
+<span id="cb43-193"><a href="#cb43-193" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-196"><a href="#cb43-196" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb43-197"><a href="#cb43-197" aria-hidden="true" tabindex="-1"></a>candidate_vars <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"UNRATE"</span>, <span class="st">"PCEPI"</span>, <span class="st">"DGS10"</span>, <span class="st">"T10Y3M"</span>)</span>
+<span id="cb43-198"><a href="#cb43-198" aria-hidden="true" tabindex="-1"></a>selected_vars <span class="ot">&lt;-</span> candidate_vars[candidate_vars <span class="sc">%in%</span> <span class="fu">names</span>(df_final)]</span>
+<span id="cb43-199"><a href="#cb43-199" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-200"><a href="#cb43-200" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="fu">length</span>(selected_vars) <span class="sc">&gt;</span> <span class="dv">0</span>) {</span>
+<span id="cb43-201"><a href="#cb43-201" aria-hidden="true" tabindex="-1"></a>  df_long <span class="ot">&lt;-</span> df_final <span class="sc">%&gt;%</span></span>
+<span id="cb43-202"><a href="#cb43-202" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(date, <span class="fu">all_of</span>(selected_vars)) <span class="sc">%&gt;%</span></span>
+<span id="cb43-203"><a href="#cb43-203" aria-hidden="true" tabindex="-1"></a>    <span class="fu">pivot_longer</span>(<span class="sc">-</span>date, <span class="at">names_to =</span> <span class="st">"Variable"</span>, <span class="at">values_to =</span> <span class="st">"Value"</span>)</span>
+<span id="cb43-204"><a href="#cb43-204" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-205"><a href="#cb43-205" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(df_long, <span class="fu">aes</span>(<span class="at">x =</span> date, <span class="at">y =</span> Value)) <span class="sc">+</span></span>
+<span id="cb43-206"><a href="#cb43-206" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_line</span>() <span class="sc">+</span></span>
+<span id="cb43-207"><a href="#cb43-207" aria-hidden="true" tabindex="-1"></a>    <span class="fu">facet_wrap</span>(<span class="sc">~</span> Variable, <span class="at">scales =</span> <span class="st">"free_y"</span>, <span class="at">ncol =</span> <span class="dv">2</span>) <span class="sc">+</span></span>
+<span id="cb43-208"><a href="#cb43-208" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(</span>
+<span id="cb43-209"><a href="#cb43-209" aria-hidden="true" tabindex="-1"></a>      <span class="at">title =</span> <span class="st">"Selected Predictors Over Time"</span>,</span>
+<span id="cb43-210"><a href="#cb43-210" aria-hidden="true" tabindex="-1"></a>      <span class="at">x =</span> <span class="st">"Date"</span>,</span>
+<span id="cb43-211"><a href="#cb43-211" aria-hidden="true" tabindex="-1"></a>      <span class="at">y =</span> <span class="st">"Value"</span></span>
+<span id="cb43-212"><a href="#cb43-212" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb43-213"><a href="#cb43-213" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb43-214"><a href="#cb43-214" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb43-215"><a href="#cb43-215" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-218"><a href="#cb43-218" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb43-219"><a href="#cb43-219" aria-hidden="true" tabindex="-1"></a>numeric_df <span class="ot">&lt;-</span> df_final <span class="sc">%&gt;%</span> <span class="fu">select</span>(<span class="fu">where</span>(is.numeric))</span>
+<span id="cb43-220"><a href="#cb43-220" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-221"><a href="#cb43-221" aria-hidden="true" tabindex="-1"></a>cor_mat <span class="ot">&lt;-</span> <span class="fu">cor</span>(numeric_df, <span class="at">use =</span> <span class="st">"complete.obs"</span>)</span>
+<span id="cb43-222"><a href="#cb43-222" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-223"><a href="#cb43-223" aria-hidden="true" tabindex="-1"></a>cor_long <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(<span class="fu">as.table</span>(cor_mat))</span>
+<span id="cb43-224"><a href="#cb43-224" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-225"><a href="#cb43-225" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(cor_long, <span class="fu">aes</span>(<span class="at">x =</span> Var1, <span class="at">y =</span> Var2, <span class="at">fill =</span> Freq)) <span class="sc">+</span></span>
+<span id="cb43-226"><a href="#cb43-226" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_tile</span>() <span class="sc">+</span></span>
+<span id="cb43-227"><a href="#cb43-227" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_gradient2</span>(<span class="at">low =</span> <span class="st">"blue"</span>, <span class="at">mid =</span> <span class="st">"white"</span>, <span class="at">high =</span> <span class="st">"red"</span>, <span class="at">midpoint =</span> <span class="dv">0</span>) <span class="sc">+</span></span>
+<span id="cb43-228"><a href="#cb43-228" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">90</span>, <span class="at">hjust =</span> <span class="dv">1</span>)) <span class="sc">+</span></span>
+<span id="cb43-229"><a href="#cb43-229" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb43-230"><a href="#cb43-230" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Correlation Heatmap of Numeric Variables"</span>,</span>
+<span id="cb43-231"><a href="#cb43-231" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">""</span>,</span>
+<span id="cb43-232"><a href="#cb43-232" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">""</span>,</span>
+<span id="cb43-233"><a href="#cb43-233" aria-hidden="true" tabindex="-1"></a>    <span class="at">fill =</span> <span class="st">"Correlation"</span></span>
+<span id="cb43-234"><a href="#cb43-234" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb43-235"><a href="#cb43-235" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb43-236"><a href="#cb43-236" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-237"><a href="#cb43-237" aria-hidden="true" tabindex="-1"></a>Selected macroeconomic predictors were examined over time to compare their movement with changes in the policy target. Correlation analysis was also used to identify strong linear relationships among numeric variables, which is useful for understanding redundancy and potential multicollinearity in later modeling steps.</span>
+<span id="cb43-238"><a href="#cb43-238" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-239"><a href="#cb43-239" aria-hidden="true" tabindex="-1"></a><span class="fu">## Key EDA Findings</span></span>
+<span id="cb43-240"><a href="#cb43-240" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-241"><a href="#cb43-241" aria-hidden="true" tabindex="-1"></a>Overall, the exploratory analysis showed that the dataset is time-ordered and contains variables that vary meaningfully across different monetary policy environments. The federal funds target displays clear changes over time rather than a uniform distribution, and several predictors appear to move in related patterns. The correlation analysis also suggests that some variables are highly related, which supports paying attention to multicollinearity and model flexibility in the later modeling stage.</span>
+</code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
+</div></div></div></div></div>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+      &nbsp;
+    </div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    <div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/inukbaik/fomc-policy-modeling/blob/main/data.qmd" class="toc-action"><i class="bi bi-github"></i>View source</a></li></ul></div></div>
+    <div class="nav-footer-right">
+<p>Built with R and Quarto. Data: FRED and the Federal Reserve.</p>
+</div>
+  </div>
+</footer>
+
+
+
+
+</body></html>
