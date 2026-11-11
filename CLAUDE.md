@@ -9,8 +9,9 @@ and financial indicators. It started as a graduate course group project
 (Inuk Baik, Asal Delkhosh, Zihong Xiong, submitted 2026-04-22) and is being
 turned into a portfolio project by Inuk Baik.
 
-Don't name the course, course number, or group number in any tracked file,
-commit message, or tag. Refer to it as "the course project".
+Never put the course number or group number in any tracked file, commit
+message, or tag. The course name ("Statistical Computing") may be used
+(user decision 2026-11-11). Otherwise refer to it as "the course project".
 
 The original submission (one notebook, `fomc_policy_analysis.Rmd`, now split into
 Quarto pages) has three research questions:
@@ -95,8 +96,9 @@ the old root-level CSVs belong to tag `v1.0-course-submission`.
   `df$date[c(198, 274, 387)]`). Compute them, so the report survives a data refresh.
 - Keep the original submission reproducible. It is tagged `v1.0-course-submission`
   (commit `2b1f27f`). Improvements go on top of it, not in place of its history.
-- Credit teammates for their sections in any published output, as
-  "course-project teammates". Don't add their names to new text; leave
+- Credit teammates for their sections in any published output. In new
+  text, name them only as "Asal D." and "Zihong X." (first name and last
+  initial, user decision 2026-11-11), never their full names; leave
   existing author lines as they are.
 
 ## Analysis decisions
@@ -120,9 +122,9 @@ each one to readers; keep the two in sync.
   target: it mislabelled about 20% of meetings.
 - **RQ1 and RQ2 stay as the original course-project chapters** (decided
   2026-11-09). Their methods are not revised; each page opens with a
-  "known limitations" note instead. Credit them to course-project
-  teammates; don't add teammates' names to new text, but leave existing
-  author lines (the Data page) as they are. Breaks (RQ1) = 3 and k (RQ2) = 3 remain
+  "known limitations" note instead. Credit them to the course-project
+  teammates (as "Asal D." and "Zihong X." in new text, never full names);
+  leave existing author lines (the Data page) as they are. Breaks (RQ1) = 3 and k (RQ2) = 3 remain
   fixed settings (BIC hits its cap; silhouette is flat).
 - **Missing values inside a series**: carry the last value forward, one month
   at most (no look-ahead).
