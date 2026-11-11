@@ -36,7 +36,6 @@ website:
         href: https://github.com/inukbaik/fomc-policy-modeling
         aria-label: GitHub repository
   page-footer:
-    left: "Course project by Inuk Baik and course-project teammates; portfolio revision by Inuk Baik."
     right: "Built with R and Quarto. Data: FRED and the Federal Reserve."
 
 format:
